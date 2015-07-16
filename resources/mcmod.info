@@ -1,0 +1,16 @@
+[
+{
+  "modid": "${modid}",
+  "name": "It's the little things",
+  "description": "A mod that does those \"little things\".",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Zlepper"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

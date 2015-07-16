@@ -31,6 +31,8 @@ public class Itlt
         config.load();
         Property javaBitDetectionProp = config.get("BitDetection", "ShouldYellAt32BitUsers", false);
         javaBitDetectionProp.comment = "Set to true to make itlt yell at people attempting to use 32x java for the modpack.";
+        String yelling = javaBitDetectionProp.getBoolean() ? "We are yelling at people" : "We are NOT yelling at people";
+        logger.info(yelling);
 
         Property javaBitIssueMessageProp = config.get("BitDetection", "ErrorMessage", "You are using a 32 bit version of java. This is not recommended with this modpack.");
         javaBitIssueMessageProp.comment = "If ShouldYellAt32BitUsers is set to true, this is the message that will be displayed to the user.";

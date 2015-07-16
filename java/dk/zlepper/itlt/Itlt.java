@@ -52,7 +52,7 @@ public class Itlt
             }
         }
 
-        FMLCommonHandler.instance().bus().register(new ChatGuiEventHandler());
+        MinecraftForge.EVENT_BUS.register(new ChatGuiEventHandler());
 
 
         config.save();

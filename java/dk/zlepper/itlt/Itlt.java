@@ -1,13 +1,20 @@
 package dk.zlepper.itlt;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import dk.zlepper.itlt.about.mod;
+import dk.zlepper.itlt.eventhandlers.ChatGuiEventHandler;
 import dk.zlepper.itlt.proxies.ClientProxy;
 import dk.zlepper.itlt.proxies.CommonProxy;
 import dk.zlepper.itlt.threads.ShouterThread;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +52,13 @@ public class Itlt
             }
         }
 
+        FMLCommonHandler.instance().bus().register(new ChatGuiEventHandler());
+
+
         config.save();
     }
+
+
+
 }
+

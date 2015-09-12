@@ -1,25 +1,31 @@
 package dk.zlepper.itlt;
 
+import com.google.gson.Gson;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import dk.zlepper.itlt.about.mod;
 import dk.zlepper.itlt.helpers.IconLoader;
 import dk.zlepper.itlt.proxies.ClientProxy;
 import dk.zlepper.itlt.proxies.CommonProxy;
 import dk.zlepper.itlt.threads.ShouterThread;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.ServerList;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.Display;
 
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 @Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME)
 public class Itlt {
@@ -83,20 +89,9 @@ public class Itlt {
             }
 
             Property useTechnicIconProp = config.get("Display", "useTechnicIcon", true);
-            useTechnicIconProp.comment = "Set to true to attempt to use the icon assigned to the modpack by the technic launcher.";
+            useTechnicIconProp.comment = "Set to true to attempt to use the icon assigned to the modpack by the technic launcher. \nThis will take priority over loadCustomIcon";
             if(useTechnicIconProp.getBoolean()) {
-                Path currentRelativePath = Paths.get("").toAbsolutePath();
-                logger.info(currentRelativePath.toString());
-                String slugname = currentRelativePath.getFileName().toString();
-                logger.info(slugname);
-
-                // Should be the .technic directory
-                Path technic = currentRelativePath.getParent().getParent();
-                logger.info(technic.toAbsolutePath().toString());
-
-                // Should be the asset directory for that modpack
-                Path assets = Paths.get(technic.toAbsolutePath().toString() , "assets", "packs", slugname);
-                logger.info(assets.toAbsolutePath().toString());
+                Path assets = getAssetDir();
 
                 File icon = Paths.get(assets.toAbsolutePath().toString(), "icon.png").toFile();
                 logger.info(icon.exists() ? "Technic icon found" : "Technic icon NOT found. ");
@@ -105,8 +100,74 @@ public class Itlt {
                 }
             }
 
+            Property useTechnicDisplayNameProp = config.get("Display", "useTechnicDisplayName", true);
+            useTechnicDisplayNameProp.comment = "Set to true to attempt to get the display name of the pack of the info json file \nThis will take priority over windowDisplayTitle";
+            if(useTechnicDisplayNameProp.getBoolean()) {
+                Path assets = getAssetDir();
+
+                File cacheFile = Paths.get(assets.toAbsolutePath().toString(), "cache.json").toFile();
+                logger.info(cacheFile.exists() ? "Cache file found" : "Cache file not found.");
+                if(cacheFile.exists() && !cacheFile.isDirectory()) {
+                    String json = null;
+                    try {
+                        json = StringUtils.join(Files.readAllLines(cacheFile.toPath(), StandardCharsets.UTF_8), "");
+                        logger.info(json);
+                    } catch (IOException e) {
+                        logger.error(e.toString());
+                    }
+                    if(json != null) {
+                        Map cacheContents = new Gson().fromJson(json, Map.class);
+                        logger.info(cacheContents.size());
+                        if(cacheContents.containsKey("displayName")) {
+                            logger.info(cacheContents.get("displayName").toString());
+                            windowDisplayTitle = cacheContents.get("displayName").toString();
+                        }
+                    }
+                }
+            }
+
+            Property addCustomServerProp = config.get("Server", "AddDedicatedServer", false);
+            addCustomServerProp.comment = "Set to true to have a dedicated server added to the server list ingame. The server will not overwrite others servers.";
+
+            Property customServerNameProp = config.get("Server", "ServerName", "Localhost");
+            customServerNameProp.comment = "The name of the dedicated server to add.";
+
+            Property customServerIpProp = config.get("Server", "ServerIP", "127.0.0.1:25555");
+            customServerIpProp.comment = "The ip of the dedicated server to add.";
+
+            if(addCustomServerProp.getBoolean()) {
+                ServerList serverList = new ServerList(Minecraft.getMinecraft());
+                int c = serverList.countServers();
+                boolean foundServer = false;
+                for (int i = 0; i < c; i++) {
+                    ServerData data = serverList.getServerData(i);
+
+                    if (data.serverIP.equals(customServerIpProp.getString())) {
+                        foundServer = true;
+                        break;
+                    }
+                }
+                if (!foundServer) {
+                    ServerData data = new ServerData(customServerNameProp.getString(), customServerIpProp.getString());
+                    serverList.addServerData(data);
+                    serverList.saveServerList();
+                }
+            }
+
             config.save();
         }
+    }
+
+    private Path getAssetDir() {
+        // Get the current Working directory
+        Path currentRelativePath = Paths.get("").toAbsolutePath();
+        String slugname = currentRelativePath.getFileName().toString();
+
+        // Should be the .technic directory
+        Path technic = currentRelativePath.getParent().getParent();
+
+        // Should be the asset directory for that modpack
+        return Paths.get(technic.toAbsolutePath().toString() , "assets", "packs", slugname);
     }
 
     @Mod.EventHandler

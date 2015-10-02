@@ -14,7 +14,8 @@ import java.lang.reflect.Field;
  */
 public class ClientProxy extends CommonProxy {
     public ClientProxy() {
-        KeyBindings.init();
+        // Feature to come
+        //KeyBindings.init();
     }
 
     public static boolean changed = false;

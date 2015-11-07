@@ -1,9 +1,9 @@
 package dk.zlepper.itlt.eventhandlers;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.InputEvent;
 import dk.zlepper.itlt.Itlt;
 import dk.zlepper.itlt.KeyBindings;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 
 /**
  * Created by Rasmus on 7/17/2015.

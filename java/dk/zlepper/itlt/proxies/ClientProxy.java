@@ -30,7 +30,9 @@ public class ClientProxy extends CommonProxy {
             try {
                 Display.setLocation(-7, 0);
                 Display.setDisplayMode(Display.getDesktopDisplayMode());
-            } catch (LWJGLException | IllegalStateException e) {
+            } catch (LWJGLException e) {
+                //e.printStackTrace();
+            } catch (IllegalStateException e) {
                 //e.printStackTrace();
             }
             changed = true;

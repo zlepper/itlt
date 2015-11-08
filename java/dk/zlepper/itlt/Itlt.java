@@ -1,10 +1,10 @@
 package dk.zlepper.itlt;
 
 import com.google.gson.Gson;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import dk.zlepper.itlt.about.mod;
 import dk.zlepper.itlt.helpers.IconLoader;
 import dk.zlepper.itlt.proxies.ClientProxy;
@@ -15,6 +15,8 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -65,7 +67,7 @@ public class Itlt {
             shouldMaximizeDisplayProp.comment = "Set to true to make minecraft attempt to maximize itself on startup (This is kinda unstable right now, so don't trust it too much)";
             makeScreenBigger = shouldMaximizeDisplayProp.getBoolean();
 
-            Property windowDisplayTitleProp = config.get("Display", "windowDisplayTitle", "Minecraft 1.7.10");
+            Property windowDisplayTitleProp = config.get("Display", "windowDisplayTitle", "Minecraft " + Minecraft.getMinecraft().getVersion());
             windowDisplayTitleProp.comment = "Change this value to change the name of the MineCraft window";
             windowDisplayTitle = windowDisplayTitleProp.getString();
 

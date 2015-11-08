@@ -1,12 +1,11 @@
 package dk.zlepper.itlt.eventhandlers;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.lang.reflect.Field;
 
@@ -41,7 +40,9 @@ public class ChatGuiEventHandler {
                 inputField = newInputField;
 
                 FMLCommonHandler.instance().bus().register(handler);
-            } catch(NoSuchFieldException | IllegalAccessException e) {
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }

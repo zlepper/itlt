@@ -150,7 +150,10 @@ public class Itlt {
                     }
                 }
                 if (!foundServer) {
-                    ServerData data = new ServerData(customServerNameProp.getString(), customServerIpProp.getString());
+                    // I have no clue what the last boolean is for.
+                    // Possibly decides if it's a lan server, or an actual multiplayer server.
+                    // Settings it to false should make it a multiplayer server
+                    ServerData data = new ServerData(customServerNameProp.getString(), customServerIpProp.getString(), false);
                     serverList.addServerData(data);
                     serverList.saveServerList();
                 }

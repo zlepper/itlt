@@ -49,12 +49,12 @@ public class Itlt {
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
             config.load();
             Property javaBitDetectionProp = config.get("BitDetection", "ShouldYellAt32BitUsers", false);
-            javaBitDetectionProp.comment = "Set to true to make itlt yell at people attempting to use 32x java for the modpack.";
+            javaBitDetectionProp.setComment("Set to true to make itlt yell at people attempting to use 32x java for the modpack.");
             String yelling = javaBitDetectionProp.getBoolean() ? "We are yelling at people" : "We are NOT yelling at people";
             logger.info(yelling);
 
             Property javaBitIssueMessageProp = config.get("BitDetection", "ErrorMessage", "You are using a 32 bit version of java. This is not recommended with this modpack.");
-            javaBitIssueMessageProp.comment = "If ShouldYellAt32BitUsers is set to true, this is the message that will be displayed to the user.";
+            javaBitIssueMessageProp.setComment("If ShouldYellAt32BitUsers is set to true, this is the message that will be displayed to the user.");
 
             if (javaBitDetectionProp.getBoolean(false)) {
                 if (!Minecraft.getMinecraft().isJava64bit()) {
@@ -64,15 +64,15 @@ public class Itlt {
             }
 
             Property shouldMaximizeDisplayProp = config.get("Display", "ShouldMaximizeDisplay", false);
-            shouldMaximizeDisplayProp.comment = "Set to true to make minecraft attempt to maximize itself on startup (This is kinda unstable right now, so don't trust it too much)";
+            shouldMaximizeDisplayProp.setComment("Set to true to make minecraft attempt to maximize itself on startup (This is kinda unstable right now, so don't trust it too much)");
             makeScreenBigger = shouldMaximizeDisplayProp.getBoolean();
 
             Property windowDisplayTitleProp = config.get("Display", "windowDisplayTitle", "Minecraft " + Minecraft.getMinecraft().getVersion());
-            windowDisplayTitleProp.comment = "Change this value to change the name of the MineCraft window";
+            windowDisplayTitleProp.setComment("Change this value to change the name of the MineCraft window");
             windowDisplayTitle = windowDisplayTitleProp.getString();
 
             Property customIconProp = config.get("Display", "loadCustomIcon", true);
-            customIconProp.comment = "Set to true to load a custom icon from config" + File.pathSeparator + "itlt" + File.pathSeparator + "icon.png";
+            customIconProp.setComment("Set to true to load a custom icon from config" + File.pathSeparator + "itlt" + File.pathSeparator + "icon.png");
             if (customIconProp.getBoolean()) {
                 File di = Paths.get(event.getModConfigurationDirectory().getAbsolutePath(), "itlt").toFile();
                 logger.info(di);
@@ -91,7 +91,7 @@ public class Itlt {
             }
 
             Property useTechnicIconProp = config.get("Display", "useTechnicIcon", true);
-            useTechnicIconProp.comment = "Set to true to attempt to use the icon assigned to the modpack by the technic launcher. \nThis will take priority over loadCustomIcon";
+            useTechnicIconProp.setComment("Set to true to attempt to use the icon assigned to the modpack by the technic launcher. \nThis will take priority over loadCustomIcon");
             if(useTechnicIconProp.getBoolean()) {
                 Path assets = getAssetDir();
 
@@ -103,7 +103,7 @@ public class Itlt {
             }
 
             Property useTechnicDisplayNameProp = config.get("Display", "useTechnicDisplayName", true);
-            useTechnicDisplayNameProp.comment = "Set to true to attempt to get the display name of the pack of the info json file \nThis will take priority over windowDisplayTitle";
+            useTechnicDisplayNameProp.setComment("Set to true to attempt to get the display name of the pack of the info json file \nThis will take priority over windowDisplayTitle");
             if(useTechnicDisplayNameProp.getBoolean()) {
                 Path assets = getAssetDir();
 
@@ -129,13 +129,13 @@ public class Itlt {
             }
 
             Property addCustomServerProp = config.get("Server", "AddDedicatedServer", false);
-            addCustomServerProp.comment = "Set to true to have a dedicated server added to the server list ingame. The server will not overwrite others servers.";
+            addCustomServerProp.setComment("Set to true to have a dedicated server added to the server list ingame. The server will not overwrite others servers.");
 
             Property customServerNameProp = config.get("Server", "ServerName", "Localhost");
-            customServerNameProp.comment = "The name of the dedicated server to add.";
+            customServerNameProp.setComment("The name of the dedicated server to add.");
 
             Property customServerIpProp = config.get("Server", "ServerIP", "127.0.0.1:25555");
-            customServerIpProp.comment = "The ip of the dedicated server to add.";
+            customServerIpProp.setComment("The ip of the dedicated server to add.");
 
             if(addCustomServerProp.getBoolean()) {
                 ServerList serverList = new ServerList(Minecraft.getMinecraft());

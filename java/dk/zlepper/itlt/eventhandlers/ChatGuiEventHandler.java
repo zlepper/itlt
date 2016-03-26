@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -22,8 +23,8 @@ public class ChatGuiEventHandler {
 
     @SubscribeEvent
     public void onGuiInitEvent(GuiScreenEvent.InitGuiEvent.Post event){
-        if(event.gui instanceof GuiChat) {
-            GuiChat chat = (GuiChat) event.gui;
+        if(event.getGui() instanceof GuiChat) {
+            GuiChat chat = (GuiChat) event.getGui();
 
             try {
                 Class<?> chatClass = chat.getClass();
@@ -39,7 +40,7 @@ public class ChatGuiEventHandler {
 
                 inputField = newInputField;
 
-                FMLCommonHandler.instance().bus().register(handler);
+                MinecraftForge.EVENT_BUS.register(handler);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -50,9 +51,9 @@ public class ChatGuiEventHandler {
 
     @SubscribeEvent
     public void OnGuiOpenEvent(GuiOpenEvent e) {
-        if(e.gui == null && handler != null) {
+        if(e.getGui() == null && handler != null) {
             try {
-                FMLCommonHandler.instance().bus().unregister(handler);
+                MinecraftForge.EVENT_BUS.unregister(handler);
             } catch(NullPointerException ex) {
                 // Ignored
             }

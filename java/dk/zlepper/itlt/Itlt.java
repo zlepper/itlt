@@ -70,7 +70,7 @@ public class Itlt {
             windowDisplayTitle = windowDisplayTitleProp.getString();
 
             Property customIconProp = config.get("Display", "loadCustomIcon", true);
-            customIconProp.setComment("Set to true to load a custom icon from config" + File.pathSeparator + "itlt" + File.pathSeparator + "icon.png");
+            customIconProp.setComment("Set to true to load a custom icon from config" + File.separator + "itlt" + File.separator + "icon.png");
             if (customIconProp.getBoolean()) {
                 File di = Paths.get(event.getModConfigurationDirectory().getAbsolutePath(), "itlt").toFile();
                 logger.info(di);
@@ -183,23 +183,3 @@ public class Itlt {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

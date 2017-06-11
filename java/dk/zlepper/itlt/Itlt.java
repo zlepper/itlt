@@ -15,6 +15,8 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -40,6 +42,7 @@ public class Itlt {
     private String windowDisplayTitle;
 
     @Mod.EventHandler
+    @SideOnly(Side.CLIENT)
     public void preinit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
 
@@ -174,6 +177,7 @@ public class Itlt {
     }
 
     @Mod.EventHandler
+    @SideOnly(Side.CLIENT)
     public void contruction(FMLLoadCompleteEvent event) {
         if (proxy instanceof ClientProxy) {
             ClientProxy cp = (ClientProxy) proxy;

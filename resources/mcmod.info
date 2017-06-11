@@ -1,6 +1,6 @@
 [
 {
-  "modid": "${modid}",
+  "modid": "itlt",
   "name": "It's the little things",
   "description": "A mod that does those \"little things\".",
   "version": "${version}",

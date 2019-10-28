@@ -163,11 +163,18 @@ public class Itlt {
         Path currentRelativePath = Paths.get("").toAbsolutePath();
         String slugname = currentRelativePath.getFileName().toString();
 
+        Path directParent = currentRelativePath.getParent();
+        if (directParent == null) {
+            return currentRelativePath;
+        }
         // Should be the .technic directory
-        Path technic = currentRelativePath.getParent().getParent();
+        Path technic = directParent.getParent();
+        if (technic == null) {
+            return currentRelativePath;
+        }
 
         // Should be the asset directory for that modpack
-        return Paths.get(technic.toAbsolutePath().toString() , "assets", "packs", slugname);
+        return Paths.get(technic.toAbsolutePath().toString(), "assets", "packs", slugname);
     }
 
     @Mod.EventHandler

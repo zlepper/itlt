@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "itlt",
+    "name": "It's the little things",
+    "description": "A mod that does those \"little things\".",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Zlepper"
+    ],
+    "credits": "sunshinehunter - Porting to 1.8",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

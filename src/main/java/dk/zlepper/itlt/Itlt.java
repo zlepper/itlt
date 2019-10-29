@@ -1,166 +1,156 @@
 package dk.zlepper.itlt;
 
 import com.google.gson.Gson;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
 import dk.zlepper.itlt.about.mod;
 import dk.zlepper.itlt.helpers.IconLoader;
 import dk.zlepper.itlt.proxies.ClientProxy;
 import dk.zlepper.itlt.proxies.CommonProxy;
+import dk.zlepper.itlt.proxies.ServerProxy;
 import dk.zlepper.itlt.threads.ShouterThread;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.Display;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWImage;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptableRemoteVersions = "*")
+@Mod("itlt")
 public class Itlt {
-    @Mod.Instance("itlt")
-    public static Itlt instance;
 
-    @SidedProxy(clientSide = "dk.zlepper.itlt.proxies.ClientProxy", serverSide = "dk.zlepper.itlt.proxies.ServerProxy")
-    public static CommonProxy proxy;
+    private static final Logger LOGGER = LogManager.getLogger();
+    public static CommonProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
 
-    public static Logger logger;
-    private boolean makeScreenBigger;
     private String windowDisplayTitle;
 
-    @Mod.EventHandler
-    @SideOnly(Side.CLIENT)
-    public void preinit(FMLPreInitializationEvent event) {
-        logger = event.getModLog();
+    public Itlt() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientInit);
 
-        if (proxy instanceof ClientProxy) {
-            Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-            config.load();
-            Property javaBitDetectionProp = config.get("BitDetection", "ShouldYellAt32BitUsers", false);
-            javaBitDetectionProp.setComment("Set to true to make itlt yell at people attempting to use 32x java for the modpack.");
-            String yelling = javaBitDetectionProp.getBoolean() ? "We are yelling at people" : "We are NOT yelling at people";
-            logger.info(yelling);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
+        Config.loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("itlt-client.toml"));
 
-            Property javaBitIssueMessageProp = config.get("BitDetection", "ErrorMessage", "You are using a 32 bit version of java. This is not recommended with this modpack.");
-            javaBitIssueMessageProp.setComment("If ShouldYellAt32BitUsers is set to true, this is the message that will be displayed to the user.");
+    }
 
-            if (javaBitDetectionProp.getBoolean(false)) {
-                if (!Minecraft.getMinecraft().isJava64bit()) {
-                    ShouterThread st = new ShouterThread(javaBitIssueMessageProp.getString());
-                    st.start();
-                }
+    private void clientInit(final FMLClientSetupEvent event) {
+        if (proxy instanceof ServerProxy) {
+            LOGGER.info("itlt loaded on server, as itlt is a clientside mod, we aren't doing anything.");
+            return;
+        }
+
+        boolean shouldYell = Config.BIT_DETECTION_SHOULD_YELL_AT_32_BIT_USERS.get();
+        String yelling = shouldYell ? "We are yelling at people" : "We are NOT yelling at people";
+        LOGGER.info(yelling);
+
+        if (shouldYell) {
+            if (!Minecraft.getInstance().isJava64bit()) {
+                ShouterThread st = new ShouterThread(Config.BIT_DETECTION_MESSAGE.get());
+                st.start();
             }
+        }
 
-            Property shouldMaximizeDisplayProp = config.get("Display", "ShouldMaximizeDisplay", false);
-            shouldMaximizeDisplayProp.setComment("Set to true to make minecraft attempt to maximize itself on startup (This is kinda unstable right now, so don't trust it too much)");
-            makeScreenBigger = shouldMaximizeDisplayProp.getBoolean();
+        windowDisplayTitle = Config.DISPLAY_WINDOW_DISPLAY_TITLE.get();
 
-            Property windowDisplayTitleProp = config.get("Display", "windowDisplayTitle", "Minecraft " + Minecraft.getMinecraft().getVersion());
-            windowDisplayTitleProp.setComment("Change this value to change the name of the MineCraft window");
-            windowDisplayTitle = windowDisplayTitleProp.getString();
+        GLFW.glfwSetWindowTitle(Minecraft.getInstance().mainWindow.getHandle(), windowDisplayTitle);
 
-            Property customIconProp = config.get("Display", "loadCustomIcon", true);
-            customIconProp.setComment("Set to true to load a custom icon from config" + File.separator + "itlt" + File.separator + "icon.png");
-            if (customIconProp.getBoolean()) {
-                File di = Paths.get(event.getModConfigurationDirectory().getAbsolutePath(), "itlt").toFile();
-                logger.info(di);
-                if (di.exists()) {
-                    File icon = Paths.get(di.getAbsolutePath(), "icon.png").toFile();
-                    logger.info(icon.exists() ? "Custom modpack icon found" : "Custom modpack icon NOT found.");
-                    if (icon.exists() && !icon.isDirectory()) {
-                        Display.setIcon(IconLoader.load(icon));
-                    }
-                } else {
-                    logger.error("Directory for custom modpack icon not found!");
-                    if (di.mkdir()) {
-                        logger.info("Made the directory for you. ");
-                    }
-                }
-            }
-
-            Property useTechnicIconProp = config.get("Display", "useTechnicIcon", true);
-            useTechnicIconProp.setComment("Set to true to attempt to use the icon assigned to the modpack by the technic launcher. \nThis will take priority over loadCustomIcon");
-            if (useTechnicIconProp.getBoolean()) {
-                Path assets = getAssetDir();
-
-                File icon = Paths.get(assets.toAbsolutePath().toString(), "icon.png").toFile();
-                logger.info(icon.exists() ? "Technic icon found" : "Technic icon NOT found. ");
+        if (Config.DISPLAY_LOAD_CUSTOM_ICON.get()) {
+            File di = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
+            LOGGER.info(di);
+            if (di.exists()) {
+                File icon = Paths.get(di.getAbsolutePath(), "icon.png").toFile();
+                LOGGER.info(icon.exists() ? "Custom modpack icon found" : "Custom modpack icon NOT found.");
                 if (icon.exists() && !icon.isDirectory()) {
-                    Display.setIcon(IconLoader.load(icon));
+                    SetWindowIcon(icon);
+                }
+            } else {
+                LOGGER.error("Directory for custom modpack icon not found!");
+                if (di.mkdir()) {
+                    LOGGER.info("Made the directory for you. ");
                 }
             }
+        }
 
-            Property useTechnicDisplayNameProp = config.get("Display", "useTechnicDisplayName", true);
-            useTechnicDisplayNameProp.setComment("Set to true to attempt to get the display name of the pack of the info json file \nThis will take priority over windowDisplayTitle");
-            if (useTechnicDisplayNameProp.getBoolean()) {
-                Path assets = getAssetDir();
+        if (Config.DISPLAY_USE_TECHNIC_ICON.get()) {
+            Path assets = getAssetDir();
 
-                File cacheFile = Paths.get(assets.toAbsolutePath().toString(), "cache.json").toFile();
-                logger.info(cacheFile.exists() ? "Cache file found" : "Cache file not found.");
-                if (cacheFile.exists() && !cacheFile.isDirectory()) {
-                    String json = null;
-                    try {
-                        json = StringUtils.join(Files.readAllLines(cacheFile.toPath(), StandardCharsets.UTF_8), "");
-                        logger.info(json);
-                    } catch (IOException e) {
-                        logger.error(e.toString());
-                    }
-                    if (json != null) {
-                        Map cacheContents = new Gson().fromJson(json, Map.class);
-                        logger.info(cacheContents.size());
-                        if (cacheContents.containsKey("displayName")) {
-                            logger.info(cacheContents.get("displayName").toString());
-                            windowDisplayTitle = cacheContents.get("displayName").toString();
-                        }
+            File icon = Paths.get(assets.toAbsolutePath().toString(), "icon.png").toFile();
+            LOGGER.info(icon.exists() ? "Technic icon found" : "Technic icon NOT found. ");
+            if (icon.exists() && !icon.isDirectory()) {
+                SetWindowIcon(icon);
+            }
+        }
+
+        if (Config.DISPLAY_USE_TECHNIC_DISPLAY_NAME.get()) {
+            Path assets = getAssetDir();
+
+            File cacheFile = Paths.get(assets.toAbsolutePath().toString(), "cache.json").toFile();
+            LOGGER.info(cacheFile.exists() ? "Cache file found" : "Cache file not found.");
+            if (cacheFile.exists() && !cacheFile.isDirectory()) {
+                String json = null;
+                try {
+                    json = StringUtils.join(Files.readAllLines(cacheFile.toPath(), StandardCharsets.UTF_8), "");
+                    LOGGER.info(json);
+                } catch (IOException e) {
+                    LOGGER.error(e.toString());
+                }
+                if (json != null) {
+                    Map cacheContents = new Gson().fromJson(json, Map.class);
+                    LOGGER.info(cacheContents.size());
+                    if (cacheContents.containsKey("displayName")) {
+                        LOGGER.info(cacheContents.get("displayName").toString());
+                        windowDisplayTitle = cacheContents.get("displayName").toString();
                     }
                 }
             }
+        }
 
-            Property addCustomServerProp = config.get("Server", "AddDedicatedServer", false);
-            addCustomServerProp.setComment("Set to true to have a dedicated server added to the server list ingame. The server will not overwrite others servers.");
+        if (Config.SERVER_ADD_DEDICATED_SERVER.get()) {
+            ServerList serverList = new ServerList(Minecraft.getInstance());
+            int c = serverList.countServers();
+            boolean foundServer = false;
+            for (int i = 0; i < c; i++) {
+                ServerData data = serverList.getServerData(i);
 
-            Property customServerNameProp = config.get("Server", "ServerName", "Localhost");
-            customServerNameProp.setComment("The name of the dedicated server to add.");
-
-            Property customServerIpProp = config.get("Server", "ServerIP", "127.0.0.1:25555");
-            customServerIpProp.setComment("The ip of the dedicated server to add.");
-
-            if (addCustomServerProp.getBoolean()) {
-                ServerList serverList = new ServerList(Minecraft.getMinecraft());
-                int c = serverList.countServers();
-                boolean foundServer = false;
-                for (int i = 0; i < c; i++) {
-                    ServerData data = serverList.getServerData(i);
-
-                    if (data.serverIP.equals(customServerIpProp.getString())) {
-                        foundServer = true;
-                        break;
-                    }
-                }
-                if (!foundServer) {
-                    // I have no clue what the last boolean is for.
-                    // Possibly decides if it's a lan server, or an actual multiplayer server.
-                    // Settings it to false should make it a multiplayer server
-                    ServerData data = new ServerData(customServerNameProp.getString(), customServerIpProp.getString(), false);
-                    serverList.addServerData(data);
-                    serverList.saveServerList();
+                if (data.serverIP.equals(Config.SERVER_SERVER_IP.get())) {
+                    foundServer = true;
+                    break;
                 }
             }
+            if (!foundServer) {
+                // I have no clue what the last boolean is for.
+                // Possibly decides if it's a lan server, or an actual multiplayer server.
+                // Settings it to false should make it a multiplayer server
+                ServerData data = new ServerData(Config.SERVER_SERVER_NAME.get(), Config.SERVER_SERVER_IP.get(), false);
+                serverList.addServerData(data);
+                serverList.saveServerList();
+            }
+        }
+    }
 
-            config.save();
+    private void SetWindowIcon(File icon) {
+        try(InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
+            try(InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
+                Minecraft.getInstance().mainWindow.setWindowIcon(is1, is2);
+                LOGGER.info("Set window icon without issues");
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Failed to open icon that we just confirmed was there???", e);
+        } catch (IOException e) {
+            LOGGER.error("Something went wrong when reading the icon file", e);
         }
     }
 
@@ -183,6 +173,7 @@ public class Itlt {
         return Paths.get(technic.toAbsolutePath().toString(), "assets", "packs", slugname);
     }
 
+    /*
     @Mod.EventHandler
     @SideOnly(Side.CLIENT)
     public void contruction(FMLLoadCompleteEvent event) {
@@ -192,5 +183,7 @@ public class Itlt {
             cp.setWindowDisplayTitle(windowDisplayTitle);
         }
     }
+
+     */
 
 }

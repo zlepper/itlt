@@ -18,7 +18,7 @@ public class ShouterThread extends Thread {
         if(Itlt.proxy instanceof ClientProxy) {
             JOptionPane.showMessageDialog(null, message, "Java version issue", JOptionPane.WARNING_MESSAGE);
         } else {
-            Itlt.logger.warn(message);
+//            Itlt.logger.warn(message);
         }
     }
 }

@@ -65,7 +65,9 @@ public class Itlt {
 
         windowDisplayTitle = Config.DISPLAY_WINDOW_DISPLAY_TITLE.get();
 
-        GLFW.glfwSetWindowTitle(Minecraft.getInstance().mainWindow.getHandle(), windowDisplayTitle);
+        //GLFW.glfwSetWindowTitle(Minecraft.getInstance().getMainWindow().getHandle(), windowDisplayTitle);
+        Minecraft.getInstance().getMainWindow().func_230148_b_(windowDisplayTitle);
+        //LOGGER.info("Set window title");
 
         if (Config.DISPLAY_LOAD_CUSTOM_ICON.get()) {
             File di = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
@@ -144,7 +146,7 @@ public class Itlt {
     private void SetWindowIcon(File icon) {
         try(InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
             try(InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
-                Minecraft.getInstance().mainWindow.setWindowIcon(is1, is2);
+                Minecraft.getInstance().getMainWindow().setWindowIcon(is1, is2);
                 LOGGER.info("Set window icon without issues");
             }
         } catch (FileNotFoundException e) {

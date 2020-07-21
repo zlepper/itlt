@@ -10,7 +10,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import java.io.File;
 import java.nio.file.Path;
 
-public class Config {
+public final class Config {
 
     public static final String CATEGORY_BIT_DETECTION = "BitDetection";
     public static final String CATEGORY_DISPLAY = "Display";
@@ -38,7 +38,7 @@ public class Config {
         CLIENT_BUILDER.comment("Bit detection").push(CATEGORY_BIT_DETECTION);
 
         BIT_DETECTION_SHOULD_YELL_AT_32_BIT_USERS = CLIENT_BUILDER.comment("Set to true to make itlt yell at people attempting to use 32x java for the modpack.")
-                .define("ShouldYellAt32BitUsers", false);
+                .define("ShouldYellAt32BitUsers", true);
         BIT_DETECTION_MESSAGE = CLIENT_BUILDER.comment("If ShouldYellAt32BitUsers is set to true, this is the message that will be displayed to the user.")
                 .define("Message", "You are using a 32 bit version of java. This is not recommended with this modpack.");
 
@@ -77,7 +77,7 @@ public class Config {
     }
 
 
-    public static void loadConfig(ForgeConfigSpec spec, Path path) {
+    public static void loadConfig(ForgeConfigSpec spec, final Path path) {
 
         final CommentedFileConfig configData = CommentedFileConfig.builder(path)
                 .sync()

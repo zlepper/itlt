@@ -56,7 +56,7 @@ public class IconLoader
             e.printStackTrace();
         }
         ByteBuffer[] buffers = null;
-        final String OS = System.getProperty("os.name").toUpperCase();
+        String OS = System.getProperty("os.name").toUpperCase();
         if(OS.contains("WIN"))
         {
             buffers = new ByteBuffer[2];

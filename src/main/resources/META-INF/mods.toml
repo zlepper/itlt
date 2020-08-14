@@ -1,15 +1,16 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[31,)" #mandatory (31 is current forge version)
+loaderVersion="[32,)" #mandatory
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/zlepper/itlt/issues" #optional
+license="MIT"
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
 # The modid of the mod
 modId="itlt" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="${file.jarVersion}" #mandatory
+version="1.16.x-1.0.3" #mandatory
  # A display name for the mod
 displayName="It's the little things" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
@@ -42,6 +43,6 @@ A mod for improving the little things, the final touches
 [[dependencies.itlt]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1,]"
+    versionRange="[1.16.1,1.16.2,]"
     ordering="NONE"
     side="BOTH"

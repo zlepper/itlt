@@ -33,7 +33,7 @@ import java.util.Map;
 @Mod("itlt")
 public final class Itlt {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
     public static CommonProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 
     public Itlt() {

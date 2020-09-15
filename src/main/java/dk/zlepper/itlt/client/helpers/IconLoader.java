@@ -1,4 +1,4 @@
-package dk.zlepper.itlt.helpers;
+package dk.zlepper.itlt.client.helpers;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

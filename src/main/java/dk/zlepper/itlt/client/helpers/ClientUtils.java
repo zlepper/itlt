@@ -1,8 +1,8 @@
 package dk.zlepper.itlt.client.helpers;
 
+import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.ClientConfig;
-import dk.zlepper.itlt.client.ClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.ModList;
 
@@ -50,7 +50,7 @@ public class ClientUtils {
             case NeedsMoreMemory:
                 messageType = "require";
                 messageTitle = "More allocated RAM required";
-                messageBody = "Whoops! This pack requires at least " + ClientConfig.reqMinMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientEvents.currentMem + "GB of RAM.";
+                messageBody = "Whoops! This pack requires at least " + ClientConfig.reqMinMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientModEvents.currentMem + "GB of RAM.";
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = "Show guide";
                 middleButtonText = "Close";
@@ -59,7 +59,7 @@ public class ClientUtils {
             case WantsMoreMemory:
                 messageType = "require";
                 messageTitle = "More allocated RAM recommended";
-                messageBody = "Warning: For the best experience, this pack must have at least " + ClientConfig.warnMinMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientEvents.currentMem + "GB of RAM.";
+                messageBody = "Warning: For the best experience, this pack must have at least " + ClientConfig.warnMinMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientModEvents.currentMem + "GB of RAM.";
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = "Show guide";
                 middleButtonText = "Ask later";
@@ -68,7 +68,7 @@ public class ClientUtils {
             case NeedsLessMemory:
                 messageType = "require";
                 messageTitle = "Less allocated RAM required";
-                messageBody = "Whoops! This pack must not have more than " + ClientConfig.reqMaxMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientEvents.currentMem + "GB of RAM.";
+                messageBody = "Whoops! This pack must not have more than " + ClientConfig.reqMaxMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientModEvents.currentMem + "GB of RAM.";
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = "Show guide";
                 middleButtonText = "Close";
@@ -77,7 +77,7 @@ public class ClientUtils {
             case WantsLessMemory:
                 messageType = "warn";
                 messageTitle = "Less allocated RAM recommended";
-                messageBody = "Warning: For the best experience, this pack must not have more than " + ClientConfig.warnMaxMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientEvents.currentMem + "GB of RAM.";
+                messageBody = "Warning: For the best experience, this pack must not have more than " + ClientConfig.warnMaxMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientModEvents.currentMem + "GB of RAM.";
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = "Show guide";
                 middleButtonText = "Ask later";
@@ -86,7 +86,7 @@ public class ClientUtils {
             case NeedsNewerJava:
                 messageType = "require";
                 messageTitle = "Java " + ClientConfig.requiredMinJavaVerion.get().toString() + "+ required";
-                messageBody = "Whoops! This pack requires Java " + ClientConfig.requiredMinJavaVerion.get() + " or newer but you appear to be using Java " + ClientEvents.javaVerInt + ".";
+                messageBody = "Whoops! This pack requires Java " + ClientConfig.requiredMinJavaVerion.get() + " or newer but you appear to be using Java " + ClientModEvents.javaVerInt + ".";
                 if (ClientConfig.enableCustom64bitJavaGuide.get()) { guideURL = ClientConfig.custom64bitJavaGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = "Get newer Java";
                 middleButtonText = "Close";
@@ -95,7 +95,7 @@ public class ClientUtils {
             case WantsNewerJava:
                 messageType = "warn";
                 messageTitle = "Java " + ClientConfig.requiredMinJavaVerion.get().toString() + "+ recommended";
-                messageBody = "Warning: For the best experience, this pack recommends Java " + ClientConfig.requiredMinJavaVerion.get() + " or newer but you appear to be using Java " + ClientEvents.javaVerInt + ".";
+                messageBody = "Warning: For the best experience, this pack recommends Java " + ClientConfig.requiredMinJavaVerion.get() + " or newer but you appear to be using Java " + ClientModEvents.javaVerInt + ".";
                 if (ClientConfig.enableCustom64bitJavaGuide.get()) { guideURL = ClientConfig.custom64bitJavaGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = "Get newer Java";
                 middleButtonText = "Ask later";

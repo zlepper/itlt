@@ -12,6 +12,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
@@ -26,22 +27,7 @@ public class ClientModEvents {
     public static int javaVerInt;
 
     @SubscribeEvent
-    public static void clientInit(final FMLClientSetupEvent e) { // todo: look into if it's possible to run earlier than FMLClientSetupEvent for what we want to do
-        final Minecraft mcInstance = Minecraft.getInstance();
-
-
-        // 32bit Java requirement and warning
-        final boolean isJava64bit = mcInstance.isJava64bit();
-        itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
-        if (!isJava64bit) {
-            if (ClientConfig.enable64bitRequirement.get()) {
-                ClientUtils.startUIProcess(MessageContent.NeedsJava64bit);
-            } else if (ClientConfig.enable64bitWarning.get()) {
-                ClientUtils.startUIProcess(MessageContent.WantsJava64bit);
-            }
-        }
-
-
+    public static void commonInit(final FMLCommonSetupEvent event) {
         // Minimum Java version requirement and warning
         javaVer = System.getProperty("java.version");
         final String[] splitJavaVer = javaVer.split(Pattern.quote("."));
@@ -76,6 +62,22 @@ public class ClientModEvents {
         } else if (ClientConfig.enableMaxMemoryWarning.get()) {
             if (currentMem > ClientConfig.warnMaxMemoryAmountInGB.get().floatValue())
                 ClientUtils.startUIProcess(MessageContent.WantsLessMemory);
+        }
+    }
+
+    @SubscribeEvent
+    public static void clientInit(final FMLClientSetupEvent event) {
+        final Minecraft mcInstance = event.getMinecraftSupplier().get();
+
+        // 32bit Java requirement and warning
+        final boolean isJava64bit = mcInstance.isJava64bit();
+        itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
+        if (!isJava64bit) {
+            if (ClientConfig.enable64bitRequirement.get()) {
+                ClientUtils.startUIProcess(MessageContent.NeedsJava64bit);
+            } else if (ClientConfig.enable64bitWarning.get()) {
+                ClientUtils.startUIProcess(MessageContent.WantsJava64bit);
+            }
         }
 
 

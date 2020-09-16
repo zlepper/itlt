@@ -13,7 +13,7 @@ import java.io.File;
 public class ClientForgeEvents {
 
     @SubscribeEvent
-    public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent e) {
+    public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
         // Anti-cheat
         if (ClientConfig.enableAnticheat.get()) {
             // todo: report to server with list of known cheats (if any)

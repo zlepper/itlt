@@ -77,7 +77,7 @@ public final class Main {
         try {
             final URI guideURI = new URI(guideURL);
             Desktop.getDesktop().browse(guideURI);
-        } catch (IOException | URISyntaxException e) {
+        } catch (final IOException | URISyntaxException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(getParentComponent(), errorMessage, null, JOptionPane.ERROR_MESSAGE);
         }

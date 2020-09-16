@@ -7,9 +7,7 @@ import dk.zlepper.itlt.client.helpers.MessageContent;
 import net.minecraft.client.Minecraft;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -36,12 +34,14 @@ public class ClientModEvents {
 
         itlt.LOGGER.debug("javaVer: " + javaVer);
         itlt.LOGGER.debug("javaVerInt: " + javaVerInt);
-        itlt.LOGGER.debug("requiredMinJavaVerion: " + ClientConfig.requiredMinJavaVerion.get());
+        itlt.LOGGER.debug("requiredMinJavaVerion: " + ClientConfig.requiredMinJavaVersion.get());
 
         if (ClientConfig.enableMinJavaVerRequirement.get()) {
-            if (javaVerInt < ClientConfig.requiredMinJavaVerion.get()) {
+            if (javaVerInt < ClientConfig.requiredMinJavaVersion.get())
                 ClientUtils.startUIProcess(MessageContent.NeedsNewerJava);
-            }
+        } else if (ClientConfig.enableMinJavaVerWarning.get()) {
+            if (javaVerInt < ClientConfig.warnMinJavaVersion.get())
+                ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
         }
 
 
@@ -93,7 +93,7 @@ public class ClientModEvents {
                 final File icon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
                 if (!icon.exists()) itlt.LOGGER.warn("enableCustomIcon is true but the icon is missing.");
                 if (icon.exists() && !icon.isDirectory())
-                    ClientUtils.setWindowIcon(icon);
+                    ClientUtils.setWindowIcon(icon, mcInstance);
             } else {
                 itlt.LOGGER.warn("itlt folder in the config folder is missing.");
                 if (itltDir.mkdir()) {

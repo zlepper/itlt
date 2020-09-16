@@ -11,15 +11,15 @@ import java.nio.file.Path;
 
 public class ClientUtils {
 
-    public static void setWindowIcon(final File icon) {
+    public static void setWindowIcon(final File icon, final Minecraft mcInstance) {
         try (final InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
             try (final InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
-                Minecraft.getInstance().getMainWindow().setWindowIcon(is1, is2);
+                mcInstance.getMainWindow().setWindowIcon(is1, is2);
                 itlt.LOGGER.info("Set window icon without issues");
             }
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             itlt.LOGGER.error("Failed to open icon that we just confirmed was there???", e);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             itlt.LOGGER.error("Something went wrong when reading the icon file", e);
         }
     }
@@ -85,18 +85,18 @@ public class ClientUtils {
                 break;
             case NeedsNewerJava:
                 messageType = "require";
-                messageTitle = "Java " + ClientConfig.requiredMinJavaVerion.get().toString() + "+ required";
-                messageBody = "Whoops! This pack requires Java " + ClientConfig.requiredMinJavaVerion.get() + " or newer but you appear to be using Java " + ClientModEvents.javaVerInt + ".";
-                if (ClientConfig.enableCustom64bitJavaGuide.get()) { guideURL = ClientConfig.custom64bitJavaGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
+                messageTitle = "Java " + ClientConfig.requiredMinJavaVersion.get().toString() + "+ required";
+                messageBody = "Whoops! This pack requires Java " + ClientConfig.requiredMinJavaVersion.get() + " or newer but you appear to be using Java " + ClientModEvents.javaVerInt + ".";
+                if (ClientConfig.enableCustomJavaUpgradeGuide.get()) { guideURL = ClientConfig.customJavaUpgradeGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = "Get newer Java";
                 middleButtonText = "Close";
                 rightButtonText = ".";
-                break; // todo: WantsNewerJava
+                break;
             case WantsNewerJava:
                 messageType = "warn";
-                messageTitle = "Java " + ClientConfig.requiredMinJavaVerion.get().toString() + "+ recommended";
-                messageBody = "Warning: For the best experience, this pack recommends Java " + ClientConfig.requiredMinJavaVerion.get() + " or newer but you appear to be using Java " + ClientModEvents.javaVerInt + ".";
-                if (ClientConfig.enableCustom64bitJavaGuide.get()) { guideURL = ClientConfig.custom64bitJavaGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
+                messageTitle = "Java " + ClientConfig.requiredMinJavaVersion.get().toString() + "+ recommended";
+                messageBody = "Warning: For the best experience, this pack recommends Java " + ClientConfig.requiredMinJavaVersion.get() + " or newer but you appear to be using Java " + ClientModEvents.javaVerInt + ".";
+                if (ClientConfig.enableCustomJavaUpgradeGuide.get()) { guideURL = ClientConfig.customJavaUpgradeGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = "Get newer Java";
                 middleButtonText = "Ask later";
                 rightButtonText = "Don't ask again";

@@ -7,10 +7,13 @@ import dk.zlepper.itlt.client.helpers.MessageContent;
 import net.minecraft.client.Minecraft;
 
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
@@ -35,34 +38,32 @@ public class ClientModEvents {
         itlt.LOGGER.debug("javaVer: " + javaVer);
         itlt.LOGGER.debug("javaVerInt: " + javaVerInt);
         itlt.LOGGER.debug("requiredMinJavaVerion: " + ClientConfig.requiredMinJavaVersion.get());
+        itlt.LOGGER.debug("warnMinJavaVersion: " + ClientConfig.warnMinJavaVersion.get());
 
-        if (ClientConfig.enableMinJavaVerRequirement.get()) {
-            if (javaVerInt < ClientConfig.requiredMinJavaVersion.get())
-                ClientUtils.startUIProcess(MessageContent.NeedsNewerJava);
-        } else if (ClientConfig.enableMinJavaVerWarning.get()) {
-            if (javaVerInt < ClientConfig.warnMinJavaVersion.get())
-                ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
-        }
+        if (ClientConfig.enableMinJavaVerRequirement.get() && javaVerInt < ClientConfig.requiredMinJavaVersion.get())
+            ClientUtils.startUIProcess(MessageContent.NeedsNewerJava);
+        else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get())
+            ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
 
 
         // Memory-related requirements and warnings
         currentMem = Runtime.getRuntime().maxMemory() / 1073741824.0F;
 
-        if (ClientConfig.enableMinMemoryRequirement.get()) {
-            if (currentMem < ClientConfig.reqMinMemoryAmountInGB.get().floatValue())
-                ClientUtils.startUIProcess(MessageContent.NeedsMoreMemory);
-        } else if (ClientConfig.enableMinMemoryWarning.get()) {
-            if (currentMem < ClientConfig.warnMinMemoryAmountInGB.get().floatValue())
-                ClientUtils.startUIProcess(MessageContent.WantsMoreMemory);
-        }
+        itlt.LOGGER.debug("currentMem: " + currentMem);
+        itlt.LOGGER.debug("reqMinMemoryAmountInGB: " + ClientConfig.reqMinMemoryAmountInGB.get());
+        itlt.LOGGER.debug("warnMinMemoryAmountInGB: " + ClientConfig.warnMinMemoryAmountInGB.get());
+        itlt.LOGGER.debug("reqMaxMemoryAmountInGB: " + ClientConfig.reqMaxMemoryAmountInGB.get());
+        itlt.LOGGER.debug("warnMaxMemoryAmountInGB: " + ClientConfig.warnMaxMemoryAmountInGB.get());
 
-        if (ClientConfig.enableMaxMemoryRequirement.get()) {
-            if (currentMem > ClientConfig.reqMaxMemoryAmountInGB.get().floatValue())
-                ClientUtils.startUIProcess(MessageContent.NeedsLessMemory);
-        } else if (ClientConfig.enableMaxMemoryWarning.get()) {
-            if (currentMem > ClientConfig.warnMaxMemoryAmountInGB.get().floatValue())
-                ClientUtils.startUIProcess(MessageContent.WantsLessMemory);
-        }
+        if (ClientConfig.enableMinMemoryRequirement.get() && currentMem < ClientConfig.reqMinMemoryAmountInGB.get().floatValue())
+            ClientUtils.startUIProcess(MessageContent.NeedsMoreMemory);
+        else if (ClientConfig.enableMinMemoryWarning.get() && currentMem < ClientConfig.warnMinMemoryAmountInGB.get().floatValue())
+            ClientUtils.startUIProcess(MessageContent.WantsMoreMemory);
+
+        if (ClientConfig.enableMaxMemoryRequirement.get() && currentMem > ClientConfig.reqMaxMemoryAmountInGB.get().floatValue())
+            ClientUtils.startUIProcess(MessageContent.NeedsLessMemory);
+        else if (ClientConfig.enableMaxMemoryWarning.get() && currentMem > ClientConfig.warnMaxMemoryAmountInGB.get().floatValue())
+            ClientUtils.startUIProcess(MessageContent.WantsLessMemory);
     }
 
     @SubscribeEvent
@@ -73,17 +74,16 @@ public class ClientModEvents {
         final boolean isJava64bit = mcInstance.isJava64bit();
         itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
         if (!isJava64bit) {
-            if (ClientConfig.enable64bitRequirement.get()) {
+            if (ClientConfig.enable64bitRequirement.get())
                 ClientUtils.startUIProcess(MessageContent.NeedsJava64bit);
-            } else if (ClientConfig.enable64bitWarning.get()) {
+            else if (ClientConfig.enable64bitWarning.get())
                 ClientUtils.startUIProcess(MessageContent.WantsJava64bit);
-            }
         }
 
 
         // Custom window title text
         if (ClientConfig.enableCustomWindowTitle.get())
-            mcInstance.getMainWindow().func_230148_b_(ClientConfig.customWindowTitleText.get());
+            mcInstance.getMainWindow().setWindowTitle(ClientConfig.customWindowTitleText.get());
 
 
         // Custom window icon
@@ -92,15 +92,13 @@ public class ClientModEvents {
             if (itltDir.exists()) {
                 final File icon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
                 if (!icon.exists()) itlt.LOGGER.warn("enableCustomIcon is true but the icon is missing.");
-                if (icon.exists() && !icon.isDirectory())
-                    ClientUtils.setWindowIcon(icon, mcInstance);
+                if (icon.exists() && !icon.isDirectory()) ClientUtils.setWindowIcon(icon, mcInstance);
             } else {
                 itlt.LOGGER.warn("itlt folder in the config folder is missing.");
-                if (itltDir.mkdir()) {
+                if (itltDir.mkdir())
                     itlt.LOGGER.info("The folder has been successfully created for you.");
-                } else {
+                else
                     itlt.LOGGER.info("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
-                }
             }
         }
     }

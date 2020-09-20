@@ -9,8 +9,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "minVersion": "0.8.1",
-  "mixins": [
-    "WindowTitleInvoker"
-  ]
+  "minVersion": "0.8.1"
 }

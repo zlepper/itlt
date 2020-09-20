@@ -4,7 +4,6 @@ import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.client.helpers.MessageContent;
 
-import dk.zlepper.itlt.mixins.WindowTitleInvoker;
 import net.minecraft.client.Minecraft;
 
 import net.minecraftforge.api.distmarker.Dist;
@@ -69,7 +68,7 @@ public class ClientModEvents {
     public static void clientInit(final FMLClientSetupEvent event) {
         final Minecraft mcInstance = event.getMinecraftSupplier().get();
 
-        // 32bit Java requirement and warning
+        // Java arch requirement and warning
         final boolean isJava64bit = mcInstance.isJava64bit();
         itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
         if (!isJava64bit)
@@ -80,9 +79,8 @@ public class ClientModEvents {
 
 
         // Custom window title text
-        if (ClientConfig.enableCustomWindowTitle.get()) {
-            mcInstance.getMainWindow().setWindowTitle(ClientConfig.customWindowTitleText.get() + " (" + WindowTitleInvoker.getWindowTitle() + ")");
-        }
+        if (ClientConfig.enableCustomWindowTitle.get())
+            mcInstance.getMainWindow().setWindowTitle(ClientConfig.customWindowTitleText.get() + " (" + mcInstance.getWindowTitle() + ")");
 
 
         // Custom window icon
@@ -102,4 +100,3 @@ public class ClientModEvents {
         }
     }
 }
-

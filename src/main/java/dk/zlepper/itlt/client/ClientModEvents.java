@@ -27,7 +27,7 @@ public class ClientModEvents {
     public static String javaVer = System.getProperty("java.version");
     public static int javaVerInt;
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST) // run this as soon as possible to avoid wasting time if a requirement isn't met
     public static void commonInit(final FMLCommonSetupEvent event) {
         // Minimum Java version requirement and warning
         javaVer = System.getProperty("java.version");

@@ -28,6 +28,7 @@ public final class ClientConfig {
             enableMinJavaVerRequirement,
             enableMinJavaVerWarning,
             enableCustomWindowTitle,
+            enableAppendingToCustomTitle,
             enableCustomIcon,
             enableAnticheat,
             enableAutoRemovalOfCheats;
@@ -205,8 +206,13 @@ public final class ClientConfig {
                         .define("enableCustomWindowTitle", false);
                 customWindowTitleText = clientConfigBuilder
                         .comment("\r\nThe name you want your Minecraft window to be.\r\n" +
-                                "Note: enableCustomWindowTitle must be enabled for this to take effect.")
-                        .define("customWindowTitleText", "Minecraft" + Minecraft.getInstance().getVersion());
+                                "Note: enableCustomWindowTitle must be enabled for this to take effect.\r\n")
+                        .define("customWindowTitleText", "ModpackName");
+                enableAppendingToCustomTitle = clientConfigBuilder
+                        .comment("\r\nEnable this if you want the game's version to be appended to the end of your customWindowTitleText.\r\n" +
+                                "For example: \"ModpackName (Minecraft* 1.16.3)\")\r\n" +
+                                "Note: This is enabled by default because Mojang went out of their way to prevent modders from changing the window title easily - this setting is a happy middle ground where both modpack authors' and Mojang's preferences are respected.")
+                        .define("enableAppendingToCustomTitle", true);
             } clientConfigBuilder.pop();
 
             // Display.Icon

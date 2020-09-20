@@ -1,7 +1,7 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[32,)" #mandatory
+loaderVersion="[33.0.49,)" #mandatory
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/zlepper/itlt/issues" #optional
 license="MIT"
@@ -34,7 +34,7 @@ A mod for improving the little things, the final touches.
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[32,)" #mandatory
+    versionRange="[33.0.49,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -43,6 +43,6 @@ A mod for improving the little things, the final touches.
 [[dependencies.itlt]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1,1.17)"
+    versionRange="[1.16.2,1.17)"
     ordering="NONE"
     side="CLIENT"

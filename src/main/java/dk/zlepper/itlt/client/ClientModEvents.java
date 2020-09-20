@@ -4,16 +4,15 @@ import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.client.helpers.MessageContent;
 
+import dk.zlepper.itlt.mixins.WindowTitleInvoker;
 import net.minecraft.client.Minecraft;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
@@ -73,17 +72,17 @@ public class ClientModEvents {
         // 32bit Java requirement and warning
         final boolean isJava64bit = mcInstance.isJava64bit();
         itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
-        if (!isJava64bit) {
+        if (!isJava64bit)
             if (ClientConfig.enable64bitRequirement.get())
                 ClientUtils.startUIProcess(MessageContent.NeedsJava64bit);
             else if (ClientConfig.enable64bitWarning.get())
                 ClientUtils.startUIProcess(MessageContent.WantsJava64bit);
-        }
 
 
         // Custom window title text
-        if (ClientConfig.enableCustomWindowTitle.get())
-            mcInstance.getMainWindow().setWindowTitle(ClientConfig.customWindowTitleText.get());
+        if (ClientConfig.enableCustomWindowTitle.get()) {
+            mcInstance.getMainWindow().setWindowTitle(ClientConfig.customWindowTitleText.get() + " (" + WindowTitleInvoker.getWindowTitle() + ")");
+        }
 
 
         // Custom window icon

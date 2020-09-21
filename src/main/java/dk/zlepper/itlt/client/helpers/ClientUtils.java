@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
+import io.seruco.encoding.base62.Base62;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.SharedConstants;
 import net.minecraftforge.fml.ModList;
@@ -58,18 +59,20 @@ public class ClientUtils {
         if (hasher.isValid())
             hasher.close();
 
-        // convert from decimal to hex
+        // convert to hex
         /*final StringBuilder sb = new StringBuilder();
         for (byte aByte : decimalBytes) {
             sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
         }*/
 
-        // convert from decimal to Base64
-        final String encodedBase64 = Base64.encodeBase64String(bytes);
+        // convert to Base64
+        //final String encodedBase64 = Base64.encodeBase64String(bytes);
 
-        Base62
+        // convert to Base62
+        final Base62 base62 = Base62.createInstance();
+        final String encodedBase62 = new String(base62.encode(bytes));
 
-        return new Object[]{ChecksumType.Modern, encodedBase64};
+        return new Object[]{ChecksumType.Modern, encodedBase62};
     }
 
     public static Object[] getFileChecksumFallback(final File file) throws IOException, NoSuchAlgorithmException {
@@ -87,17 +90,21 @@ public class ClientUtils {
         // Get the hash's bytes
         byte[] bytes = digest.digest();
 
-        // convert from decimal to hex
-        final StringBuilder sb = new StringBuilder();
+        // convert to hex
+        /*final StringBuilder sb = new StringBuilder();
         for (byte aByte : bytes) {
             sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
-        }
+        }*/
 
-        // convert from decimal to Base64
+        // convert to Base64
         //final String encodedBase64 = Base64.encodeBase64String(bytes);
 
+        // convert to Base62
+        final Base62 base62 = Base62.createInstance();
+        final String encodedBase62 = new String(base62.encode(bytes));
+
         // return the completed hash
-        return new Object[]{ChecksumType.Fallback, sb.toString()};
+        return new Object[]{ChecksumType.Fallback, encodedBase62};
     }
 
     public enum ChecksumType {

@@ -116,6 +116,12 @@ dependencies {
     compile files("libs/blake3jni-0.2.2.jar")
     implementation "org.scijava:native-lib-loader:2.3.4"
 
+    // itlt uses the "Base62" library for Base62 encoding of checksums
+    // Why not Base64? Base62 is purely letters and numbers (no special characters like +, /, =, etc) and lacks the
+    // padding requirement of Base64. These things allow for similar encoding efficiency to Base64 while also looking
+    // prettier as well as looking less scary to a technophobe
+    implementation "io.seruco.encoding:base62:0.1.3" // https://github.com/seruco/base62
+
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"

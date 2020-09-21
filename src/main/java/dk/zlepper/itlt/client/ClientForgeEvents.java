@@ -1,6 +1,6 @@
 package dk.zlepper.itlt.client;
 
-// todo: check with a webserver for latest modids and checksums
+// todo: caching of webserver definitions in case it fails or returns empty sections
 // todo: fingerprinting of known cheat mods (beyond just checksumming)
 // todo: analysis of mods to detect suspiciously cheaty code in unknown cheat mods
 // todo: detect FML tweaker type cheat mods
@@ -21,41 +21,89 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Stream;
 
 @Mod.EventBusSubscriber(modid = itlt.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientForgeEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
+    @SuppressWarnings("unchecked") // It's handled through the try/catch block and fallbacks of the same type. Java's just being overly paranoid here.
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
         if (ClientConfig.enableAnticheat.get()) {
+
+            // definition updates
+            ArrayList<String> cheatModIds = new ArrayList<>(0);
+            ArrayList<String> cheatModChecksums = new ArrayList<>(0);
             try {
-                ClientUtils.getLatestDefinitions(Minecraft.getInstance());
+                final Map<String, Object> latestDefinitions = ClientUtils.getLatestDefinitions(Minecraft.getInstance());
+                itlt.LOGGER.debug("latestDefinitions: " + latestDefinitions);
+
+                cheatModIds = (ArrayList<String>) latestDefinitions.getOrDefault("modIds", new ArrayList<String>(0));
+                if (cheatModIds.isEmpty()) itlt.LOGGER.warn("modIds section missing from latest definitions");
+
+                cheatModChecksums = (ArrayList<String>) latestDefinitions.getOrDefault("checksums", new ArrayList<String>(0));
+                if (cheatModChecksums.isEmpty()) itlt.LOGGER.warn("checksums section missing from latest definitions");
+
+                itlt.LOGGER.debug("cheatModIds: " + cheatModIds);
+                itlt.LOGGER.debug("cheatModChecksums: " + cheatModChecksums);
             } catch (final IOException e) {
+                itlt.LOGGER.error("Unable to get latest definitions");
+                e.printStackTrace();
+            } catch (final ClassCastException | NullPointerException e) {
+                itlt.LOGGER.error("Unable to parse latest definitions");
                 e.printStackTrace();
             }
+            final ArrayList<String> finalCheatModIds = cheatModIds;
+            final ArrayList<String> finalCheatModChecksums = cheatModChecksums;
 
-            ArrayList<ModInfo> listOfcheatMods = new ArrayList<>();
+            ArrayList<ModInfo> listOfDetectedCheatMods = new ArrayList<>();
 
-            ModList.get().getMods().forEach(modInfo -> {
+            // there's a significant overhead involved in parallel streams that may make it run slower than sequential if
+            // you're only doing a small amount of work, therefore we only use it if there's *a lot* of mods to iterate through
+            final Stream<ModInfo> modInfoStream;
+            if (ModList.get().getMods().size() > 100) modInfoStream = ModList.get().getMods().parallelStream();
+            else modInfoStream = ModList.get().getMods().stream();
+
+            itlt.LOGGER.debug("isParallel: " + modInfoStream.isParallel());
+
+            modInfoStream.forEach(modInfo -> {
                 // by modId
                 final String modId = modInfo.getModId().toLowerCase();
+
+                // simple algorithm for xray modIds and a hard-coded list of known cheat modIds
                 if ((modId.contains("xray") && !modId.contains("anti"))
                         || modId.equals("forgehax") || modId.equals("forgewurst")) {
-                    listOfcheatMods.add(modInfo);
+                    listOfDetectedCheatMods.add(modInfo);
                 }
+
+                // known cheat modIds from definition file
+                finalCheatModIds.forEach(cheatModId -> {
+                    if (modId.equalsIgnoreCase(cheatModId))
+                        listOfDetectedCheatMods.add(modInfo);
+                });
 
                 // by checksum
                 final File modFile = modInfo.getOwningFile().getFile().getFilePath().toFile();
                 try {
                     final String modFileChecksum = ClientUtils.getFileChecksum(modFile);
-                    itlt.LOGGER.warn(modFileChecksum);
+                    itlt.LOGGER.debug("modFileChecksum: " + modFileChecksum);
+
+                    // known cheat checksums from definition file
+                    finalCheatModChecksums.forEach(cheatModChecksum -> {
+                        if (modFileChecksum.equals(cheatModChecksum))
+                            listOfDetectedCheatMods.add(modInfo);
+                    });
                 } catch (final IOException | NoSuchAlgorithmException e) {
+                    itlt.LOGGER.warn("Unable to calculate checksum for " + modFile.getPath());
                     e.printStackTrace();
                 }
             });
 
+            listOfDetectedCheatMods.forEach(cheatMod -> itlt.LOGGER.debug("Found cheat mod: \"" + cheatMod.getOwningFile().getFile().getFileName() + "\""));
+
             if (ClientConfig.enableAutoRemovalOfCheats.get()) {
-                listOfcheatMods.forEach(cheatMod -> {
+                listOfDetectedCheatMods.forEach(cheatMod -> {
                     final File cheatModFile = cheatMod.getOwningFile().getFile().getFilePath().toFile();
                     if (!cheatModFile.delete()) // if it can't be deleted immediately,
                         cheatModFile.deleteOnExit(); // delete it when the game closes or crashes

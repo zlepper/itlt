@@ -6,55 +6,49 @@ import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.ClientConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.SharedConstants;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ClientUtils {
 
     public static String getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException {
         final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-        // Get file input stream for reading the file content
         final FileInputStream fis = new FileInputStream(file);
 
-        // Create byte array to read data in chunks
+        // create byte array to read data in chunks
         byte[] byteArray = new byte[1024];
         int bytesCount;
 
-        // Read file data and update in message digest
+        // read file data and update in message digest
         while ((bytesCount = fis.read(byteArray)) != -1) {
             digest.update(byteArray, 0, bytesCount);
         }
-
-        // Close the stream; We don't need it now.
         fis.close();
 
         // Get the hash's bytes
         byte[] bytes = digest.digest();
 
-        // This bytes[] has bytes in decimal format;
-        // Convert it to hexadecimal format
+        // Convert the bytes[] from decimal to hex
         final StringBuilder sb = new StringBuilder();
         for (byte aByte : bytes) {
             sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
         }
 
-        // return complete hash
+        // return the completed hash
         return sb.toString();
     }
 
@@ -177,8 +171,9 @@ public class ClientUtils {
         }
     }
 
-    public static void getLatestDefinitions(final Minecraft mcInstance) throws IOException {
-        final String definitionsURLString = "";
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> getLatestDefinitions(final Minecraft mcInstance) throws IOException, ClassCastException {
+        final String definitionsURLString = "https://raw.githubusercontent.com/zlepper/itlt/1.16-2.0-rewrite/definitionsAPI/v1/definitions.json";
 
         // download the definitions and put it in the string "definitionsJson"
         final URLConnection connection = new URL(definitionsURLString).openConnection();
@@ -186,16 +181,18 @@ public class ClientUtils {
         final String definitionsJson = reader.lines().collect(Collectors.joining("\n"));
 
         // convert the definitionsJson string to a Map
-        final Type type = new TypeToken<Map<String, String>>(){}.getType();
-        final Map<String, String> definitionsMap = new Gson().fromJson(definitionsJson, type);
+        final Type type = new TypeToken<Map<String, Object>>(){}.getType();
+        final Map<String, Object> definitionsMap = new Gson().fromJson(definitionsJson, type);
 
-        itlt.LOGGER.error("getVersion: " + mcInstance.getVersion());
-        itlt.LOGGER.error("getVersionType: " + mcInstance.getVersionType());
-        itlt.LOGGER.error("definitionsMap: " + definitionsMap.toString());
+        String mcVersion = SharedConstants.getVersion().getName();
+        final String[] splitMcVersion = mcVersion.split(Pattern.quote("."));
+        mcVersion = splitMcVersion[0] + "." + splitMcVersion[1];
+        itlt.LOGGER.debug("mcVersion: " + mcVersion);
+        itlt.LOGGER.debug("definitionsMap: " + definitionsMap.toString());
 
-        /*if (definitionsMap.containsKey(mcInstance.getVersion())) {
+        return Collections.unmodifiableMap((Map<String, Object>) definitionsMap.getOrDefault(mcVersion, Collections.<String, Object>emptyMap()));
 
-        }*/
+        //return (Map<String, Object>) definitionsMap.getOrDefault(mcInstance.getVersion(), null);
 
         /* The definitions JSON looks something like this:
          *  {

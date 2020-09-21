@@ -1,15 +1,62 @@
 package dk.zlepper.itlt.client.helpers;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.ClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.*;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ClientUtils {
+
+    public static String getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException {
+        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+        // Get file input stream for reading the file content
+        final FileInputStream fis = new FileInputStream(file);
+
+        // Create byte array to read data in chunks
+        byte[] byteArray = new byte[1024];
+        int bytesCount;
+
+        // Read file data and update in message digest
+        while ((bytesCount = fis.read(byteArray)) != -1) {
+            digest.update(byteArray, 0, bytesCount);
+        }
+
+        // Close the stream; We don't need it now.
+        fis.close();
+
+        // Get the hash's bytes
+        byte[] bytes = digest.digest();
+
+        // This bytes[] has bytes in decimal format;
+        // Convert it to hexadecimal format
+        final StringBuilder sb = new StringBuilder();
+        for (byte aByte : bytes) {
+            sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
+        }
+
+        // return complete hash
+        return sb.toString();
+    }
 
     public static void setWindowIcon(final File icon, final Minecraft mcInstance) {
         try (final InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
@@ -130,4 +177,38 @@ public class ClientUtils {
         }
     }
 
+    public static void getLatestDefinitions(final Minecraft mcInstance) throws IOException {
+        final String definitionsURLString = "";
+
+        // download the definitions and put it in the string "definitionsJson"
+        final URLConnection connection = new URL(definitionsURLString).openConnection();
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+        final String definitionsJson = reader.lines().collect(Collectors.joining("\n"));
+
+        // convert the definitionsJson string to a Map
+        final Type type = new TypeToken<Map<String, String>>(){}.getType();
+        final Map<String, String> definitionsMap = new Gson().fromJson(definitionsJson, type);
+
+        itlt.LOGGER.error("getVersion: " + mcInstance.getVersion());
+        itlt.LOGGER.error("getVersionType: " + mcInstance.getVersionType());
+        itlt.LOGGER.error("definitionsMap: " + definitionsMap.toString());
+
+        /*if (definitionsMap.containsKey(mcInstance.getVersion())) {
+
+        }*/
+
+        /* The definitions JSON looks something like this:
+         *  {
+         *      "1.16": {
+         *          "modIds": [ "modid1", "modid2", "modid3" ],
+         *          "checksums": [ "aabc", "e102", "8fc2" ]
+         *      },
+         *      "1.15": {
+         *          (...)
+         *      }
+         *  }
+         *
+         * Patch releases such as 1.16.1, 1.16.2, etc... all point to 1.16
+         */
+    }
 }

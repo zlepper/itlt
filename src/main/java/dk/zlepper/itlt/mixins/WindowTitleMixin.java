@@ -8,13 +8,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
 public class WindowTitleMixin {
-
     /**
      * @author Paint_Ninja
      * @reason Restores the ability to change the Minecraft window title
      */
     @Inject(method = "setDefaultMinecraftTitle", at = @At(value = "HEAD"), cancellable = true)
-    private void setDefaultMinecraftTitle(CallbackInfo ci) {
-        ci.cancel();
-    }
+    private void setDefaultMinecraftTitle(CallbackInfo ci) { ci.cancel(); }
 }

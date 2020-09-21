@@ -103,6 +103,19 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.16.3-34.0.9'
     compile 'org.spongepowered:mixin:0.8.1'
 
+    // itlt uses the "BLAKE3-JNI" library for BLAKE3 checksum calculations with a fallback to SHA-512.
+    // Unfortunately, the library published on Maven Central is compiled for a version of Java newer than 8
+    // so we can't use it as we need Java 8 support. :(
+    //implementation 'io.lktk:blake3jni:0.2.2'
+
+    // The workaround is to instead manually build it with Java 8, include it in the libs folder (which I've
+    // also included in this repo) and then include the library it depends on.
+    //
+    // If you're a contributor or dev looking at the itlt source code, you shouldn't need to worry about any of
+    // this unless you want to recompile blake3jni with support for more platforms as I've handled it for you :)
+    compile files("libs/blake3jni-0.2.2.jar")
+    implementation "org.scijava:native-lib-loader:2.3.4"
+
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"

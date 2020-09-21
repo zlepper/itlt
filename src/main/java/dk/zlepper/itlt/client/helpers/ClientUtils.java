@@ -2,9 +2,9 @@ package dk.zlepper.itlt.client.helpers;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
-import dk.zlepper.itlt.client.ClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.SharedConstants;
 import net.minecraftforge.fml.ModList;
@@ -18,22 +18,67 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import io.lktk.NativeBLAKE3;
+import io.lktk.NativeBLAKE3Util;
+import org.apache.commons.codec.binary.Base64;
+
 public class ClientUtils {
 
-    public static String getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException {
-        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    public static Object[] getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException, NativeBLAKE3Util.InvalidNativeOutput {
+        // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to SHA-512
+        if (!NativeBLAKE3.isEnabled())
+            return getFileChecksumFallback(file);
+
+        // setup the BLAKE3 hasher
+        final NativeBLAKE3 hasher = new NativeBLAKE3();
+        hasher.initDefault();
+
+        // open the file to hash
         final FileInputStream fis = new FileInputStream(file);
 
         // create byte array to read data in chunks
         byte[] byteArray = new byte[1024];
+
+        // read file data in chunks of 1KB and send it off to the hasher
+        while ((fis.read(byteArray)) != -1) {
+            hasher.update(byteArray);
+        }
+
+        // we're finished reading the file, so close it
+        fis.close();
+
+        // get the hasher's output
+        final byte[] bytes = hasher.getOutput();
+
+        // the NaitveBLAKE3 JNI is a C lib so we need to manually tell it to free up the memory now that we're done with it
+        if (hasher.isValid())
+            hasher.close();
+
+        // convert from decimal to hex
+        /*final StringBuilder sb = new StringBuilder();
+        for (byte aByte : decimalBytes) {
+            sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
+        }*/
+
+        // convert from decimal to Base64
+        final String encodedBase64 = Base64.encodeBase64String(bytes);
+
+        Base62
+
+        return new Object[]{ChecksumType.Modern, encodedBase64};
+    }
+
+    public static Object[] getFileChecksumFallback(final File file) throws IOException, NoSuchAlgorithmException {
+        final MessageDigest digest = MessageDigest.getInstance("SHA-512");
+        final FileInputStream fis = new FileInputStream(file);
+
+        byte[] byteArray = new byte[1024];
         int bytesCount;
 
-        // read file data and update in message digest
         while ((bytesCount = fis.read(byteArray)) != -1) {
             digest.update(byteArray, 0, bytesCount);
         }
@@ -42,14 +87,22 @@ public class ClientUtils {
         // Get the hash's bytes
         byte[] bytes = digest.digest();
 
-        // Convert the bytes[] from decimal to hex
+        // convert from decimal to hex
         final StringBuilder sb = new StringBuilder();
         for (byte aByte : bytes) {
             sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
         }
 
+        // convert from decimal to Base64
+        //final String encodedBase64 = Base64.encodeBase64String(bytes);
+
         // return the completed hash
-        return sb.toString();
+        return new Object[]{ChecksumType.Fallback, sb.toString()};
+    }
+
+    public enum ChecksumType {
+        Fallback,
+        Modern
     }
 
     public static void setWindowIcon(final File icon, final Minecraft mcInstance) {
@@ -172,8 +225,10 @@ public class ClientUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> getLatestDefinitions(final Minecraft mcInstance) throws IOException, ClassCastException {
-        final String definitionsURLString = "https://raw.githubusercontent.com/zlepper/itlt/1.16-2.0-rewrite/definitionsAPI/v1/definitions.json";
+    public static Map<String, Object> getLatestDefinitions(final Minecraft mcInstance, final ChecksumType checksumType) throws IOException, ClassCastException {
+        final String definitionsURLString;
+        if (checksumType == ChecksumType.Modern) definitionsURLString = "https://raw.githubusercontent.com/zlepper/itlt/1.16-2.0-rewrite/definitionsAPI/v1/definitions.json";
+        else definitionsURLString = "https://raw.githubusercontent.com/zlepper/itlt/1.16-2.0-rewrite/definitionsAPI/v1/definitions-fallback.json";
 
         // download the definitions and put it in the string "definitionsJson"
         final URLConnection connection = new URL(definitionsURLString).openConnection();
@@ -184,9 +239,11 @@ public class ClientUtils {
         final Type type = new TypeToken<Map<String, Object>>(){}.getType();
         final Map<String, Object> definitionsMap = new Gson().fromJson(definitionsJson, type);
 
+        // trim off the version patch number, accounting for cases like 1.17.10 that have a double-digit patch number
         String mcVersion = SharedConstants.getVersion().getName();
         final String[] splitMcVersion = mcVersion.split(Pattern.quote("."));
         mcVersion = splitMcVersion[0] + "." + splitMcVersion[1];
+
         itlt.LOGGER.debug("mcVersion: " + mcVersion);
         itlt.LOGGER.debug("definitionsMap: " + definitionsMap.toString());
 

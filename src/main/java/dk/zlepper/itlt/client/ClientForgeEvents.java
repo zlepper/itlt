@@ -8,6 +8,8 @@ package dk.zlepper.itlt.client;
 
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.itlt;
+import io.lktk.NativeBLAKE3;
+import io.lktk.NativeBLAKE3Util;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -21,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -33,19 +36,23 @@ public class ClientForgeEvents {
         if (ClientConfig.enableAnticheat.get()) {
 
             // definition updates
-            ArrayList<String> cheatModIds = new ArrayList<>(0);
-            ArrayList<String> cheatModChecksums = new ArrayList<>(0);
+            ArrayList<String> cheatModIds = new ArrayList<>();
+            ArrayList<String> cheatModChecksums = new ArrayList<>();
             try {
-                final Map<String, Object> latestDefinitions = ClientUtils.getLatestDefinitions(Minecraft.getInstance());
+                // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to SHA-512
+                final Map<String, Object> latestDefinitions;
+                if (NativeBLAKE3.isEnabled()) latestDefinitions = ClientUtils.getLatestDefinitions(Minecraft.getInstance(), ClientUtils.ChecksumType.Modern);
+                else latestDefinitions = ClientUtils.getLatestDefinitions(Minecraft.getInstance(), ClientUtils.ChecksumType.Fallback);
                 itlt.LOGGER.debug("latestDefinitions: " + latestDefinitions);
 
+                // try to get the modIds section and fallback to an empty value and show a warning if unable to
                 cheatModIds = (ArrayList<String>) latestDefinitions.getOrDefault("modIds", new ArrayList<String>(0));
                 if (cheatModIds.isEmpty()) itlt.LOGGER.warn("modIds section missing from latest definitions");
+                itlt.LOGGER.debug("cheatModIds: " + cheatModIds);
 
+                // same with the checksums section
                 cheatModChecksums = (ArrayList<String>) latestDefinitions.getOrDefault("checksums", new ArrayList<String>(0));
                 if (cheatModChecksums.isEmpty()) itlt.LOGGER.warn("checksums section missing from latest definitions");
-
-                itlt.LOGGER.debug("cheatModIds: " + cheatModIds);
                 itlt.LOGGER.debug("cheatModChecksums: " + cheatModChecksums);
             } catch (final IOException e) {
                 itlt.LOGGER.error("Unable to get latest definitions");
@@ -86,15 +93,15 @@ public class ClientForgeEvents {
                 // by checksum
                 final File modFile = modInfo.getOwningFile().getFile().getFilePath().toFile();
                 try {
-                    final String modFileChecksum = ClientUtils.getFileChecksum(modFile);
-                    itlt.LOGGER.debug("modFileChecksum: " + modFileChecksum);
+                    final Object[] modFileChecksum = ClientUtils.getFileChecksum(modFile);
+                    itlt.LOGGER.debug("modFileChecksum: " + Arrays.toString(modFileChecksum));
 
                     // known cheat checksums from definition file
                     finalCheatModChecksums.forEach(cheatModChecksum -> {
-                        if (modFileChecksum.equals(cheatModChecksum))
+                        if (modFileChecksum[1].toString().equals(cheatModChecksum))
                             listOfDetectedCheatMods.add(modInfo);
                     });
-                } catch (final IOException | NoSuchAlgorithmException e) {
+                } catch (final IOException | NoSuchAlgorithmException | NativeBLAKE3Util.InvalidNativeOutput e) {
                     itlt.LOGGER.warn("Unable to calculate checksum for " + modFile.getPath());
                     e.printStackTrace();
                 }

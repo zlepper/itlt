@@ -29,6 +29,36 @@ import io.lktk.NativeBLAKE3Util;
 
 public class ClientUtils {
 
+    public static LauncherName detectLauncher() {
+        final Path itltJarPath = ModList.get().getModFileById("itlt").getFile().getFilePath();
+        itlt.LOGGER.debug("itltJarPath: " + itltJarPath); // should be something like ???\mcRoot\mods\itlt.jar
+
+        // jumping up a few directories should theoretically take us out of the mods folder and into the root folder of
+        // the Twitch launcher. If the path name we're in after doing this is "Twitch", we know we're running within a
+        // Twitch launcher modpack.
+        final Path theoreticalTwitchPath = itltJarPath.getParent().getParent().getParent().getParent().getParent();
+        final boolean isTwitchLauncher = theoreticalTwitchPath.getFileName().toString().equals("Twitch");
+        itlt.LOGGER.debug("theoreticalTwitchPath: " + theoreticalTwitchPath);
+        itlt.LOGGER.debug("isTwitchLauncher: " + isTwitchLauncher);
+
+        // same deal for the Technic Launcher. If the path name we're in after doing this is ".technic", we know we're
+        // running within a Technic Launcher modpack.
+        final Path theoreticalTechnicPath = itltJarPath.getParent().getParent().getParent().getParent();
+        final boolean isTechnicLauncher = theoreticalTwitchPath.getFileName().toString().equals(".technic");
+        itlt.LOGGER.debug("theoreticalTechnicPath: " + theoreticalTechnicPath);
+        itlt.LOGGER.debug("isTechnicLauncher: " + isTechnicLauncher);
+
+        if (isTwitchLauncher) return LauncherName.Twitch;
+        else if (isTechnicLauncher) return LauncherName.Technic;
+        else return LauncherName.Unknown;
+    }
+
+    public enum LauncherName {
+        Unknown,
+        Twitch,
+        Technic
+    }
+
     public static Object[] getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException, NativeBLAKE3Util.InvalidNativeOutput {
         // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to SHA-512
         if (!NativeBLAKE3.isEnabled())
@@ -45,9 +75,7 @@ public class ClientUtils {
         byte[] byteArray = new byte[1024];
 
         // read file data in chunks of 1KB and send it off to the hasher
-        while ((fis.read(byteArray)) != -1) {
-            hasher.update(byteArray);
-        }
+        while ((fis.read(byteArray)) != -1) hasher.update(byteArray);
 
         // we're finished reading the file, so close it
         fis.close();
@@ -56,8 +84,7 @@ public class ClientUtils {
         final byte[] bytes = hasher.getOutput();
 
         // the NaitveBLAKE3 JNI is a C lib so we need to manually tell it to free up the memory now that we're done with it
-        if (hasher.isValid())
-            hasher.close();
+        if (hasher.isValid()) hasher.close();
 
         // convert to hex
         /*final StringBuilder sb = new StringBuilder();
@@ -82,9 +109,7 @@ public class ClientUtils {
         byte[] byteArray = new byte[1024];
         int bytesCount;
 
-        while ((bytesCount = fis.read(byteArray)) != -1) {
-            digest.update(byteArray, 0, bytesCount);
-        }
+        while ((bytesCount = fis.read(byteArray)) != -1) digest.update(byteArray, 0, bytesCount);
         fis.close();
 
         // Get the hash's bytes

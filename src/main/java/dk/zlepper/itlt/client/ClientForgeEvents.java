@@ -41,8 +41,8 @@ public class ClientForgeEvents {
             try {
                 // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to SHA-512
                 final Map<String, Object> latestDefinitions;
-                if (NativeBLAKE3.isEnabled()) latestDefinitions = ClientUtils.getLatestDefinitions(Minecraft.getInstance(), ClientUtils.ChecksumType.Modern);
-                else latestDefinitions = ClientUtils.getLatestDefinitions(Minecraft.getInstance(), ClientUtils.ChecksumType.Fallback);
+                if (NativeBLAKE3.isEnabled()) latestDefinitions = ClientUtils.getLatestDefinitions(ClientUtils.ChecksumType.Modern);
+                else latestDefinitions = ClientUtils.getLatestDefinitions(ClientUtils.ChecksumType.Fallback);
                 itlt.LOGGER.debug("latestDefinitions: " + latestDefinitions);
 
                 // try to get the modIds section and fallback to an empty value and show a warning if unable to
@@ -71,7 +71,6 @@ public class ClientForgeEvents {
             final Stream<ModInfo> modInfoStream;
             if (ModList.get().getMods().size() > 100) modInfoStream = ModList.get().getMods().parallelStream();
             else modInfoStream = ModList.get().getMods().stream();
-
             itlt.LOGGER.debug("isParallel: " + modInfoStream.isParallel());
 
             modInfoStream.forEach(modInfo -> {

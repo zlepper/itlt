@@ -5,7 +5,6 @@ package dk.zlepper.itlt.client;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.io.File;
@@ -27,6 +26,7 @@ public final class ClientConfig {
             enableCustomMemoryAllocGuide,
             enableMinJavaVerRequirement,
             enableMinJavaVerWarning,
+            selectivelyIgnoreMinJavaVerWarning,
             enableCustomWindowTitle,
             enableAppendingToCustomTitle,
             enableCustomIcon,
@@ -122,6 +122,10 @@ public final class ClientConfig {
                     warnMinJavaVersion = clientConfigBuilder
                             .comment("")
                             .define("warnMinJavaVersion", 8);
+                    selectivelyIgnoreMinJavaVerWarning = clientConfigBuilder
+                            .comment("\r\nSome launchers (such as Twitch/CurseForge launcher) do not allow the Java version to be changed beyond Java 8.\r\n" +
+                                    "Enable this option to ignore the MinJavaVerWarning on launchers where the users are unable to change the version of Java used to launch the game.")
+                            .define("ignoreMinJavaVerWarningWhenVerForced", true);
                 } clientConfigBuilder.pop();
 
             } clientConfigBuilder.pop(); // end of Java.Version

@@ -38,10 +38,20 @@ public class ClientModEvents {
         itlt.LOGGER.debug("requiredMinJavaVerion: " + ClientConfig.requiredMinJavaVersion.get());
         itlt.LOGGER.debug("warnMinJavaVersion: " + ClientConfig.warnMinJavaVersion.get());
 
-        if (ClientConfig.enableMinJavaVerRequirement.get() && javaVerInt < ClientConfig.requiredMinJavaVersion.get())
+        if (ClientConfig.enableMinJavaVerRequirement.get() && javaVerInt < ClientConfig.requiredMinJavaVersion.get()) {
             ClientUtils.startUIProcess(MessageContent.NeedsNewerJava);
-        else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get())
-            ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
+        } else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get()) {
+            if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
+                final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
+                itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
+                if (detectedLauncher == ClientUtils.LauncherName.Twitch)
+                    itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the Twitch Launcher " +
+                            "which currently does not allow changing Java version beyond Java 8. :(");
+                else ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
+            } else {
+                ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
+            }
+        }
 
 
         // Memory-related requirements and warnings
@@ -67,15 +77,14 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void clientInit(final FMLClientSetupEvent event) {
         final Minecraft mcInstance = event.getMinecraftSupplier().get();
+        ClientUtils.detectLauncher(); // put here solely for debugging purposes
 
         // Java arch requirement and warning
         final boolean isJava64bit = mcInstance.isJava64bit();
         itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
         if (!isJava64bit)
-            if (ClientConfig.enable64bitRequirement.get())
-                ClientUtils.startUIProcess(MessageContent.NeedsJava64bit);
-            else if (ClientConfig.enable64bitWarning.get())
-                ClientUtils.startUIProcess(MessageContent.WantsJava64bit);
+            if (ClientConfig.enable64bitRequirement.get()) ClientUtils.startUIProcess(MessageContent.NeedsJava64bit);
+            else if (ClientConfig.enable64bitWarning.get()) ClientUtils.startUIProcess(MessageContent.WantsJava64bit);
 
 
         // Custom window title text
@@ -92,10 +101,8 @@ public class ClientModEvents {
                 if (icon.exists() && !icon.isDirectory()) ClientUtils.setWindowIcon(icon, mcInstance);
             } else {
                 itlt.LOGGER.warn("itlt folder in the config folder is missing.");
-                if (itltDir.mkdir())
-                    itlt.LOGGER.info("The folder has been successfully created for you.");
-                else
-                    itlt.LOGGER.info("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
+                if (itltDir.mkdir()) itlt.LOGGER.info("The folder has been successfully created for you.");
+                else itlt.LOGGER.info("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
             }
         }
     }

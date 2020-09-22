@@ -10,7 +10,6 @@ import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.itlt;
 import io.lktk.NativeBLAKE3;
 import io.lktk.NativeBLAKE3Util;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;

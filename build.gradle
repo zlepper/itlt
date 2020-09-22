@@ -109,7 +109,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.16.3-34.0.9'
+    minecraft 'net.minecraftforge:forge:1.16.3-34.0.13'
     compile 'org.spongepowered:mixin:0.8.1'
 
     // itlt uses the "BLAKE3-JNI" library for BLAKE3 checksum calculations with a fallback to SHA-512.

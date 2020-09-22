@@ -1,7 +1,6 @@
 package dk.zlepper.itlt.client;
 
 // todo: config option of warning when more than (maxSysRAM - 1GB) is allocated to the game
-// todo: ignoreMinJavaVerWarningOnTwitchLauncher (as it forces you to use at most Java 8)
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;

@@ -8,6 +8,8 @@ import dk.zlepper.itlt.itlt;
 import io.seruco.encoding.base62.Base62;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.SharedConstants;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.fml.ModList;
 
 import java.io.*;
@@ -25,7 +27,6 @@ import java.util.stream.Collectors;
 
 import io.lktk.NativeBLAKE3;
 import io.lktk.NativeBLAKE3Util;
-import org.apache.commons.codec.binary.Base64;
 
 public class ClientUtils {
 
@@ -116,7 +117,7 @@ public class ClientUtils {
         try (final InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
             try (final InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
                 mcInstance.getMainWindow().setWindowIcon(is1, is2);
-                itlt.LOGGER.info("Set window icon without issues");
+                itlt.LOGGER.debug("Set window icon without issues");
             }
         } catch (final FileNotFoundException e) {
             itlt.LOGGER.error("Failed to open icon that we just confirmed was there???", e);
@@ -132,75 +133,75 @@ public class ClientUtils {
         switch (messageContent) {
             case NeedsJava64bit:
                 messageType = "require";
-                messageTitle = "64bit Java required"; // todo: i18n/multilingual support
-                messageBody = "Whoops! This pack requires 64bit Java but you appear to be using 32bit Java.";
+                messageTitle = new TranslationTextComponent("itlt.java.arch.require.title").getUnformattedComponentText();
+                messageBody = new TranslationTextComponent("itlt.java.arch.require.body").getUnformattedComponentText();
                 if (ClientConfig.enableCustom64bitJavaGuide.get()) { guideURL = ClientConfig.custom64bitJavaGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
-                leftButtonText = "Get 64bit Java";
-                middleButtonText = "Close";
+                leftButtonText = new TranslationTextComponent("itlt.java.arch.require.guideButtonText").getUnformattedComponentText();
+                middleButtonText = new TranslationTextComponent("itlt.java.arch.require.closeButtonText").getUnformattedComponentText();
                 rightButtonText = ".";
                 break;
             case WantsJava64bit:
                 messageType = "warn";
-                messageTitle = "64bit Java recommended";
-                messageBody = "Warning: You appear to be using 32bit Java - this pack recommends 64bit Java for the best experience.";
+                messageTitle = new TranslationTextComponent("itlt.java.arch.warning.title").getUnformattedComponentText();
+                messageBody = new TranslationTextComponent("itlt.java.arch.warning.body").getUnformattedComponentText();
                 if (ClientConfig.enableCustom64bitJavaGuide.get()) { guideURL = ClientConfig.custom64bitJavaGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
-                leftButtonText = "Get 64bit Java";
-                middleButtonText = "Ask later";
-                rightButtonText = "Don't ask again";
+                leftButtonText = new TranslationTextComponent("itlt.java.arch.warning.guideButtonText").getUnformattedComponentText();
+                middleButtonText = new TranslationTextComponent("itlt.java.arch.warning.askLaterButtonText").getUnformattedComponentText();
+                rightButtonText = new TranslationTextComponent("itlt.java.arch.warning.dontAskAgainButtonText").getUnformattedComponentText();
                 break;
             case NeedsMoreMemory:
                 messageType = "require";
-                messageTitle = "More allocated RAM required";
-                messageBody = "Whoops! This pack requires at least " + ClientConfig.reqMinMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientModEvents.currentMem + "GB of RAM.";
+                messageTitle = new TranslationTextComponent("itlt.java.memory.min.require.title").getUnformattedComponentText();
+                messageBody = new TranslationTextComponent("itlt.java.memory.min.require.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.reqMinMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
-                leftButtonText = "Show guide";
-                middleButtonText = "Close";
+                leftButtonText = new TranslationTextComponent("itlt.java.memory.min.require.guideButtonText").getUnformattedComponentText();
+                middleButtonText = new TranslationTextComponent("itlt.java.memory.min.require.closeButtonText").getUnformattedComponentText();
                 rightButtonText = ".";
                 break;
             case WantsMoreMemory:
-                messageType = "require";
-                messageTitle = "More allocated RAM recommended";
-                messageBody = "Warning: For the best experience, this pack must have at least " + ClientConfig.warnMinMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientModEvents.currentMem + "GB of RAM.";
+                messageType = "warn";
+                messageTitle = new TranslationTextComponent("itlt.java.memory.min.warning.title").getUnformattedComponentText();
+                messageBody = new TranslationTextComponent("itlt.java.memory.min.warning.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.warnMinMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
-                leftButtonText = "Show guide";
-                middleButtonText = "Ask later";
-                rightButtonText = "Don't ask again";
+                leftButtonText = new TranslationTextComponent("itlt.java.memory.min.warning.guideButtonText").getUnformattedComponentText();
+                middleButtonText = new TranslationTextComponent("itlt.java.memory.min.warning.askLaterButtonText").getUnformattedComponentText();
+                rightButtonText = new TranslationTextComponent("itlt.java.memory.min.warning.dontAskAgainButtonText").getUnformattedComponentText();
                 break;
             case NeedsLessMemory:
                 messageType = "require";
-                messageTitle = "Less allocated RAM required";
-                messageBody = "Whoops! This pack must not have more than " + ClientConfig.reqMaxMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientModEvents.currentMem + "GB of RAM.";
+                messageTitle = new TranslationTextComponent("itlt.java.memory.max.require.title").getUnformattedComponentText();
+                messageBody = new TranslationTextComponent("itlt.java.memory.max.require.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.reqMaxMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
-                leftButtonText = "Show guide";
-                middleButtonText = "Close";
+                leftButtonText = new TranslationTextComponent("itlt.java.memory.max.require.guideButtonText").getUnformattedComponentText();
+                middleButtonText = new TranslationTextComponent("itlt.java.memory.max.require.closeButtonText").getUnformattedComponentText();
                 rightButtonText = ".";
                 break;
             case WantsLessMemory:
                 messageType = "warn";
-                messageTitle = "Less allocated RAM recommended";
-                messageBody = "Warning: For the best experience, this pack must not have more than " + ClientConfig.warnMaxMemoryAmountInGB.get() + "GB but you appear to be allocating " + ClientModEvents.currentMem + "GB of RAM.";
+                messageTitle = new TranslationTextComponent("itlt.java.memory.max.warning.title").getUnformattedComponentText();
+                messageBody = new TranslationTextComponent("itlt.java.memory.max.warning.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.warnMaxMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
-                leftButtonText = "Show guide";
-                middleButtonText = "Ask later";
-                rightButtonText = "Don't ask again";
+                leftButtonText = new TranslationTextComponent("itlt.java.memory.max.warning.guideButtonText").getUnformattedComponentText();
+                middleButtonText = new TranslationTextComponent("itlt.java.memory.max.warning.askLaterButtonText").getUnformattedComponentText();
+                rightButtonText = new TranslationTextComponent("itlt.java.memory.max.warning.dontAskAgainButtonText").getUnformattedComponentText();
                 break;
             case NeedsNewerJava:
                 messageType = "require";
-                messageTitle = "Java " + ClientConfig.requiredMinJavaVersion.get().toString() + "+ required";
-                messageBody = "Whoops! This pack requires Java " + ClientConfig.requiredMinJavaVersion.get() + " or newer but you appear to be using Java " + ClientModEvents.javaVerInt + ".";
+                messageTitle = new TranslationTextComponent("itlt.java.version.require.title").getUnformattedComponentText();
+                messageBody = new TranslationTextComponent("itlt.java.version.require.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.javaVerInt));
                 if (ClientConfig.enableCustomJavaUpgradeGuide.get()) { guideURL = ClientConfig.customJavaUpgradeGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
-                leftButtonText = "Get newer Java";
-                middleButtonText = "Close";
+                leftButtonText = new TranslationTextComponent("itlt.java.version.require.guideButtonText").getUnformattedComponentText();
+                middleButtonText = new TranslationTextComponent("itlt.java.version.require.closeButtonText").getUnformattedComponentText();
                 rightButtonText = ".";
                 break;
             case WantsNewerJava:
                 messageType = "warn";
-                messageTitle = "Java " + ClientConfig.requiredMinJavaVersion.get().toString() + "+ recommended";
-                messageBody = "Warning: For the best experience, this pack recommends Java " + ClientConfig.requiredMinJavaVersion.get() + " or newer but you appear to be using Java " + ClientModEvents.javaVerInt + ".";
+                messageTitle = new TranslationTextComponent("itlt.java.version.warning.title").getUnformattedComponentText();
+                messageBody = new TranslationTextComponent("itlt.java.version.warning.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.javaVerInt));
                 if (ClientConfig.enableCustomJavaUpgradeGuide.get()) { guideURL = ClientConfig.customJavaUpgradeGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
-                leftButtonText = "Get newer Java";
-                middleButtonText = "Ask later";
-                rightButtonText = "Don't ask again";
+                leftButtonText = new TranslationTextComponent("itlt.java.version.warning.guideButtonText").getUnformattedComponentText();
+                middleButtonText = new TranslationTextComponent("itlt.java.version.warning.askLaterButtonText").getUnformattedComponentText();
+                rightButtonText = new TranslationTextComponent("itlt.java.version.warning.dontAskAgainButtonText").getUnformattedComponentText();
                 break;
             default:
                 messageType = "";
@@ -255,8 +256,6 @@ public class ClientUtils {
         itlt.LOGGER.debug("definitionsMap: " + definitionsMap.toString());
 
         return Collections.unmodifiableMap((Map<String, Object>) definitionsMap.getOrDefault(mcVersion, Collections.<String, Object>emptyMap()));
-
-        //return (Map<String, Object>) definitionsMap.getOrDefault(mcInstance.getVersion(), null);
 
         /* The definitions JSON looks something like this:
          *  {

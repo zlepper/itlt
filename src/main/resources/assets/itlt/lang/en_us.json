@@ -1,0 +1,45 @@
+{
+  "itlt.java.arch.require.title": "64bit Java required",
+  "itlt.java.arch.require.body": "Whoops! This pack requires 64bit Java but you appear to be using 32bit Java.",
+  "itlt.java.arch.require.guideButtonText": "Get 64bit Java",
+  "itlt.java.arch.require.closeButtonText": "Close",
+
+  "itlt.java.arch.warning.title": "64bit Java recommended",
+  "itlt.java.arch.warning.body": "Warning: You appear to be using 32bit Java - this pack recommends 64bit Java for the best experience.",
+  "itlt.java.arch.warning.guideButtonText": "Get 64bit Java",
+  "itlt.java.arch.warning.askLaterButtonText": "Ask later",
+  "itlt.java.arch.warning.dontAskAgainButtonText": "Don't ask again",
+
+  "itlt.java.version.require.title": "Java %s+ required",
+  "itlt.java.version.require.body": "Whoops! This pack requires Java %s or newer but you appear to be using Java %sb.",
+  "itlt.java.version.require.guideButtonText": "Update Java",
+  "itlt.java.version.require.closeButtonText": "Close",
+
+  "itlt.java.version.warning.title": "Java %s+ recommended",
+  "itlt.java.version.warning.body": "Warning: For the best experience, this pack recommends Java %s or newer but you appear to be using Java %sb.",
+  "itlt.java.version.warning.guideButtonText": "Update Java",
+  "itlt.java.version.warning.askLaterButtonText": "Ask later",
+  "itlt.java.version.warning.dontAskAgainButtonText": "Don't ask again",
+
+  "itlt.java.memory.min.require.title": "More allocated RAM required",
+  "itlt.java.memory.min.require.body": "Whoops! This pack requires at least %sGB but you appear to be allocating %sbGB of RAM.",
+  "itlt.java.memory.min.require.guideButtonText": "Show guide",
+  "itlt.java.memory.min.require.closeButtonText": "Close",
+
+  "itlt.java.memory.min.warning.title": "More allocated RAM recommended",
+  "itlt.java.memory.min.warning.body": "Warning: For the best experience, this pack must have at least %sGB but you appear to be allocating %sbGB of RAM.",
+  "itlt.java.memory.min.warning.guideButtonText": "Show guide",
+  "itlt.java.memory.min.warning.askLaterButtonText": "Ask later",
+  "itlt.java.memory.min.warning.dontAskAgainButtonText": "Don't ask again",
+
+  "itlt.java.memory.max.require.title": "Less allocated RAM required",
+  "itlt.java.memory.max.require.body": "Whoops! This pack must not have more than %sGB but you appear to be allocating %sbGB of RAM.",
+  "itlt.java.memory.max.require.guideButtonText": "Show guide",
+  "itlt.java.memory.max.require.closeButtonText": "Close",
+
+  "itlt.java.memory.max.warning.title": "Less allocated RAM recommended",
+  "itlt.java.memory.max.warning.body": "Warning: For the best experience, this pack must not have more than %sGB but you appear to be allocating %sbGB of RAM.",
+  "itlt.java.memory.max.warning.guideButtonText": "Show guide",
+  "itlt.java.memory.max.warning.askLaterButtonText": "Ask later",
+  "itlt.java.memory.max.warning.dontAskAgainButtonText": "Don't ask again"
+}

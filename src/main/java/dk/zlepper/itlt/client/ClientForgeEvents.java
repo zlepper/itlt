@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 public class ClientForgeEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    @SuppressWarnings("unchecked") // It's handled through the try/catch block and fallbacks of the same type. Java's just being overly paranoid here.
+    @SuppressWarnings("unchecked") // Cast checking is handled through the try/catch block and fallbacks of the same type, Java's just being overly paranoid here.
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
         if (ClientConfig.enableAnticheat.get()) {
 
@@ -86,20 +86,21 @@ public class ClientForgeEvents {
 
                 // known cheat modIds from definition file
                 finalCheatModIds.forEach(cheatModId -> {
-                    if (modId.equalsIgnoreCase(cheatModId))
-                        listOfDetectedCheatMods.add(modInfo);
+                    if (modId.equalsIgnoreCase(cheatModId)) listOfDetectedCheatMods.add(modInfo);
                 });
 
                 // by checksum
                 final File modFile = modInfo.getOwningFile().getFile().getFilePath().toFile();
                 try {
                     final Object[] modFileChecksum = ClientUtils.getFileChecksum(modFile);
+                    itlt.LOGGER.debug("");
+                    itlt.LOGGER.debug("modId: " + modId);
+                    itlt.LOGGER.debug("modFile: " + modFile.toPath().toString());
                     itlt.LOGGER.debug("modFileChecksum: " + Arrays.toString(modFileChecksum));
 
                     // known cheat checksums from definition file
                     finalCheatModChecksums.forEach(cheatModChecksum -> {
-                        if (modFileChecksum[1].toString().equals(cheatModChecksum))
-                            listOfDetectedCheatMods.add(modInfo);
+                        if (modFileChecksum[1].toString().equals(cheatModChecksum)) listOfDetectedCheatMods.add(modInfo);
                     });
                 } catch (final IOException | NoSuchAlgorithmException | NativeBLAKE3Util.InvalidNativeOutput e) {
                     itlt.LOGGER.warn("Unable to calculate checksum for " + modFile.getPath());

@@ -9,7 +9,6 @@ import io.seruco.encoding.base62.Base62;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.SharedConstants;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.fml.ModList;
 
 import java.io.*;
@@ -152,7 +151,8 @@ public class ClientUtils {
             case NeedsMoreMemory:
                 messageType = "require";
                 messageTitle = new TranslationTextComponent("itlt.java.memory.min.require.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.memory.min.require.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.reqMinMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
+                messageBody = new TranslationTextComponent("itlt.java.memory.min.require.body").getUnformattedComponentText()
+                        .replaceFirst("%s", ClientConfig.reqMinMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = new TranslationTextComponent("itlt.java.memory.min.require.guideButtonText").getUnformattedComponentText();
                 middleButtonText = new TranslationTextComponent("itlt.java.memory.min.require.closeButtonText").getUnformattedComponentText();
@@ -161,7 +161,8 @@ public class ClientUtils {
             case WantsMoreMemory:
                 messageType = "warn";
                 messageTitle = new TranslationTextComponent("itlt.java.memory.min.warning.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.memory.min.warning.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.warnMinMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
+                messageBody = new TranslationTextComponent("itlt.java.memory.min.warning.body").getUnformattedComponentText()
+                        .replaceFirst("%s", ClientConfig.warnMinMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = new TranslationTextComponent("itlt.java.memory.min.warning.guideButtonText").getUnformattedComponentText();
                 middleButtonText = new TranslationTextComponent("itlt.java.memory.min.warning.askLaterButtonText").getUnformattedComponentText();
@@ -170,7 +171,8 @@ public class ClientUtils {
             case NeedsLessMemory:
                 messageType = "require";
                 messageTitle = new TranslationTextComponent("itlt.java.memory.max.require.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.memory.max.require.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.reqMaxMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
+                messageBody = new TranslationTextComponent("itlt.java.memory.max.require.body").getUnformattedComponentText()
+                        .replaceFirst("%s", ClientConfig.reqMaxMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = new TranslationTextComponent("itlt.java.memory.max.require.guideButtonText").getUnformattedComponentText();
                 middleButtonText = new TranslationTextComponent("itlt.java.memory.max.require.closeButtonText").getUnformattedComponentText();
@@ -179,7 +181,8 @@ public class ClientUtils {
             case WantsLessMemory:
                 messageType = "warn";
                 messageTitle = new TranslationTextComponent("itlt.java.memory.max.warning.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.memory.max.warning.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.warnMaxMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
+                messageBody = new TranslationTextComponent("itlt.java.memory.max.warning.body").getUnformattedComponentText()
+                        .replaceFirst("%s", ClientConfig.warnMaxMemoryAmountInGB.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) { guideURL = ClientConfig.customMemoryAllocGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = new TranslationTextComponent("itlt.java.memory.max.warning.guideButtonText").getUnformattedComponentText();
                 middleButtonText = new TranslationTextComponent("itlt.java.memory.max.warning.askLaterButtonText").getUnformattedComponentText();
@@ -188,7 +191,8 @@ public class ClientUtils {
             case NeedsNewerJava:
                 messageType = "require";
                 messageTitle = new TranslationTextComponent("itlt.java.version.require.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.version.require.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.javaVerInt));
+                messageBody = new TranslationTextComponent("itlt.java.version.require.body").getUnformattedComponentText()
+                        .replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.javaVerInt));
                 if (ClientConfig.enableCustomJavaUpgradeGuide.get()) { guideURL = ClientConfig.customJavaUpgradeGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = new TranslationTextComponent("itlt.java.version.require.guideButtonText").getUnformattedComponentText();
                 middleButtonText = new TranslationTextComponent("itlt.java.version.require.closeButtonText").getUnformattedComponentText();
@@ -197,7 +201,8 @@ public class ClientUtils {
             case WantsNewerJava:
                 messageType = "warn";
                 messageTitle = new TranslationTextComponent("itlt.java.version.warning.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.version.warning.body").getUnformattedComponentText().replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.javaVerInt));
+                messageBody = new TranslationTextComponent("itlt.java.version.warning.body").getUnformattedComponentText()
+                        .replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString()).replaceFirst("%sb", String.valueOf(ClientModEvents.javaVerInt));
                 if (ClientConfig.enableCustomJavaUpgradeGuide.get()) { guideURL = ClientConfig.customJavaUpgradeGuideURL.get(); } else { guideURL = "https://ozli.ga"; }
                 leftButtonText = new TranslationTextComponent("itlt.java.version.warning.guideButtonText").getUnformattedComponentText();
                 middleButtonText = new TranslationTextComponent("itlt.java.version.warning.askLaterButtonText").getUnformattedComponentText();
@@ -222,18 +227,19 @@ public class ClientUtils {
                     messageType, messageTitle, messageBody, leftButtonText, middleButtonText, rightButtonText, errorMessage, guideURL);
             builder.inheritIO();
             builder.start();
-
-            // don't allow the pack to continue launching if a requirement isn't met
-            if (messageType.equals("require")) {
-                System.exit(1);
-            }
         } catch (final IOException e) {
             e.printStackTrace();
+        } finally {
+            // don't allow the pack to continue launching if a requirement isn't met
+            if (messageType.equals("require")) {
+                itlt.LOGGER.fatal("Can't launch the game as a requirement isn't met. The unmet requirement is:\"" + messageContent.toString() + "\".");
+                System.exit(1);
+            }
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> getLatestDefinitions(final Minecraft mcInstance, final ChecksumType checksumType) throws IOException, ClassCastException {
+    public static Map<String, Object> getLatestDefinitions(final ChecksumType checksumType) throws IOException, ClassCastException {
         final String definitionsURLString;
         if (checksumType == ChecksumType.Modern) definitionsURLString = "https://raw.githubusercontent.com/zlepper/itlt/1.16-2.0-rewrite/definitionsAPI/v1/definitions.json";
         else definitionsURLString = "https://raw.githubusercontent.com/zlepper/itlt/1.16-2.0-rewrite/definitionsAPI/v1/definitions-fallback.json";

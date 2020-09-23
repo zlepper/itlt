@@ -97,10 +97,6 @@ minecraft {
     }
 }
 
-repositories {
-    maven { url = "https://dist.creeper.host/Sponge/maven" }
-}
-
 configurations {
     shade
 }

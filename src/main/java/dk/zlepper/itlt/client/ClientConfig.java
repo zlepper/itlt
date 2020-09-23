@@ -98,30 +98,38 @@ public final class ClientConfig {
                 // Java.Version.Guide
                 clientConfigBuilder.push("Guide"); {
                     enableCustomJavaUpgradeGuide = clientConfigBuilder
-                            .comment("")
+                            .comment("\r\nEnable this if you want to be able to change the link your users are sent to when they ask for instructions on how to upgrade Java.\r\n" +
+                                    "This is mainly useful for when you're using an unsupported version of this mod and the default guide is outdated.")
                             .define("enableCustomJavaUpgradeGuide", false);
                     customJavaUpgradeGuideURL = clientConfigBuilder
-                            .comment("")
+                            .comment("\r\nThe URL of the guide you want users to visit when they want 64bit Java.\r\n" +
+                                    "Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect.\r\n" +
+                                    "Note: The URL must start with \"https://\" for security reasons.")
                             .define("customJavaUpgradeGuideURL", "https://ozli.ga");
                 } clientConfigBuilder.pop();
 
                 // Java.Version.Requirement
                 clientConfigBuilder.push("Requirement"); {
                     enableMinJavaVerRequirement = clientConfigBuilder
-                            .comment("") // todo: comment
+                            .comment("\r\nWhether or not to require a certain version of Java to be able to launch the modpack.\r\n" +
+                                    "If someone tries to launch the modpack with a version of Java older than that specified in requiredMinJavaVersion, they'll get a message telling them how to upgrade and that the modpack will close until they relaunch it with more modern Java.\r\n" +
+                                    "Note: This is *separate* from enableMinJavaVerWarning - you can have a separate version requirement and warning.")
                             .define("enableMinJavaVerRequirement", true);
                     requiredMinJavaVersion = clientConfigBuilder
-                            .comment("")
+                            .comment("\r\nThe minimum version of Java needed to be able to launch the modpack.\r\n" +
+                                    "Note: itlt handles Java version naming scheme differences for you, meaning you can put \"7\" here and itlt will correctly check against \"Java 1.7\" internally, while values such as \"15\" will check against \"Java 15\" internally.")
                             .define("requiredMinJavaVerion", 8);
                 } clientConfigBuilder.pop();
 
                 // Java.Version.Warning
                 clientConfigBuilder.push("Warning"); {
                     enableMinJavaVerWarning = clientConfigBuilder
-                            .comment("") // todo: comment
+                            .comment("\r\nWhether or not to warn when someone tries to launch the modpack with a version of Java older than that specified in warnMinJavaVersion.\r\n" +
+                                    "If this is enabled and someone does that, they'll get a message telling them how to upgrade with the option to ask later and continue launching the modpack.\r\n" +
+                                    "Note: This is *separate* from enableMinJavaVerRequirement - you can have a separate version requirement and warning.")
                             .define("enableMinJavaVerWarning", true);
                     warnMinJavaVersion = clientConfigBuilder
-                            .comment("")
+                            .comment("\r\nThe minimum recommended version of Java needed to skip the warning message when launching the modpack.")
                             .define("warnMinJavaVersion", 8);
                     selectivelyIgnoreMinJavaVerWarning = clientConfigBuilder
                             .comment("\r\nSome launchers (such as Twitch/CurseForge launcher) do not allow the Java version to be changed beyond Java 8.\r\n" +
@@ -152,20 +160,24 @@ public final class ClientConfig {
                     clientConfigBuilder.push("Requirement"); {
                         enableMinMemoryRequirement = clientConfigBuilder
                                 .comment("\r\nEnable this to require that at least X amount of RAM is available to the modpack for allocating.\r\n" +
-                                        "This is useful if you have users complaining about \"OutOfMemory\" crashes.")
+                                        "This is useful if you have users complaining about \"OutOfMemory\" crashes.\r\n" +
+                                        "Note: This is *separate* from enableMinMemoryWarning - you can have a separate min RAM allocation requirement and warning.")
                                 .define("enableMinMemoryRequirement", true);
                         reqMinMemoryAmountInGB = clientConfigBuilder
-                                .comment("") // todo: comment
+                                .comment("\r\nThe minimum amount of allocated RAM in GB needed to be able to launch the modpack.")
                                 .define("reqMinMemoryAmountInGB", 0.5);
                     } clientConfigBuilder.pop();
 
                     // Java.Memory.Min.Warning
                     clientConfigBuilder.push("Warning"); {
                         enableMinMemoryWarning = clientConfigBuilder
-                                .comment("")
+                                .comment("\r\nEnable this to show a warning when less than X amount of RAM is available to the modpack for allocating.\r\n" +
+                                        "Think of this like a recommended amount while the requirement is a minimum amount.\r\n" +
+                                        "Warning: Setting this too high could make it impossible for some of your users to allocate the amount you're recommending and may actually hurt performance (see the max memory section for details).\r\n" +
+                                        "Note: This is *separate* from enableMinMemoryRequirement - you can have a separate min RAM allocation requirement and warning.")
                                 .define("enableMinMemoryWarning", true);
                         warnMinMemoryAmountInGB = clientConfigBuilder
-                                .comment("") // todo: comment
+                                .comment("\r\nThe minimum recommended amount of allocated RAM in GB needed to skip the warning message when launching the modpack.")
                                 .define("warnMinMemoryAmountInGB", 1.0);
                     } clientConfigBuilder.pop();
 
@@ -178,7 +190,7 @@ public final class ClientConfig {
                     clientConfigBuilder.push("Requirement"); {
                         enableMaxMemoryRequirement = clientConfigBuilder
                                 .comment("\r\nEnable this to require that no more than X amount of RAM is available to the modpack for allocating.\r\n" +
-                                        "This is useful if for preventing users from allocating excessive amounts of RAM to the point of causing nasty GC-related lag spikes as a result.")
+                                        "This is useful for preventing users from allocating excessive amounts of RAM to the point of causing nasty GC-related lag spikes as a result.")
                                 .define("enableMaxMemoryRequirement", true);
                         reqMaxMemoryAmountInGB = clientConfigBuilder
                                 .comment("") // todo: comment
@@ -238,8 +250,6 @@ public final class ClientConfig {
                                 "Note: enableCustomIcon must be enabled for this to take effect.")
                         .define("enableUsingTechnicIcon", true);
             } clientConfigBuilder.pop();
-
-            // todo: Technic launcher support (for both custom window title and custom icon) and relevant configs for turning that off if desired
 
         } clientConfigBuilder.pop(); // end of Display section
 

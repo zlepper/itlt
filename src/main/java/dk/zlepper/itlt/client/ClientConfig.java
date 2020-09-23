@@ -207,11 +207,11 @@ public final class ClientConfig {
             clientConfigBuilder.push("WindowTitle"); {
                 enableCustomWindowTitle = clientConfigBuilder
                         .comment("\r\nEnable this if you want to change the name of the Minecraft window.")
-                        .define("enableCustomWindowTitle", false);
+                        .define("enableCustomWindowTitle", true);
                 customWindowTitleText = clientConfigBuilder
                         .comment("\r\nThe name you want your Minecraft window to be.\r\n" +
                                 "Note: enableCustomWindowTitle must be enabled for this to take effect.\r\n")
-                        .define("customWindowTitleText", "ModpackName");
+                        .define("customWindowTitleText", "");
                 enableAppendingToCustomTitle = clientConfigBuilder
                         .comment("\r\nEnable this if you want the game's version to be appended to the end of your customWindowTitleText.\r\n" +
                                 "For example: \"ModpackName (Minecraft* 1.16.3)\")\r\n" +

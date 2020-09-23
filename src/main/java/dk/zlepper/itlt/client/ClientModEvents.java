@@ -89,7 +89,7 @@ public class ClientModEvents {
 
         // Custom window title text
         if (ClientConfig.enableCustomWindowTitle.get()) {
-            String packName = ClientConfig.customWindowTitleText.get();
+            String customWindowTitle = ClientConfig.customWindowTitleText.get();
 
             if (ClientConfig.enableUsingTechnicDisplayName.get()) {
                 final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
@@ -97,17 +97,18 @@ public class ClientModEvents {
                 // if running from the Technic Launcher, use the pack slug's displayName instead of the customWindowTitleText from the config
                 if (detectedLauncher == ClientUtils.LauncherName.Technic) {
                     try {
-                        packName = ClientUtils.getTechnicPackName();
+                        customWindowTitle = ClientUtils.getTechnicPackName();
                     } catch (final IOException e) {
                         itlt.LOGGER.info("Unable to get pack displayName, falling back to customWindowTitleText in config.");
                         e.printStackTrace();
                     }
                 }
             }
-            itlt.LOGGER.info("packName: " + packName);
+            itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
 
             // set the new window title
-            mcInstance.getMainWindow().setWindowTitle(packName + " (" + mcInstance.getWindowTitle() + ")");
+            if (!customWindowTitle.equals(""))
+                mcInstance.getMainWindow().setWindowTitle(customWindowTitle + " (" + mcInstance.getWindowTitle() + ")");
         }
 
 

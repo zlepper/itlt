@@ -16,7 +16,9 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
@@ -44,7 +46,7 @@ public class ClientUtils {
         // same deal for the Technic Launcher. If the path name we're in after doing this is ".technic", we know we're
         // running within a Technic Launcher modpack.
         final Path theoreticalTechnicPath = itltJarPath.getParent().getParent().getParent().getParent();
-        final boolean isTechnicLauncher = theoreticalTwitchPath.getFileName().toString().equals(".technic");
+        final boolean isTechnicLauncher = theoreticalTechnicPath.getFileName().toString().equals(".technic");
         itlt.LOGGER.debug("theoreticalTechnicPath: " + theoreticalTechnicPath);
         itlt.LOGGER.debug("isTechnicLauncher: " + isTechnicLauncher);
 
@@ -57,6 +59,26 @@ public class ClientUtils {
         Unknown,
         Twitch,
         Technic
+    }
+
+    public static String getTechnicPackName() throws IOException {
+        final Path itltJarPath = ModList.get().getModFileById("itlt").getFile().getFilePath();
+        itlt.LOGGER.debug("itltJarPath: " + itltJarPath); // should be something like ???\mcRoot\mods\itlt.jar
+
+        // get the pack slug
+        final String packSlug = itltJarPath.getParent().getParent().getFileName().toString();
+
+        // open the cache.json for the associated slug to get the pack's displayName
+        final Path cacheJsonPath = Paths.get(itltJarPath.getParent().getParent().getParent().getParent()
+                + File.separator + "assets" + File.separator + "packs" + File.separator + packSlug + File.separator + "cache.json");
+
+        final String cacheJson = new String(Files.readAllBytes(cacheJsonPath));
+
+        // convert the cacheJson String to a Map
+        final Type type = new TypeToken<Map<String, Object>>(){}.getType();
+        final Map<String, Object> definitionsMap = new Gson().fromJson(cacheJson, type);
+
+        return definitionsMap.get("displayName").toString();
     }
 
     public static Object[] getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException, NativeBLAKE3Util.InvalidNativeOutput {
@@ -274,7 +296,7 @@ public class ClientUtils {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
         final String definitionsJson = reader.lines().collect(Collectors.joining("\n"));
 
-        // convert the definitionsJson string to a Map
+        // convert the definitionsJson String to a Map
         final Type type = new TypeToken<Map<String, Object>>(){}.getType();
         final Map<String, Object> definitionsMap = new Gson().fromJson(definitionsJson, type);
 

@@ -15,6 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
@@ -77,7 +78,6 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void clientInit(final FMLClientSetupEvent event) {
         final Minecraft mcInstance = event.getMinecraftSupplier().get();
-        ClientUtils.detectLauncher(); // put here solely for debugging purposes
 
         // Java arch requirement and warning
         final boolean isJava64bit = mcInstance.isJava64bit();
@@ -88,8 +88,27 @@ public class ClientModEvents {
 
 
         // Custom window title text
-        if (ClientConfig.enableCustomWindowTitle.get())
-            mcInstance.getMainWindow().setWindowTitle(ClientConfig.customWindowTitleText.get() + " (" + mcInstance.getWindowTitle() + ")");
+        if (ClientConfig.enableCustomWindowTitle.get()) {
+            String packName = ClientConfig.customWindowTitleText.get();
+
+            if (ClientConfig.enableUsingTechnicDisplayName.get()) {
+                final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
+                itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
+                // if running from the Technic Launcher, use the pack slug's displayName instead of the customWindowTitleText from the config
+                if (detectedLauncher == ClientUtils.LauncherName.Technic) {
+                    try {
+                        packName = ClientUtils.getTechnicPackName();
+                    } catch (final IOException e) {
+                        itlt.LOGGER.info("Unable to get pack displayName, falling back to customWindowTitleText in config.");
+                        e.printStackTrace();
+                    }
+                }
+            }
+            itlt.LOGGER.info("packName: " + packName);
+
+            // set the new window title
+            mcInstance.getMainWindow().setWindowTitle(packName + " (" + mcInstance.getWindowTitle() + ")");
+        }
 
 
         // Custom window icon

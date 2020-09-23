@@ -14,6 +14,13 @@ public final class Main {
             System.out.println("arg" + i + ": " + args[i]);
         }*/
 
+        // prevent an error from showing if something tries running the jar directly
+        try {
+            System.out.println("guideURL: " + args[7]);
+        } catch (final ArrayIndexOutOfBoundsException e) {
+            return;
+        }
+
         final String
                 messageType = args[0],
                 messageTitle = args[1],

@@ -274,13 +274,13 @@ public class ClientUtils {
                 rightButtonText = new TranslationTextComponent("itlt.java.version.warning.dontAskAgainButtonText").getUnformattedComponentText();
                 break;
             default:
-                messageType = "";
-                messageTitle = "";
-                messageBody = "";
-                guideURL = "";
-                leftButtonText = "";
-                middleButtonText = "";
-                rightButtonText = "";
+                messageType = ".";
+                messageTitle = ".";
+                messageBody = ".";
+                guideURL = ".";
+                leftButtonText = ".";
+                middleButtonText = ".";
+                rightButtonText = ".";
                 break;
         }
 

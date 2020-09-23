@@ -114,16 +114,29 @@ public class ClientModEvents {
 
         // Custom window icon
         if (ClientConfig.enableCustomIcon.get()) {
+            File customIcon = null;
+
             final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
             if (itltDir.exists()) {
-                final File icon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
-                if (!icon.exists()) itlt.LOGGER.warn("enableCustomIcon is true but the icon is missing.");
-                if (icon.exists() && !icon.isDirectory()) ClientUtils.setWindowIcon(icon, mcInstance);
+                customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
             } else {
                 itlt.LOGGER.warn("itlt folder in the config folder is missing.");
                 if (itltDir.mkdir()) itlt.LOGGER.info("The folder has been successfully created for you.");
-                else itlt.LOGGER.info("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
+                else itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
             }
+
+            if (ClientConfig.enableUsingTechnicIcon.get()) {
+                final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
+                itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
+                // if running from the Technic Launcher, use the pack slug's displayName instead of the customWindowTitleText from the config
+                if (detectedLauncher == ClientUtils.LauncherName.Technic) {
+                    final File technicPackIcon = ClientUtils.getTechnicPackIcon();
+                    if (technicPackIcon != null) customIcon = technicPackIcon;
+                }
+            }
+
+            if (customIcon != null && customIcon.exists() && !customIcon.isDirectory()) ClientUtils.setWindowIcon(customIcon, mcInstance);
+            else itlt.LOGGER.warn("enableCustomIcon is true but icon.png is missing or invalid.");
         }
     }
 }

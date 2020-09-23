@@ -30,6 +30,7 @@ public final class ClientConfig {
             enableAppendingToCustomTitle,
             enableUsingTechnicDisplayName,
             enableCustomIcon,
+            enableUsingTechnicIcon,
             enableAnticheat,
             enableAutoRemovalOfCheats;
 
@@ -210,7 +211,7 @@ public final class ClientConfig {
                         .define("enableCustomWindowTitle", true);
                 customWindowTitleText = clientConfigBuilder
                         .comment("\r\nThe name you want your Minecraft window to be.\r\n" +
-                                "Note: enableCustomWindowTitle must be enabled for this to take effect.\r\n")
+                                "Note: enableCustomWindowTitle must be enabled for this to take effect.")
                         .define("customWindowTitleText", "");
                 enableAppendingToCustomTitle = clientConfigBuilder
                         .comment("\r\nEnable this if you want the game's version to be appended to the end of your customWindowTitleText.\r\n" +
@@ -219,7 +220,8 @@ public final class ClientConfig {
                         .define("enableAppendingToCustomTitle", true);
                 enableUsingTechnicDisplayName = clientConfigBuilder
                         .comment("\r\nWhether or not to automatically use your modpack's display name instead of the customWindowTitleText when launching from the Technic Launcher.\r\n" +
-                                "Note: This will override the contents of customWindowTitleText when launching from a Technic Platform modpack.")
+                                "Note: This will override the contents of customWindowTitleText when launching from a Technic Platform modpack.\r\n" +
+                                "Note: enableCustomWindowTitle must be enabled for this to take effect.")
                         .define("enableUsingTechnicDisplayName", true);
             } clientConfigBuilder.pop();
 
@@ -230,6 +232,11 @@ public final class ClientConfig {
                                 "Note: The icon needs to be placed in config" + File.separator + "itlt" + File.separator + "icon.png and be no larger than 128px squared.\r\n" +
                                 "Warning: Icon sizes beyond 128px squared can cause blurriness or even crashes on certain operating systems!")
                         .define("enableCustomIcon", false);
+                enableUsingTechnicIcon = clientConfigBuilder
+                        .comment("\r\nEnable this if you want itlt to automatically use your modpack's icon instead of the icon.png when launching from the Technic Launcher.\r\n" +
+                                "Note: This will override the icon.png when launching from a Technic Platform modpack.\r\n" +
+                                "Note: enableCustomIcon must be enabled for this to take effect.")
+                        .define("enableUsingTechnicIcon", true);
             } clientConfigBuilder.pop();
 
             // todo: Technic launcher support (for both custom window title and custom icon) and relevant configs for turning that off if desired

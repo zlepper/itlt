@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 import io.lktk.NativeBLAKE3;
 import io.lktk.NativeBLAKE3Util;
 
+import javax.annotation.Nullable;
+
 public class ClientUtils {
 
     public static LauncherName detectLauncher() {
@@ -79,6 +81,22 @@ public class ClientUtils {
         final Map<String, Object> definitionsMap = new Gson().fromJson(cacheJson, type);
 
         return definitionsMap.get("displayName").toString();
+    }
+
+    @Nullable
+    public static File getTechnicPackIcon() {
+        final Path itltJarPath = ModList.get().getModFileById("itlt").getFile().getFilePath();
+        itlt.LOGGER.debug("itltJarPath: " + itltJarPath); // should be something like ???\mcRoot\mods\itlt.jar
+
+        // get the pack slug
+        final String packSlug = itltJarPath.getParent().getParent().getFileName().toString();
+
+        // get the icon from the associated pack's slug
+        final Path iconPath = Paths.get(itltJarPath.getParent().getParent().getParent().getParent()
+                + File.separator + "assets" + File.separator + "packs" + File.separator + packSlug + File.separator + "icon.png");
+
+        if (iconPath.toFile().exists()) return iconPath.toFile();
+        else return null;
     }
 
     public static Object[] getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException, NativeBLAKE3Util.InvalidNativeOutput {

@@ -1,11 +1,16 @@
 package dk.zlepper.itlt.client;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.client.helpers.MessageContent;
 
 import net.minecraft.client.Minecraft;
 
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.ServerList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -16,6 +21,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
@@ -137,6 +144,47 @@ public class ClientModEvents {
 
             if (customIcon != null && customIcon.exists() && !customIcon.isDirectory()) ClientUtils.setWindowIcon(customIcon, mcInstance);
             else itlt.LOGGER.warn("enableCustomIcon is true but icon.png is missing or invalid.");
+        }
+
+
+        // Custom server list entries
+        // todo: revisit this at another time to simplify and cleanup the code
+        if (ClientConfig.enableCustomServerListEntries.get()) {
+            final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
+
+            if (itltDir.exists()) {
+                final Path customServersJsonPath = Paths.get(itltDir.getAbsolutePath(), "servers.json");
+                if (customServersJsonPath.toFile().exists()) {
+                    String customServersJson = null;
+                    try {
+                        customServersJson = new String(Files.readAllBytes(customServersJsonPath));
+                    } catch (final IOException e) {
+                        itlt.LOGGER.error("Unable to read the contents of " + customServersJsonPath);
+                        e.printStackTrace();
+                    }
+
+                    if (customServersJson != null) {
+                        ClientUtils.CustomServerData[] featuredList = new Gson().fromJson(customServersJson, ClientUtils.CustomServerData[].class);
+                        if (featuredList != null) {
+                            ServerList serverList = new ServerList(mcInstance);
+                            for (ClientUtils.CustomServerData customServerEntry : featuredList) {
+                                ServerData servertoAdd = new ServerData(customServerEntry.name, customServerEntry.IP, false);
+                                if (customServerEntry.forceResourcePack != null && customServerEntry.forceResourcePack)
+                                    servertoAdd.setResourceMode(ServerData.ServerResourceMode.ENABLED);
+                                if (!ClientUtils.alreadyInServerList(servertoAdd, serverList)) {
+                                    itlt.LOGGER.info("Adding custom server entry");
+                                    serverList.addServerData(servertoAdd);
+                                    serverList.saveServerList();
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                itlt.LOGGER.warn("itlt folder in the config folder is missing.");
+                if (itltDir.mkdir()) itlt.LOGGER.info("The folder has been successfully created for you.");
+                else itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
+            }
         }
     }
 }

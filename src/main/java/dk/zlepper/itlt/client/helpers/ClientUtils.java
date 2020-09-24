@@ -7,6 +7,8 @@ import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
 import io.seruco.encoding.base62.Base62;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.util.SharedConstants;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.ModList;
@@ -32,6 +34,23 @@ import io.lktk.NativeBLAKE3Util;
 import javax.annotation.Nullable;
 
 public class ClientUtils {
+
+    public static class CustomServerData {
+        public String name, IP;
+        public Boolean forceResourcePack;
+    }
+
+    public static boolean alreadyInServerList(final ServerData server, final ServerList list) {
+        if (list == null)
+            return false;
+        for (int i = 0; i < list.countServers(); i++) {
+            final ServerData serverData = list.getServerData(i);
+            if (serverData.serverName != null && serverData.serverIP != null &&
+                    serverData.serverName.equalsIgnoreCase(server.serverName) && serverData.serverIP.equalsIgnoreCase(server.serverIP))
+                return true;
+        }
+        return false;
+    }
 
     public static LauncherName detectLauncher() {
         final Path itltJarPath = ModList.get().getModFileById("itlt").getFile().getFilePath();

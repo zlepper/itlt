@@ -1,6 +1,7 @@
 package dk.zlepper.itlt.client;
 
 // todo: config option of warning when more than (maxSysRAM - 1GB) is allocated to the game
+// todo: being able to imc to the itlt mod and get a crash report back if it was your fault
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -31,6 +32,7 @@ public final class ClientConfig {
             enableUsingTechnicDisplayName,
             enableCustomIcon,
             enableUsingTechnicIcon,
+            enableCustomServerListEntries,
             enableAnticheat,
             enableAutoRemovalOfCheats;
 
@@ -255,7 +257,9 @@ public final class ClientConfig {
 
         // Server list section
         clientConfigBuilder.push("ServerList"); {
-            // todo
+            enableCustomServerListEntries = clientConfigBuilder
+                    .comment("") // todo
+                    .define("enableCustomServerListEntries", false);
         } clientConfigBuilder.pop();
 
         // Anticheat section

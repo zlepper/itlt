@@ -36,9 +36,8 @@ public final class Itlt {
     private static final Logger LOGGER = LogManager.getLogger();
     public static CommonProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 
-    private String windowDisplayTitle;
-
     public Itlt() {
+        System.setProperty("java.awt.headless", "false");
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientInit);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
@@ -65,7 +64,7 @@ public final class Itlt {
             }
         }
 
-        windowDisplayTitle = Config.DISPLAY_WINDOW_DISPLAY_TITLE.get();
+        String windowDisplayTitle = Config.DISPLAY_WINDOW_DISPLAY_TITLE.get();
 
         GLFW.glfwSetWindowTitle(mcInstance.mainWindow.getHandle(), windowDisplayTitle);
 

@@ -1,7 +1,15 @@
 package dk.zlepper.itlt.client;
 
-// todo: config option of warning when more than (maxSysRAM - 1GB) is allocated to the game
 // todo: being able to imc to the itlt mod and get a crash report back if it was your fault
+
+/* todo: change format of enableAppendingToCustomTitle from "packName (Minecraft* version)"
+         to "Minecraft* version - packName" and account for Vanilla changing the title depending on the menu
+         (e.g. "Minecraft* 1.15.2 (Multiplayer) - My Fancy Modpack v2.0").
+         Doing this is in theory the best middle-ground approach. An option to change between the old and new
+         appending formats is probably a good idea as well.
+ */
+
+// todo: investigate relaunching the game with modern Java when available on the system on launchers that force Java 8
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -23,6 +31,7 @@ public final class ClientConfig {
             enableMinMemoryWarning,
             enableMaxMemoryRequirement,
             enableMaxMemoryWarning,
+            enableNearMaxMemoryWarning,
             enableCustomMemoryAllocGuide,
             enableMinJavaVerRequirement,
             enableMinJavaVerWarning,
@@ -31,7 +40,7 @@ public final class ClientConfig {
             enableAppendingToCustomTitle,
             enableUsingTechnicDisplayName,
             enableCustomIcon,
-            enableUsingTechnicIcon,
+            enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
             enableAnticheat,
             enableAutoRemovalOfCheats;
@@ -46,7 +55,8 @@ public final class ClientConfig {
             reqMinMemoryAmountInGB,
             reqMaxMemoryAmountInGB,
             warnMinMemoryAmountInGB,
-            warnMaxMemoryAmountInGB;
+            warnMaxMemoryAmountInGB,
+            warnNearMaxMemoryWarningInGB;
 
     public static ForgeConfigSpec.ConfigValue<Integer>
             requiredMinJavaVersion,
@@ -219,6 +229,22 @@ public final class ClientConfig {
 
                 } clientConfigBuilder.pop();
 
+                // Java.Memory.NearMax
+                clientConfigBuilder.push("NearMax"); {
+
+                    // Java.Memory.NearMax.Warning
+                    clientConfigBuilder.push("Warning"); {
+                        enableNearMaxMemoryWarning = clientConfigBuilder
+                                .comment("\r\nEnable this to show a warning when not enough RAM is left over for the OS and drivers to use.\r\n" +
+                                        "This is useful for warning users that are allocating so much RAM that there isn't enough left over for other important processes to use " +
+                                        "without hitting the swap, hurting performance as a result.\r\n")
+                                .define("enableNearMaxMemoryWarning", true);
+                        warnNearMaxMemoryWarningInGB = clientConfigBuilder
+                                .comment("\r\nThe minimum recommended amount of memory left over after allocation in GB needed to skip the warning message when launching the modpack.")
+                                .defineInRange("warnNearMaxMemoryWarningInGB", 1.0, 0.1, 2.0);
+                    }
+                } clientConfigBuilder.pop();
+
             } clientConfigBuilder.pop(); // end of Java.Memory
 
         } clientConfigBuilder.pop(); // end of Java section
@@ -255,11 +281,11 @@ public final class ClientConfig {
                                 "Note: The icon needs to be placed in config" + File.separator + "itlt" + File.separator + "icon.png and be no larger than 128px squared.\r\n" +
                                 "Warning: Icon sizes beyond 128px squared can cause blurriness or even crashes on certain operating systems!")
                         .define("enableCustomIcon", false);
-                enableUsingTechnicIcon = clientConfigBuilder
-                        .comment("\r\nEnable this if you want itlt to automatically use your modpack's icon instead of the icon.png when launching from the Technic Launcher.\r\n" +
-                                "Note: This will override the icon.png when launching from a Technic Platform modpack.\r\n" +
+                enableUsingAutodetectedIcon = clientConfigBuilder
+                        .comment("\r\nEnable this if you want itlt to automatically use your modpack's icon instead of the icon.png when launching from a supported launcher.\r\n" +
+                                "Note: This will override the config" + File.separator + "itlt" + File.separator + "icon.png when launching from a supported launcher modpack.\r\n" +
                                 "Note: enableCustomIcon must be enabled for this to take effect.")
-                        .define("enableUsingTechnicIcon", true);
+                        .define("enableUsingAutodetectedIcon", true); // Currently supported launchers: Technic, MultiMC.
             } clientConfigBuilder.pop();
 
         } clientConfigBuilder.pop(); // end of Display section
@@ -271,8 +297,8 @@ public final class ClientConfig {
                     .define("enableCustomServerListEntries", false);
         } clientConfigBuilder.pop();
 
-        // Anticheat section
-        clientConfigBuilder.push("Anticheat"); { //.comment("No silver bullet, but definitely helps combat against some cheaters. Intended to compliment a full server-side anti-cheat mod/plugin.\r\n");
+        // Anti-cheat section
+        clientConfigBuilder.push("Anti-cheat"); { //.comment("No silver bullet, but definitely helps combat against some cheaters. Intended to compliment a full server-side anti-cheat mod/plugin.\r\n");
             enableAnticheat = clientConfigBuilder
                     .comment("\r\nWhether or not to detect and report known cheats to servers with itlt installed and anti-cheat enabled.\r\n" +
                             "Note: Disabling this won't suddenly allow you to cheat on said servers - it'll simply prevent you from joining them at all.\r\n" +
@@ -287,7 +313,7 @@ public final class ClientConfig {
             parallelModChecksThreshold = clientConfigBuilder
                     .comment("\r\nTo check if a known cheat mod is present, itlt needs to iterate through each currently loaded mod.\r\n" +
                             "These checks are pretty fast, but can still benefit from multithreading if there are *a lot* of mods.\r\n" +
-                            "You can change the threshold of how many mods are needed before multithreading is attempted here. The default is >100 mods.\r\n" +
+                            "You can change the threshold for how many mods are needed before multithreading is attempted here. The default is >100 mods.\r\n" +
                             "Warning: There's an overhead associated with multithreading so having the threshold too low can actually hurt performance.")
                     .defineInRange("parallelModChecksThreshold", 100, 1, 1024);
         } clientConfigBuilder.pop();

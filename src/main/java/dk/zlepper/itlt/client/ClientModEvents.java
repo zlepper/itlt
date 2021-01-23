@@ -1,8 +1,6 @@
 package dk.zlepper.itlt.client;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.client.helpers.MessageContent;
@@ -52,8 +50,8 @@ public class ClientModEvents {
             if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
                 final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
                 itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
-                if (detectedLauncher == ClientUtils.LauncherName.Twitch)
-                    itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the Twitch Launcher " +
+                if (detectedLauncher == ClientUtils.LauncherName.Twitch || detectedLauncher == ClientUtils.LauncherName.CurseClient)
+                    itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.toString() + " Launcher " +
                             "which currently does not allow changing Java version beyond Java 8. :(");
                 else ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
             } else {
@@ -109,6 +107,7 @@ public class ClientModEvents {
                         e.printStackTrace();
                     }
                 }
+                // todo: MultiMC launcher support
             }
             itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
 
@@ -130,14 +129,22 @@ public class ClientModEvents {
                 else itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
             }
 
-            if (ClientConfig.enableUsingTechnicIcon.get()) {
+            if (ClientConfig.enableUsingAutodetectedIcon.get()) {
+                final File autoDetectedIcon;
                 final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
                 itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
-                // if running from the Technic Launcher, use the pack slug's displayName instead of the customWindowTitleText from the config
-                if (detectedLauncher == ClientUtils.LauncherName.Technic) {
-                    final File technicPackIcon = ClientUtils.getTechnicPackIcon();
-                    if (technicPackIcon != null) customIcon = technicPackIcon;
+                switch (detectedLauncher) {
+                    case Technic:
+                        autoDetectedIcon = ClientUtils.getTechnicPackIcon();
+                        break;
+                    case MultiMC:
+                        autoDetectedIcon = ClientUtils.getMultiMCInstanceIcon();
+                        break;
+                    default:
+                        autoDetectedIcon = null;
+                        break;
                 }
+                if (autoDetectedIcon != null) customIcon = autoDetectedIcon;
             }
 
             if (customIcon != null && customIcon.exists() && !customIcon.isDirectory()) ClientUtils.setWindowIcon(customIcon, mcInstance);

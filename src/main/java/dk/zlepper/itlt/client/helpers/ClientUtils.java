@@ -68,6 +68,7 @@ public class ClientUtils {
         final boolean isTwitchLauncher = theoreticalTwitchPath.getFileName().toString().equals("Twitch");
         itlt.LOGGER.debug("theoreticalTwitchPath: " + theoreticalTwitchPath);
         itlt.LOGGER.debug("isTwitchLauncher: " + isTwitchLauncher);
+        if (isTwitchLauncher) return LauncherName.Twitch;
 
         // same deal for the Technic Launcher. If the path name we're in after doing this is ".technic", we know we're
         // running within a Technic Launcher modpack.
@@ -75,16 +76,35 @@ public class ClientUtils {
         final boolean isTechnicLauncher = theoreticalTechnicPath.getFileName().toString().equals(".technic");
         itlt.LOGGER.debug("theoreticalTechnicPath: " + theoreticalTechnicPath);
         itlt.LOGGER.debug("isTechnicLauncher: " + isTechnicLauncher);
+        if (isTechnicLauncher) return LauncherName.Technic;
 
-        if (isTwitchLauncher) return LauncherName.Twitch;
-        else if (isTechnicLauncher) return LauncherName.Technic;
-        else return LauncherName.Unknown;
+        // if the .minecraft folder has mmc-pack.json and instance.cfg files beside it then we know we're running within
+        // a MultiMC modpack.
+        final Path theoreticalMultiMCPath = itltJarPath.getParent().getParent().getParent();
+        final boolean isMultiMCLauncher =
+                Files.exists(theoreticalMultiMCPath.resolve("mmc-pack.json")) &&
+                Files.exists(theoreticalMultiMCPath.resolve("instance.cfg"));
+        itlt.LOGGER.debug("theoreticalMultiMCPath: " + theoreticalMultiMCPath);
+        itlt.LOGGER.debug("isMultiMCLauncher: " + isMultiMCLauncher);
+        if (isMultiMCLauncher) return LauncherName.MultiMC;
+
+        // todo: test this
+        final Path theoreticalCurseClientPath = itltJarPath.getParent();
+        final boolean isCurseClientLauncher =
+                Files.exists(theoreticalCurseClientPath.resolve(".curseclient")) &&
+                Files.exists(theoreticalCurseClientPath.resolve("minecraftinstance.json"));
+        itlt.LOGGER.debug("isCurseClientLauncher: " + isCurseClientLauncher);
+        if (isCurseClientLauncher) return LauncherName.CurseClient;
+
+        return LauncherName.Unknown;
     }
 
     public enum LauncherName {
         Unknown,
         Twitch,
-        Technic
+        Technic,
+        MultiMC,
+        CurseClient
     }
 
     public static String getTechnicPackName() throws IOException {
@@ -118,6 +138,17 @@ public class ClientUtils {
         // get the icon from the associated pack's slug
         final Path iconPath = Paths.get(itltJarPath.getParent().getParent().getParent().getParent()
                 + File.separator + "assets" + File.separator + "packs" + File.separator + packSlug + File.separator + "icon.png");
+
+        if (iconPath.toFile().exists()) return iconPath.toFile();
+        else return null;
+    }
+
+    @Nullable
+    public static File getMultiMCInstanceIcon() {
+        final Path itltJarPath = ModList.get().getModFileById("itlt").getFile().getFilePath();
+        itlt.LOGGER.debug("itltJarPath: " + itltJarPath); // should be something like ???\mcRoot\mods\itlt.jar
+
+        final Path iconPath = itltJarPath.getParent().getParent().resolve("icon.png");
 
         if (iconPath.toFile().exists()) return iconPath.toFile();
         else return null;

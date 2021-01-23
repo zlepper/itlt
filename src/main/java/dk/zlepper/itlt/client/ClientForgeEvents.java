@@ -69,7 +69,7 @@ public class ClientForgeEvents {
             // you're only doing a small amount of work, therefore we only use it if there's *a lot* of mods to iterate through
             // todo: make the threshold configurable rather than hard-coded as 100
             final Stream<ModInfo> modInfoStream;
-            if (ModList.get().getMods().size() > 100) modInfoStream = ModList.get().getMods().parallelStream();
+            if (ModList.get().getMods().size() > ClientConfig.parallelModChecksThreshold.get()) modInfoStream = ModList.get().getMods().parallelStream();
             else modInfoStream = ModList.get().getMods().stream();
             itlt.LOGGER.debug("isParallel: " + modInfoStream.isParallel());
 

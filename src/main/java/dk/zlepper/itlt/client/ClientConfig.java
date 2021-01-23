@@ -50,7 +50,8 @@ public final class ClientConfig {
 
     public static ForgeConfigSpec.ConfigValue<Integer>
             requiredMinJavaVersion,
-            warnMinJavaVersion;
+            warnMinJavaVersion,
+            parallelModChecksThreshold;
 
     static {
         // Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to avoid confusion to the user.
@@ -79,7 +80,8 @@ public final class ClientConfig {
                 clientConfigBuilder.push("Requirement"); {
                     enable64bitRequirement = clientConfigBuilder
                             .comment("\r\nWhether or not to require 64bit Java to be able to launch the modpack.\r\n" +
-                                    "If this is enabled and someone tries to launch the modpack with 32bit Java, they'll get a message telling them how to upgrade and the modpack will close until they relaunch it with 64bit Java.\r\n" +
+                                    "If this is enabled and someone tries to launch the modpack with 32bit Java, they'll get a message telling them how to upgrade" +
+                                    " and the modpack will close until they relaunch it with 64bit Java.\r\n" +
                                     "Note: Enabling this overrides enable64bitWarning.")
                             .define("enable64bitRequirement", true);
                 } clientConfigBuilder.pop();
@@ -114,13 +116,15 @@ public final class ClientConfig {
                 clientConfigBuilder.push("Requirement"); {
                     enableMinJavaVerRequirement = clientConfigBuilder
                             .comment("\r\nWhether or not to require a certain version of Java to be able to launch the modpack.\r\n" +
-                                    "If someone tries to launch the modpack with a version of Java older than that specified in requiredMinJavaVersion, they'll get a message telling them how to upgrade and that the modpack will close until they relaunch it with more modern Java.\r\n" +
+                                    "If someone tries to launch the modpack with a version of Java older than that specified in requiredMinJavaVersion, " +
+                                    "they'll get a message telling them how to upgrade and that the modpack will close until they relaunch it with more modern Java.\r\n" +
                                     "Note: This is *separate* from enableMinJavaVerWarning - you can have a separate version requirement and warning.")
                             .define("enableMinJavaVerRequirement", true);
                     requiredMinJavaVersion = clientConfigBuilder
                             .comment("\r\nThe minimum version of Java needed to be able to launch the modpack.\r\n" +
-                                    "Note: itlt handles Java version naming scheme differences for you, meaning you can put \"7\" here and itlt will correctly check against \"Java 1.7\" internally, while values such as \"15\" will check against \"Java 15\" internally.")
-                            .define("requiredMinJavaVerion", 8);
+                                    "Note: itlt handles Java version naming scheme differences for you, meaning you can put \"7\" here and itlt will correctly check " +
+                                    "against \"Java 1.7\" internally, while values such as \"15\" will check against \"Java 15\" internally.")
+                            .defineInRange("requiredMinJavaVerion", 8, 6, 128);
                 } clientConfigBuilder.pop();
 
                 // Java.Version.Warning
@@ -132,7 +136,7 @@ public final class ClientConfig {
                             .define("enableMinJavaVerWarning", true);
                     warnMinJavaVersion = clientConfigBuilder
                             .comment("\r\nThe minimum recommended version of Java needed to skip the warning message when launching the modpack.")
-                            .define("warnMinJavaVersion", 8);
+                            .defineInRange("warnMinJavaVersion", 8, 6, 128);
                     selectivelyIgnoreMinJavaVerWarning = clientConfigBuilder
                             .comment("\r\nSome launchers (such as Twitch/CurseForge launcher) do not allow the Java version to be changed beyond Java 8.\r\n" +
                                     "Enable this option to ignore the MinJavaVerWarning on launchers where the users are unable to change the version of Java used to launch the game.")
@@ -141,17 +145,19 @@ public final class ClientConfig {
 
             } clientConfigBuilder.pop(); // end of Java.Version
 
-            // Todo: improve comments for memory-related options
             // Java.Memory
             clientConfigBuilder.push("Memory"); {
 
                 // Java.Memory.Guide
                 clientConfigBuilder.push("Guide"); {
                     enableCustomMemoryAllocGuide = clientConfigBuilder
-                            .comment("") // todo: comment
+                            .comment("\r\nEnable this if you want to be able to change the link your users are sent to when they ask for instructions on how to change their memory allocation settings.\r\n" +
+                                    "This is mainly useful for when you're using an unsupported version of this mod and the default guide is outdated.")
                             .define("enableCustomMemoryGuide", false);
                     customMemoryAllocGuideURL = clientConfigBuilder
-                            .comment("") // todo: comment
+                            .comment("\r\nThe URL of the guide you want users to visit when they want to change their memory allocation settings.\r\n" +
+                                    "Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect\r\n" +
+                                    "Note: The URL must start with \"https://\" for security reasons.")
                             .define("customMemoryAllocGuideURL", "https://ozli.ga");
                 } clientConfigBuilder.pop();
 
@@ -167,7 +173,7 @@ public final class ClientConfig {
                                 .define("enableMinMemoryRequirement", true);
                         reqMinMemoryAmountInGB = clientConfigBuilder
                                 .comment("\r\nThe minimum amount of allocated RAM in GB needed to be able to launch the modpack.")
-                                .define("reqMinMemoryAmountInGB", 0.5);
+                                .defineInRange("reqMinMemoryAmountInGB", 0.5, 0.1, 1024.0);
                     } clientConfigBuilder.pop();
 
                     // Java.Memory.Min.Warning
@@ -175,12 +181,13 @@ public final class ClientConfig {
                         enableMinMemoryWarning = clientConfigBuilder
                                 .comment("\r\nEnable this to show a warning when less than X amount of RAM is available to the modpack for allocating.\r\n" +
                                         "Think of this like a recommended amount while the requirement is a minimum amount.\r\n" +
-                                        "Warning: Setting this too high could make it impossible for some of your users to allocate the amount you're recommending and may actually hurt performance (see the max memory section for details).\r\n" +
+                                        "Warning: Setting this too high could make it impossible for some of your users to allocate the amount you're recommending and may " +
+                                        "actually hurt performance (see the max memory section for details).\r\n" +
                                         "Note: This is *separate* from enableMinMemoryRequirement - you can have a separate min RAM allocation requirement and warning.")
                                 .define("enableMinMemoryWarning", true);
                         warnMinMemoryAmountInGB = clientConfigBuilder
                                 .comment("\r\nThe minimum recommended amount of allocated RAM in GB needed to skip the warning message when launching the modpack.")
-                                .define("warnMinMemoryAmountInGB", 1.0);
+                                .defineInRange("warnMinMemoryAmountInGB", 1.0, 0.1, 1024.0);
                     } clientConfigBuilder.pop();
 
                 } clientConfigBuilder.pop();
@@ -195,17 +202,18 @@ public final class ClientConfig {
                                         "This is useful for preventing users from allocating excessive amounts of RAM to the point of causing nasty GC-related lag spikes as a result.")
                                 .define("enableMaxMemoryRequirement", true);
                         reqMaxMemoryAmountInGB = clientConfigBuilder
-                                .comment("") // todo: comment
+                                .comment("\r\nThe maximum amount of allocated RAM in GB to be able to launch the modpack.")
                                 .define("reqMaxMemoryAmountInGB", 16.0);
                     } clientConfigBuilder.pop();
 
                     // Java.Memory.Max.Warning
                     clientConfigBuilder.push("Warning"); {
                         enableMaxMemoryWarning = clientConfigBuilder
-                                .comment("")
+                                .comment("\r\nEnable this to show a warning when more than X amount of RAM is available to the modpack for allocating.\r\n" +
+                                        "This is useful for warning users that are allocating excessive amounts of RAM to the point of causing nasty GC-related lag spikes as a result.")
                                 .define("enableMaxMemoryWarning", true);
                         warnMaxMemoryAmountInGB = clientConfigBuilder
-                                .comment("") // todo: comment
+                                .comment("\r\nThe maximum recommended amount of allocated RAM in GB needed to skip the warning message when launching the modpack.")
                                 .define("warnMaxMemoryAmountInGB", 14.0);
                     } clientConfigBuilder.pop();
 
@@ -230,7 +238,8 @@ public final class ClientConfig {
                 enableAppendingToCustomTitle = clientConfigBuilder
                         .comment("\r\nEnable this if you want the game's version to be appended to the end of your customWindowTitleText.\r\n" +
                                 "For example: \"ModpackName (Minecraft* 1.16.3)\")\r\n" +
-                                "Note: This is enabled by default because Mojang went out of their way to prevent modders from changing the window title easily - this setting is a happy middle ground where both modpack authors' and Mojang's preferences are respected.")
+                                "Note: This is enabled by default because Mojang went out of their way to prevent modders from changing the window title easily - this setting is a " +
+                                "happy middle ground where both modpack authors' and Mojang's preferences are respected.")
                         .define("enableAppendingToCustomTitle", true);
                 enableUsingTechnicDisplayName = clientConfigBuilder
                         .comment("\r\nWhether or not to automatically use your modpack's display name instead of the customWindowTitleText when launching from the Technic Launcher.\r\n" +
@@ -267,22 +276,27 @@ public final class ClientConfig {
             enableAnticheat = clientConfigBuilder
                     .comment("\r\nWhether or not to detect and report known cheats to servers with itlt installed and anti-cheat enabled.\r\n" +
                             "Note: Disabling this won't suddenly allow you to cheat on said servers - it'll simply prevent you from joining them at all.\r\n" +
-                            "Note: Depending on the server, you may be able to join it with cheats installed even if anti-cheat is enabled on the server. The action the server takes towards cheaters is down to the server's staff.")
+                            "Note: Depending on the server, you may be able to join it with cheats installed even if anti-cheat is enabled on the server. The action the " +
+                            "server takes towards cheaters is down to the server's staff.")
                     .define("enableAnticheat", true);
             enableAutoRemovalOfCheats = clientConfigBuilder
                     .comment("\r\nEnable this if you want itlt to automatically delete known cheat mods so that they don't run on next launch.\r\n" +
                             "This feature is intended to prevent accidental cheating on servers. You'll probably want to disable this setting if you want to cheat on singleplayer.\r\n" +
                             "Note: enableAnticheat must be enabled for this to take effect.")
                     .define("enableAutoRemovalOfCheats", true);
+            parallelModChecksThreshold = clientConfigBuilder
+                    .comment("\r\nTo check if a known cheat mod is present, itlt needs to iterate through each currently loaded mod.\r\n" +
+                            "These checks are pretty fast, but can still benefit from multithreading if there are *a lot* of mods.\r\n" +
+                            "You can change the threshold of how many mods are needed before multithreading is attempted here. The default is >100 mods.\r\n" +
+                            "Warning: There's an overhead associated with multithreading so having the threshold too low can actually hurt performance.")
+                    .defineInRange("parallelModChecksThreshold", 100, 1, 1024);
         } clientConfigBuilder.pop();
-
 
         // Build the config
         clientConfig = clientConfigBuilder.build();
     }
 
     public static void loadConfig(ForgeConfigSpec spec, final Path path) {
-
         final CommentedFileConfig configData = CommentedFileConfig.builder(path)
                 .sync()
                 .autosave()

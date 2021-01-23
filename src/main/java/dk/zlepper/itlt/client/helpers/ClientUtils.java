@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import io.lktk.NativeBLAKE3;
 import io.lktk.NativeBLAKE3Util;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 
@@ -43,12 +44,16 @@ public class ClientUtils {
     public static boolean alreadyInServerList(final ServerData server, final ServerList list) {
         if (list == null)
             return false;
+
         for (int i = 0; i < list.countServers(); i++) {
             final ServerData serverData = list.getServerData(i);
             if (serverData.serverName != null && serverData.serverIP != null &&
-                    serverData.serverName.equalsIgnoreCase(server.serverName) && serverData.serverIP.equalsIgnoreCase(server.serverIP))
+                    serverData.serverName.equalsIgnoreCase(server.serverName) &&
+                    serverData.serverIP.equalsIgnoreCase(server.serverIP)) {
                 return true;
+            }
         }
+
         return false;
     }
 
@@ -118,7 +123,7 @@ public class ClientUtils {
         else return null;
     }
 
-    public static Object[] getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException, NativeBLAKE3Util.InvalidNativeOutput {
+    public static Pair<ChecksumType, String> getFileChecksum(final File file) throws IOException, NoSuchAlgorithmException, NativeBLAKE3Util.InvalidNativeOutput {
         // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to SHA-512
         if (!NativeBLAKE3.isEnabled())
             return getFileChecksumFallback(file);
@@ -127,20 +132,15 @@ public class ClientUtils {
         final NativeBLAKE3 hasher = new NativeBLAKE3();
         hasher.initDefault();
 
-        // open the file to hash
-        final FileInputStream fis = new FileInputStream(file);
-
-        // create byte array to read data in chunks
-        byte[] byteArray = new byte[1024];
+        final FileInputStream fis = new FileInputStream(file); // open the file to hash
+        byte[] byteArray = new byte[1024]; // create byte array to read data in chunks
 
         // read file data in chunks of 1KB and send it off to the hasher
         while ((fis.read(byteArray)) != -1) hasher.update(byteArray);
 
-        // we're finished reading the file, so close it
-        fis.close();
+        fis.close(); // we're finished reading the file, so close it
 
-        // get the hasher's output
-        final byte[] bytes = hasher.getOutput();
+        final byte[] bytes = hasher.getOutput(); // get the hasher's output
 
         // the NaitveBLAKE3 JNI is a C lib so we need to manually tell it to free up the memory now that we're done with it
         if (hasher.isValid()) hasher.close();
@@ -158,10 +158,10 @@ public class ClientUtils {
         final Base62 base62 = Base62.createInstance();
         final String encodedBase62 = new String(base62.encode(bytes));
 
-        return new Object[]{ChecksumType.Modern, encodedBase62};
+        return Pair.of(ChecksumType.Modern, encodedBase62);
     }
 
-    public static Object[] getFileChecksumFallback(final File file) throws IOException, NoSuchAlgorithmException {
+    public static Pair<ChecksumType, String> getFileChecksumFallback(final File file) throws IOException, NoSuchAlgorithmException {
         final MessageDigest digest = MessageDigest.getInstance("SHA-512");
         final FileInputStream fis = new FileInputStream(file);
 
@@ -188,7 +188,7 @@ public class ClientUtils {
         final String encodedBase62 = new String(base62.encode(bytes));
 
         // return the completed hash
-        return new Object[]{ChecksumType.Fallback, encodedBase62};
+        return Pair.of(ChecksumType.Fallback, encodedBase62);
     }
 
     public enum ChecksumType {

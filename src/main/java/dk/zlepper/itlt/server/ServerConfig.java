@@ -11,20 +11,16 @@ public final class ServerConfig {
     public static ForgeConfigSpec serverConfig;
 
     static {
-
         // Anti-cheat section
         serverConfigBuilder.push("Anti-cheat");
 
         serverConfigBuilder.pop();
 
-
         // Build the config
         serverConfig = serverConfigBuilder.build();
     }
 
-
     public static void loadConfig(ForgeConfigSpec spec, final Path path) {
-
         final CommentedFileConfig configData = CommentedFileConfig.builder(path)
                 .sync()
                 .autosave()

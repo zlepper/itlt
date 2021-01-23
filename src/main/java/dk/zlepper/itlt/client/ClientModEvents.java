@@ -61,7 +61,6 @@ public class ClientModEvents {
             }
         }
 
-
         // Memory-related requirements and warnings
         currentMem = Runtime.getRuntime().maxMemory() / 1073741824.0F;
 
@@ -89,10 +88,10 @@ public class ClientModEvents {
         // Java arch requirement and warning
         final boolean isJava64bit = mcInstance.isJava64bit();
         itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
-        if (!isJava64bit)
+        if (!isJava64bit) {
             if (ClientConfig.enable64bitRequirement.get()) ClientUtils.startUIProcess(MessageContent.NeedsJava64bit);
             else if (ClientConfig.enable64bitWarning.get()) ClientUtils.startUIProcess(MessageContent.WantsJava64bit);
-
+        }
 
         // Custom window title text
         if (ClientConfig.enableCustomWindowTitle.get()) {
@@ -117,7 +116,6 @@ public class ClientModEvents {
             if (!customWindowTitle.equals(""))
                 mcInstance.getMainWindow().setWindowTitle(customWindowTitle + " (" + mcInstance.getWindowTitle() + ")");
         }
-
 
         // Custom window icon
         if (ClientConfig.enableCustomIcon.get()) {
@@ -145,7 +143,6 @@ public class ClientModEvents {
             if (customIcon != null && customIcon.exists() && !customIcon.isDirectory()) ClientUtils.setWindowIcon(customIcon, mcInstance);
             else itlt.LOGGER.warn("enableCustomIcon is true but icon.png is missing or invalid.");
         }
-
 
         // Custom server list entries
         // todo: revisit this at another time to simplify and cleanup the code

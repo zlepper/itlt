@@ -17,6 +17,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,6 @@ public class ClientForgeEvents {
     @SuppressWarnings("unchecked") // Cast checking is handled through the try/catch block and fallbacks of the same type, Java's just being overly paranoid here.
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
         if (ClientConfig.enableAnticheat.get()) {
-
             // definition updates
             ArrayList<String> cheatModIds = new ArrayList<>();
             ArrayList<String> cheatModChecksums = new ArrayList<>();
@@ -67,6 +67,7 @@ public class ClientForgeEvents {
 
             // there's a significant overhead involved in parallel streams that may make it run slower than sequential if
             // you're only doing a small amount of work, therefore we only use it if there's *a lot* of mods to iterate through
+            // todo: make the threshold configurable rather than hard-coded as 100
             final Stream<ModInfo> modInfoStream;
             if (ModList.get().getMods().size() > 100) modInfoStream = ModList.get().getMods().parallelStream();
             else modInfoStream = ModList.get().getMods().stream();
@@ -90,15 +91,15 @@ public class ClientForgeEvents {
                 // by checksum
                 final File modFile = modInfo.getOwningFile().getFile().getFilePath().toFile();
                 try {
-                    final Object[] modFileChecksum = ClientUtils.getFileChecksum(modFile);
+                    final Pair<ClientUtils.ChecksumType, String> modFileChecksum = ClientUtils.getFileChecksum(modFile);
                     itlt.LOGGER.debug("");
                     itlt.LOGGER.debug("modId: " + modId);
                     itlt.LOGGER.debug("modFile: " + modFile.toPath().toString());
-                    itlt.LOGGER.debug("modFileChecksum: " + Arrays.toString(modFileChecksum));
+                    itlt.LOGGER.debug("modFileChecksum: " + modFileChecksum.toString());
 
                     // known cheat checksums from definition file
                     finalCheatModChecksums.forEach(cheatModChecksum -> {
-                        if (modFileChecksum[1].toString().equals(cheatModChecksum)) listOfDetectedCheatMods.add(modInfo);
+                        if (modFileChecksum.getRight().equals(cheatModChecksum)) listOfDetectedCheatMods.add(modInfo);
                     });
                 } catch (final IOException | NoSuchAlgorithmException | NativeBLAKE3Util.InvalidNativeOutput e) {
                     itlt.LOGGER.warn("Unable to calculate checksum for " + modFile.getPath());

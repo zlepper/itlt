@@ -66,6 +66,8 @@ public final class Main {
             showGuide(guideURL, errorMessage);
         } else if (selectedOption == 2) {
             // Todo: "Don't remind again" functionality
+        } else {
+            // "Remind me later"
         }
 
         // prevent the jvm running the popup window from continuing to run after it's closed

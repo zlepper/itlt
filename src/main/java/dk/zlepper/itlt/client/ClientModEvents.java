@@ -50,9 +50,9 @@ public class ClientModEvents {
             if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
                 final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
                 itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
-                if (detectedLauncher == ClientUtils.LauncherName.Twitch || detectedLauncher == ClientUtils.LauncherName.CurseClient)
-                    itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.toString() + " Launcher " +
-                            "which currently does not allow changing Java version beyond Java 8. :(");
+                if (detectedLauncher == ClientUtils.LauncherName.CurseClient)
+                    itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
+                            + " launcher which currently does not allow changing Java version beyond Java 8. :(");
                 else ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
             } else {
                 ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
@@ -95,19 +95,29 @@ public class ClientModEvents {
         if (ClientConfig.enableCustomWindowTitle.get()) {
             String customWindowTitle = ClientConfig.customWindowTitleText.get();
 
-            if (ClientConfig.enableUsingTechnicDisplayName.get()) {
+            if (ClientConfig.enableUsingAutodetectedDisplayName.get()) {
                 final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
                 itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
-                // if running from the Technic Launcher, use the pack slug's displayName instead of the customWindowTitleText from the config
-                if (detectedLauncher == ClientUtils.LauncherName.Technic) {
-                    try {
-                        customWindowTitle = ClientUtils.getTechnicPackName();
-                    } catch (final IOException e) {
-                        itlt.LOGGER.info("Unable to get pack displayName, falling back to customWindowTitleText in config.");
-                        e.printStackTrace();
+                try {
+                    switch (detectedLauncher) {
+                        case Technic:
+                            // if running from the Technic Launcher, use the pack slug's displayName
+                            customWindowTitle = ClientUtils.getTechnicPackName();
+                            break;
+                        case MultiMC:
+                            // if running from the MultiMC launcher, use the instance's user-friendly name
+                            customWindowTitle = ClientUtils.getMultiMCInstanceName();
+                            break;
+                        case CurseClient:
+                            // if running from the Curse Client launcher, use the profile's name
+                            customWindowTitle = ClientUtils.getCurseClientProfileName();
+                        default:
+                            break;
                     }
+                } catch (final IOException e) {
+                    itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to customWindowTitleText in the config.");
+                    e.printStackTrace();
                 }
-                // todo: MultiMC launcher support
             }
             itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
 
@@ -147,7 +157,8 @@ public class ClientModEvents {
                 if (autoDetectedIcon != null) customIcon = autoDetectedIcon;
             }
 
-            if (customIcon != null && customIcon.exists() && !customIcon.isDirectory()) ClientUtils.setWindowIcon(customIcon, mcInstance);
+            if (customIcon != null && customIcon.exists() && !customIcon.isDirectory())
+                ClientUtils.setWindowIcon(customIcon, mcInstance);
             else itlt.LOGGER.warn("enableCustomIcon is true but icon.png is missing or invalid.");
         }
 

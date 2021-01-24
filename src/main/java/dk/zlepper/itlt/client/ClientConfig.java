@@ -38,7 +38,7 @@ public final class ClientConfig {
             selectivelyIgnoreMinJavaVerWarning,
             enableCustomWindowTitle,
             enableAppendingToCustomTitle,
-            enableUsingTechnicDisplayName,
+            enableUsingAutodetectedDisplayName,
             enableCustomIcon,
             enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
@@ -64,8 +64,12 @@ public final class ClientConfig {
             parallelModChecksThreshold;
 
     static {
-        // Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to avoid confusion to the user.
-        // Yes, I'm aware I don't need the curly brackets around each config group, I do it so that devs looking at this have the ability to collapse config groups to make things easier to read and understand.
+        /* Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to
+         * avoid confusion to the user.
+         *
+         * Yes, I'm aware I don't need the curly brackets around each config group, I do it so that devs looking at
+         * this have the ability to collapse config groups to make things easier to read and understand.
+         */
 
         // Java section
         clientConfigBuilder.push("Java"); {
@@ -267,9 +271,9 @@ public final class ClientConfig {
                                 "Note: This is enabled by default because Mojang went out of their way to prevent modders from changing the window title easily - this setting is a " +
                                 "happy middle ground where both modpack authors' and Mojang's preferences are respected.")
                         .define("enableAppendingToCustomTitle", true);
-                enableUsingTechnicDisplayName = clientConfigBuilder
-                        .comment("\r\nWhether or not to automatically use your modpack's display name instead of the customWindowTitleText when launching from the Technic Launcher.\r\n" +
-                                "Note: This will override the contents of customWindowTitleText when launching from a Technic Platform modpack.\r\n" +
+                enableUsingAutodetectedDisplayName = clientConfigBuilder
+                        .comment("\r\nWhether or not to automatically use your modpack's display name instead of the customWindowTitleText when launching from a supported launcher.\r\n" +
+                                "Note: This will override the contents of customWindowTitleText when launching from a supported launcher.\r\n" +
                                 "Note: enableCustomWindowTitle must be enabled for this to take effect.")
                         .define("enableUsingTechnicDisplayName", true);
             } clientConfigBuilder.pop();

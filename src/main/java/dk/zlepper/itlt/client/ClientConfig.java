@@ -13,6 +13,7 @@ package dk.zlepper.itlt.client;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
+import dk.zlepper.itlt.client.helpers.ClientUtils;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.io.File;
@@ -62,6 +63,8 @@ public final class ClientConfig {
             requiredMinJavaVersion,
             warnMinJavaVersion,
             parallelModChecksThreshold;
+
+    public static ForgeConfigSpec.ConfigValue<ClientUtils.ChecksumType> preferredChecksumType;
 
     static {
         /* Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to
@@ -314,12 +317,19 @@ public final class ClientConfig {
                             "This feature is intended to prevent accidental cheating on servers. You'll probably want to disable this setting if you want to cheat on singleplayer.\r\n" +
                             "Note: enableAnticheat must be enabled for this to take effect.")
                     .define("enableAutoRemovalOfCheats", true);
-            parallelModChecksThreshold = clientConfigBuilder
-                    .comment("\r\nTo check if a known cheat mod is present, itlt needs to iterate through each currently loaded mod.\r\n" +
-                            "These checks are pretty fast, but can still benefit from multithreading if there are *a lot* of mods.\r\n" +
-                            "You can change the threshold for how many mods are needed before multithreading is attempted here. The default is >100 mods.\r\n" +
-                            "Warning: There's an overhead associated with multithreading so having the threshold too low can actually hurt performance.")
-                    .defineInRange("parallelModChecksThreshold", 100, 1, 1024);
+
+            // Anti-cheat.Advanced
+            clientConfigBuilder.push("Advanced"); {
+                parallelModChecksThreshold = clientConfigBuilder
+                        .comment("\r\nTo check if a known cheat mod is present, itlt needs to iterate through each currently loaded mod.\r\n" +
+                                "These checks are pretty fast, but can still benefit from multithreading if there are *a lot* of mods.\r\n" +
+                                "You can change the threshold for how many mods are needed before multithreading is attempted here. The default is >100 mods.\r\n" +
+                                "Warning: There's an overhead associated with multithreading so having the threshold too low can actually hurt performance.")
+                        .defineInRange("parallelModChecksThreshold", 100, 1, 1024);
+                preferredChecksumType = clientConfigBuilder
+                        .comment("")
+                        .defineEnum("preferredChecksumType", ClientUtils.ChecksumType.Default);
+            }
         } clientConfigBuilder.pop();
 
         // Build the config

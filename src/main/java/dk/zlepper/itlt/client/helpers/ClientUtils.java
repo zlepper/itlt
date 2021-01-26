@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
+import io.github.rctcwyvrn.blake3.Blake3;
 import io.seruco.encoding.base62.Base62;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
@@ -20,15 +21,14 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import io.lktk.NativeBLAKE3;
 import io.lktk.NativeBLAKE3Util;
+import net.minecraftforge.userdev.FMLDevClientLaunchProvider;
+import net.minecraftforge.userdev.FMLDevServerLaunchProvider;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -96,14 +96,35 @@ public class ClientUtils {
         itlt.LOGGER.debug("isCurseClientLauncher: " + isCurseClientLauncher);
         if (isCurseClientLauncher) return LauncherName.CurseClient;
 
+        final Path theoreticalFTBAppPath = itltJarPath.getParent().getParent().getParent().getParent();
+        final boolean isFTBAppLauncher =
+                Files.exists(theoreticalFTBAppPath.resolve("ftbapp.log"));
+        itlt.LOGGER.debug("theoreticalFTBAppPath: " + theoreticalFTBAppPath);
+        itlt.LOGGER.debug("isFTBAppLauncher: " + isFTBAppLauncher);
+        if (isFTBAppLauncher) return LauncherName.FTBApp; // todo: determine if there's any benefit to supporting this launcher
+
+        final boolean isForgeDevEnv = isForgeDevEnv();
+        itlt.LOGGER.debug("isForgeDevEnv: " + isForgeDevEnv);
+        if (isForgeDevEnv) return LauncherName.ForgeDevEnv;
+
         return LauncherName.Unknown;
+    }
+
+    public static boolean isForgeDevEnv() {
+        try {
+            if (new FMLDevClientLaunchProvider().name().equals("fmldevclient")) return true;
+            if (new FMLDevServerLaunchProvider().name().equals("fmldevserver")) return true;
+        } catch (Exception ignored) {}
+        return false;
     }
 
     public enum LauncherName {
         Unknown,
         Technic,
         MultiMC,
-        CurseClient
+        CurseClient,
+        FTBApp,
+        ForgeDevEnv
     }
 
     public static String getTechnicPackName() throws IOException {
@@ -113,8 +134,6 @@ public class ClientUtils {
         final String packSlug = itltJarPath.getParent().getParent().getFileName().toString();
 
         // open the cache.json for the associated slug to get the pack's displayName
-        //final Path cacheJsonPath = Paths.get(itltJarPath.resolve("../../../..") + File.separator + "assets"
-        //        + File.separator + "packs" + File.separator + packSlug + File.separator + "cache.json");
         final Path cacheJsonPath = itltJarPath.resolve("../../../../assets/packs" + packSlug + "/cache.json");
         final Reader reader = Files.newBufferedReader(cacheJsonPath);
 
@@ -189,57 +208,49 @@ public class ClientUtils {
         else return null;
     }
 
-    public static Pair<ChecksumType, String> getFileChecksum(final File file) throws IOException,
-            NoSuchAlgorithmException, NativeBLAKE3Util.InvalidNativeOutput {
-        // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to SHA-512
+    public static Pair<ChecksumType, String> getFileChecksum(final File file, ChecksumType checksumType)
+            throws IOException, NativeBLAKE3Util.InvalidNativeOutput {
+        // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to the Java implementation
         if (!NativeBLAKE3.isEnabled())
-            return getFileChecksumFallback(file);
+            return getFileChecksumFallback(file, checksumType);
+
+        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // default to BLAKE3_224
 
         // setup the BLAKE3 hasher
         final NativeBLAKE3 hasher = new NativeBLAKE3();
         hasher.initDefault();
 
         final FileInputStream fis = new FileInputStream(file); // open the file to hash
-        byte[] byteArray = new byte[1024]; // create byte array to read data in chunks
+        byte[] byteArray = new byte[16384]; // create byte array to read data in chunks / as a buffer
 
-        // read file data in chunks of 1KB and send it off to the hasher
+        // a 16KB buffer is what the BLAKE3 team seems to recommend as a minimum for best performance
+        // please open an issue on the itlt github with an explanation and correction if I've misunderstood this, I'm
+        // not sure if internally Java works best with 8KB file reads instead or something...
+        // https://github.com/BLAKE3-team/BLAKE3/blob/3a8204f5f38109aae08f4ae58b275663e1cfebab/b3sum/src/main.rs#L256
+
+        // read file data in chunks of 16KB and send it off to the hasher
         while ((fis.read(byteArray)) != -1) hasher.update(byteArray);
 
         fis.close(); // we're finished reading the file, so close it
 
-        final byte[] bytes = hasher.getOutput(); // get the hasher's output
+        // get the hasher's output, with the number arg being the number of output bytes, prior to hex encoding
+        // our default is 28, aka BLAKE3-224. for BLAKE3-256, use 32
+        final byte[] bytes;
+        switch (checksumType) {
+            case BLAKE3_256: {
+                bytes = hasher.getOutput(32);
+                break;
+            }
+            case BLAKE3_224:
+            default: {
+                bytes = hasher.getOutput(28);
+                break;
+            }
+        }
 
-        // the NaitveBLAKE3 JNI is a C lib so we need to manually tell it to free up the memory now that we're done with it
+        // the NativeBLAKE3 JNI is a C lib so we need to manually tell it to free up the memory now that
+        // we're done with it
         if (hasher.isValid()) hasher.close();
-
-        // convert to hex
-        /*final StringBuilder sb = new StringBuilder();
-        for (byte aByte : decimalBytes) {
-            sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
-        }*/
-
-        // convert to Base64
-        //final String encodedBase64 = Base64.encodeBase64String(bytes);
-
-        // convert to Base62
-        final Base62 base62 = Base62.createInstance();
-        final String encodedBase62 = new String(base62.encode(bytes));
-
-        return Pair.of(ChecksumType.Modern, encodedBase62);
-    }
-
-    public static Pair<ChecksumType, String> getFileChecksumFallback(final File file) throws IOException, NoSuchAlgorithmException {
-        final MessageDigest digest = MessageDigest.getInstance("SHA-512");
-        final FileInputStream fis = new FileInputStream(file);
-
-        byte[] byteArray = new byte[1024];
-        int bytesCount;
-
-        while ((bytesCount = fis.read(byteArray)) != -1) digest.update(byteArray, 0, bytesCount);
-        fis.close();
-
-        // Get the hash's bytes
-        byte[] bytes = digest.digest();
 
         // convert to hex
         /*final StringBuilder sb = new StringBuilder();
@@ -255,12 +266,53 @@ public class ClientUtils {
         final String encodedBase62 = new String(base62.encode(bytes));
 
         // return the completed hash
-        return Pair.of(ChecksumType.Fallback, encodedBase62);
+        return Pair.of(checksumType, encodedBase62);
+    }
+
+    public static Pair<ChecksumType, String> getFileChecksum(final File file)
+            throws IOException, NativeBLAKE3Util.InvalidNativeOutput {
+        return getFileChecksum(file, ChecksumType.Default);
+    }
+
+    public static Pair<ChecksumType, String> getFileChecksumFallback(final File file, ChecksumType checksumType)
+            throws IOException {
+        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // default to BLAKE3_224
+
+        final Blake3 hasher = Blake3.newInstance();
+
+        final FileInputStream fis = new FileInputStream(file);
+        byte[] byteArray = new byte[16384];
+
+        // read file data in chunks of 16KB and send it off to the hasher
+        while ((fis.read(byteArray)) != -1) hasher.update(byteArray);
+
+        fis.close();
+
+        final byte[] bytes;
+        switch (checksumType) {
+            case BLAKE3_256: {
+                bytes = hasher.digest(32);
+                break;
+            }
+            case BLAKE3_224:
+            default: {
+                bytes = hasher.digest(28);
+                break;
+            }
+        }
+
+        // convert to Base62
+        final Base62 base62 = Base62.createInstance();
+        final String encodedBase62 = new String(base62.encode(bytes));
+
+        // return the completed hash
+        return Pair.of(checksumType, encodedBase62);
     }
 
     public enum ChecksumType {
-        Fallback,
-        Modern
+        BLAKE3_256,
+        BLAKE3_224,
+        Default
     }
 
     public static void setWindowIcon(final File icon, final Minecraft mcInstance) {
@@ -374,8 +426,9 @@ public class ClientUtils {
 
         try {
             final ProcessBuilder builder = new ProcessBuilder(
-                    System.getProperty("java.home") + File.separator + "bin" + File.separator + "java", "-jar", modFile.toString(),
-                    messageType, messageTitle, messageBody, leftButtonText, middleButtonText, rightButtonText, errorMessage, guideURL);
+                    System.getProperty("java.home") + File.separator + "bin" + File.separator + "java",
+                    "-jar", modFile.toString(), messageType, messageTitle, messageBody, leftButtonText,
+                    middleButtonText, rightButtonText, errorMessage, guideURL);
             builder.inheritIO();
             builder.start();
         } catch (final IOException e) {
@@ -383,17 +436,20 @@ public class ClientUtils {
         } finally {
             // don't allow the pack to continue launching if a requirement isn't met
             if (messageType.equals("require")) {
-                itlt.LOGGER.fatal("Can't launch the game as a requirement isn't met. The unmet requirement is:\"" + messageContent.toString() + "\".");
+                itlt.LOGGER.fatal("Can't launch the game as a requirement isn't met. ");
+                itlt.LOGGER.fatal("The unmet requirement is: \"" + messageContent.toString() + "\".");
+
                 System.exit(1);
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> getLatestDefinitions(final ChecksumType checksumType) throws IOException, ClassCastException {
-        final String definitionsURLString;
-        if (checksumType == ChecksumType.Modern) definitionsURLString = "https://raw.githubusercontent.com/zlepper/itlt/1.16-2.0-rewrite/definitionsAPI/v1/definitions.json";
-        else definitionsURLString = "https://raw.githubusercontent.com/zlepper/itlt/1.16-2.0-rewrite/definitionsAPI/v1/definitions-fallback.json";
+    public static Map<String, Object> getLatestDefinitions(ChecksumType checksumType) throws IOException, ClassCastException {
+        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // wow, an actual use of Java's mutable by default function args!
+        final String definitionsURLString =
+                "https://raw.githubusercontent.com/zlepper/itlt/api/forge/v1.0/definitions/" +
+                checksumType.toString().toLowerCase() + ".json";
 
         // download the definitions and put it in the string "definitionsJson"
         final URLConnection connection = new URL(definitionsURLString).openConnection();
@@ -412,7 +468,8 @@ public class ClientUtils {
         itlt.LOGGER.debug("mcVersion: " + mcVersion);
         itlt.LOGGER.debug("definitionsMap: " + definitionsMap.toString());
 
-        return Collections.unmodifiableMap((Map<String, Object>) definitionsMap.getOrDefault(mcVersion, Collections.<String, Object>emptyMap()));
+        return Collections.unmodifiableMap(
+                (Map<String, Object>) definitionsMap.getOrDefault(mcVersion, Collections.<String, Object>emptyMap()));
 
         /* The definitions JSON looks something like this:
          *  {

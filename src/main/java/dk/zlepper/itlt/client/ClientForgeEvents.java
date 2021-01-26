@@ -5,10 +5,13 @@ package dk.zlepper.itlt.client;
 // todo: analysis of mods to detect suspiciously cheaty code in unknown cheat mods
 // todo: detect FML tweaker type cheat mods
 // todo: report to server with list of known cheats (if any)
+// todo: report to server when unable to get definitions or unable to check a mod
+// todo: cache results of checks after first login and reuse for future logins for the game session
+//       (purge cache on game close/crash/restart)
+// todo: treat empty returned definitions as suspicious
 
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.itlt;
-import io.lktk.NativeBLAKE3;
 import io.lktk.NativeBLAKE3Util;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -21,38 +24,32 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Mod.EventBusSubscriber(modid = itlt.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientForgeEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    @SuppressWarnings("unchecked") // Cast checking is handled through the try/catch block and fallbacks of the same type, Java's just being overly paranoid here.
+    @SuppressWarnings("unchecked") // Casts are checked and handled using a try/catch block for ClassCastExceptions
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
         if (ClientConfig.enableAnticheat.get()) {
             // definition updates
-            ArrayList<String> cheatModIds = new ArrayList<>();
-            ArrayList<String> cheatModChecksums = new ArrayList<>();
+            HashSet<String> cheatModIds = new HashSet<>();
+            HashSet<String> cheatModChecksums = new HashSet<>();
             try {
-                // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to SHA-512
-                final Map<String, Object> latestDefinitions;
-                if (NativeBLAKE3.isEnabled()) latestDefinitions = ClientUtils.getLatestDefinitions(ClientUtils.ChecksumType.Modern);
-                else latestDefinitions = ClientUtils.getLatestDefinitions(ClientUtils.ChecksumType.Fallback);
+                // grab the latest definitions for the requested checksum type
+                final Map<String, Object> latestDefinitions = ClientUtils.getLatestDefinitions(ClientUtils.ChecksumType.BLAKE3_224);
                 itlt.LOGGER.debug("latestDefinitions: " + latestDefinitions);
 
                 // try to get the modIds section and fallback to an empty value and show a warning if unable to
-                cheatModIds = (ArrayList<String>) latestDefinitions.getOrDefault("modIds", new ArrayList<String>(0));
-                if (cheatModIds.isEmpty()) itlt.LOGGER.warn("modIds section missing from latest definitions");
+                cheatModIds.addAll((Collection<String>) latestDefinitions.get("modIds"));
                 itlt.LOGGER.debug("cheatModIds: " + cheatModIds);
 
                 // same with the checksums section
-                cheatModChecksums = (ArrayList<String>) latestDefinitions.getOrDefault("checksums", new ArrayList<String>(0));
-                if (cheatModChecksums.isEmpty()) itlt.LOGGER.warn("checksums section missing from latest definitions");
+                cheatModChecksums.addAll((Collection<String>) latestDefinitions.get("checksums"));
                 itlt.LOGGER.debug("cheatModChecksums: " + cheatModChecksums);
+
             } catch (final IOException e) {
                 itlt.LOGGER.error("Unable to get latest definitions");
                 e.printStackTrace();
@@ -60,54 +57,70 @@ public class ClientForgeEvents {
                 itlt.LOGGER.error("Unable to parse latest definitions");
                 e.printStackTrace();
             }
-            final ArrayList<String> finalCheatModIds = cheatModIds;
-            final ArrayList<String> finalCheatModChecksums = cheatModChecksums;
 
-            ArrayList<ModInfo> listOfDetectedCheatMods = new ArrayList<>();
+            ArrayList<ModInfo> listOfDetectedCheatMods = new ArrayList<>(0);
+
+            final ModList modList = ModList.get();
+            final Stream<ModInfo> modInfoStream;
 
             // there's a significant overhead involved in parallel streams that may make it run slower than sequential if
             // you're only doing a small amount of work, therefore we only use it if there's *a lot* of mods to iterate through
-            // todo: make the threshold configurable rather than hard-coded as 100
-            final Stream<ModInfo> modInfoStream;
-            if (ModList.get().getMods().size() > ClientConfig.parallelModChecksThreshold.get()) modInfoStream = ModList.get().getMods().parallelStream();
-            else modInfoStream = ModList.get().getMods().stream();
+            if (modList.getMods().size() > ClientConfig.parallelModChecksThreshold.get()) modInfoStream = modList.getMods().parallelStream();
+            else modInfoStream = modList.getMods().stream();
             itlt.LOGGER.debug("isParallel: " + modInfoStream.isParallel());
+
+            if (cheatModIds.isEmpty()) itlt.LOGGER.warn("modIds section missing from latest definitions");
+            if (cheatModChecksums.isEmpty()) itlt.LOGGER.warn("checksums section missing from latest definitions");
+            final Set<String> finalCheatModIds = Collections.unmodifiableSet(cheatModIds);
+            final Set<String> finalCheatModChecksums = Collections.unmodifiableSet(cheatModChecksums);
 
             modInfoStream.forEach(modInfo -> {
                 // by modId
                 final String modId = modInfo.getModId().toLowerCase();
 
-                // simple algorithm for xray modIds and a hard-coded list of known cheat modIds
-                if ((modId.contains("xray") && !modId.contains("anti"))
-                        || modId.equals("forgehax") || modId.equals("forgewurst")) {
-                    listOfDetectedCheatMods.add(modInfo);
-                }
+                // skip Forge and MC modIds from checks (they're a part of every FML setup afaik)
+                if (!modId.equals("forge") && !modId.equals("minecraft")) {
 
-                // known cheat modIds from definition file
-                finalCheatModIds.forEach(cheatModId -> {
-                    if (modId.equalsIgnoreCase(cheatModId)) listOfDetectedCheatMods.add(modInfo);
-                });
+                    // simple algorithm for xray modIds and a hard-coded list of known cheat modIds
+                    if ((modId.contains("xray") && !modId.contains("anti"))
+                            || modId.equals("forgehax") || modId.equals("forgewurst")) {
+                        listOfDetectedCheatMods.add(modInfo);
+                    }
 
-                // by checksum
-                final File modFile = modInfo.getOwningFile().getFile().getFilePath().toFile();
-                try {
-                    final Pair<ClientUtils.ChecksumType, String> modFileChecksum = ClientUtils.getFileChecksum(modFile);
-                    itlt.LOGGER.debug("");
-                    itlt.LOGGER.debug("modId: " + modId);
-                    itlt.LOGGER.debug("modFile: " + modFile.toPath().toString());
-                    itlt.LOGGER.debug("modFileChecksum: " + modFileChecksum.toString());
+                    // known cheat modIds from definition file
+                    if (finalCheatModIds.contains(modId)) listOfDetectedCheatMods.add(modInfo);
 
-                    // known cheat checksums from definition file
-                    finalCheatModChecksums.forEach(cheatModChecksum -> {
-                        if (modFileChecksum.getRight().equals(cheatModChecksum)) listOfDetectedCheatMods.add(modInfo);
-                    });
-                } catch (final IOException | NoSuchAlgorithmException | NativeBLAKE3Util.InvalidNativeOutput e) {
-                    itlt.LOGGER.warn("Unable to calculate checksum for " + modFile.getPath());
-                    e.printStackTrace();
+                    // by file checksum
+                    final File modFile = modInfo.getOwningFile().getFile().getFilePath().toFile();
+                    try {
+                        final Pair<ClientUtils.ChecksumType, String> modFileChecksum = ClientUtils.getFileChecksum(modFile);
+                        itlt.LOGGER.debug("");
+                        itlt.LOGGER.debug("modId: " + modId);
+                        itlt.LOGGER.debug("modFile: " + modFile.toPath().toString());
+                        itlt.LOGGER.debug("modFileChecksum: " + modFileChecksum.toString());
+
+                        // known cheat checksums from definition file
+                        if (finalCheatModChecksums.contains(modFileChecksum.getRight()))
+                            listOfDetectedCheatMods.add(modInfo);
+
+                    } catch (final IOException | NativeBLAKE3Util.InvalidNativeOutput e) {
+                        final StringBuilder warningMsgBuilder = new StringBuilder();
+                        warningMsgBuilder.append("Unable to calculate checksum for \"").append(modFile.getPath()).append("\"");
+
+                        final boolean fileNonExistentOrInaccessible =
+                                !modFile.exists() || e.getMessage().toLowerCase().contains("access is denied");
+
+                        if (fileNonExistentOrInaccessible)
+                            warningMsgBuilder.append(" because itlt can't find or access it on the filesystem.");
+
+                        itlt.LOGGER.warn(warningMsgBuilder.toString());
+                        if (!fileNonExistentOrInaccessible) e.printStackTrace();
+                    }
                 }
             });
 
-            listOfDetectedCheatMods.forEach(cheatMod -> itlt.LOGGER.debug("Found cheat mod: \"" + cheatMod.getOwningFile().getFile().getFileName() + "\""));
+            listOfDetectedCheatMods.forEach(cheatMod ->
+                    itlt.LOGGER.debug("Found cheat mod: \"" + cheatMod.getOwningFile().getFile().getFileName() + "\""));
 
             if (ClientConfig.enableAutoRemovalOfCheats.get()) {
                 listOfDetectedCheatMods.forEach(cheatMod -> {

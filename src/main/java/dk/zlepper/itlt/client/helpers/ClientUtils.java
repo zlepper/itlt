@@ -14,6 +14,7 @@ import net.minecraft.util.SharedConstants;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.ModList;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -30,8 +31,10 @@ import io.lktk.NativeBLAKE3Util;
 import net.minecraftforge.userdev.FMLDevClientLaunchProvider;
 import net.minecraftforge.userdev.FMLDevServerLaunchProvider;
 import org.apache.commons.lang3.tuple.Pair;
+import org.imgscalr.Scalr;
 
 import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
 
 public class ClientUtils {
 
@@ -315,17 +318,70 @@ public class ClientUtils {
         Default
     }
 
-    public static void setWindowIcon(final File icon, final Minecraft mcInstance) {
-        try (final InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
-            try (final InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
-                mcInstance.getMainWindow().setWindowIcon(is1, is2);
-                itlt.LOGGER.debug("Set window icon without issues");
+    public static void setWindowIcon(final File inputIconFile, final Minecraft mcInstance) throws IOException {
+        final BufferedImage inputIcon = ImageIO.read(inputIconFile);
+
+        // make the 16x16 icon
+        final BufferedImage resizedSmall = Scalr.resize(inputIcon, 16, 16);
+
+        final int inputWidth = inputIcon.getWidth();
+        final int inputHeight = inputIcon.getHeight();
+
+        /* this ensures that icons are the right size, resizing to the middle of a boundary if necessary
+         * here's some examples...
+         * - a 28x31 icon would be resized to 32x32 as the longest side (31px in this case) is between 24 and 48
+         * - a 64x64 icon would be used directly as it's already a valid size and aspect ratio
+         * - a 48x32 icon would be resized to 48x48 as its longest side (48px) is between 32 and 64
+         * - a 140x100 icon would be resized to 128x128 as one of its sides is over 128px
+         * - a tiny 12x12 icon would be resized to 16x16 as both sides are under 16px
+         * note that the resizing maintains the existing aspect ratios - a weird 16:9 icon will still look like 16:9
+         * but in a square file and be visually small as a result
+         */
+        final BufferedImage resizedLarge;
+        if ((inputWidth == 128 && inputHeight == 128) || (inputWidth == 96 && inputHeight == 96) ||
+            (inputWidth == 64 && inputHeight == 64)   || (inputWidth == 48 && inputHeight == 48) ||
+            (inputWidth == 32 && inputHeight == 32)   || (inputWidth == 24 && inputHeight == 24) ||
+            (inputWidth == 16 && inputHeight == 16)) {
+            // if the icon is already a valid size and aspect ratio, use it directly without resizing
+            resizedLarge = inputIcon;
+        } else if (inputWidth > 128 || inputHeight > 128)
+            // one of the sides are too big, resize to 128px²
+            resizedLarge = Scalr.resize(inputIcon, 128, 128);
+        else if ((inputWidth > 64 && inputWidth < 128) || (inputHeight > 64 && inputHeight < 128))
+            // if a side is between 64 and 128px, resize to 96px²
+            resizedLarge = Scalr.resize(inputIcon, 96, 96);
+        else if ((inputWidth > 48 && inputWidth < 96) || (inputHeight > 48 && inputHeight < 96))
+            // if a side is between 48 and 96px, resize to 64px²
+            resizedLarge = Scalr.resize(inputIcon, 64, 64);
+        else if ((inputWidth > 32 && inputWidth < 64) || (inputHeight > 32 && inputHeight < 64))
+            // etc...
+            resizedLarge = Scalr.resize(inputIcon, 48, 48);
+        else if ((inputWidth > 24 && inputWidth < 48) || (inputHeight > 24 && inputHeight < 48))
+            resizedLarge = Scalr.resize(inputIcon, 24, 32);
+        else if ((inputWidth > 16 && inputWidth < 32) || (inputHeight > 16 && inputHeight < 32))
+            resizedLarge = Scalr.resize(inputIcon, 24, 24);
+        else
+            // if both sides are <=16px, resize to 16px²
+            resizedLarge = Scalr.resize(inputIcon, 16, 16);
+
+        inputIcon.flush();
+
+        mcInstance.getMainWindow().setWindowIcon(convertToInputStream(resizedSmall), convertToInputStream(resizedLarge));
+    }
+
+    public static ByteArrayInputStream convertToInputStream(final BufferedImage bufferedImage) throws IOException {
+        // convert BufferedImage to ByteArrayOutputStream without a double copy behind the scenes
+        // https://stackoverflow.com/a/12253091/3944931
+        final ByteArrayOutputStream output = new ByteArrayOutputStream() {
+            @Override
+            public synchronized byte[] toByteArray() {
+                return this.buf;
             }
-        } catch (final FileNotFoundException e) {
-            itlt.LOGGER.error("Failed to open icon that we just confirmed was there???", e);
-        } catch (final IOException e) {
-            itlt.LOGGER.error("Something went wrong when reading the icon file", e);
-        }
+        };
+        ImageIO.write(bufferedImage, "png", output);
+        final ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray(), 0, output.size());
+        bufferedImage.flush();
+        return inputStream;
     }
 
     public static void startUIProcess(final MessageContent messageContent) {
@@ -446,7 +502,7 @@ public class ClientUtils {
 
     @SuppressWarnings("unchecked")
     public static Map<String, Object> getLatestDefinitions(ChecksumType checksumType) throws IOException, ClassCastException {
-        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // wow, an actual use of Java's mutable by default function args!
+        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // wow, an actual use of Java's mutable-by-default function args!
         final String definitionsURLString =
                 "https://raw.githubusercontent.com/zlepper/itlt/api/forge/v1.0/definitions/" +
                 checksumType.toString().toLowerCase() + ".json";

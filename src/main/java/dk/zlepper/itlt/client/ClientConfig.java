@@ -278,15 +278,16 @@ public final class ClientConfig {
                         .comment("\r\nWhether or not to automatically use your modpack's display name instead of the customWindowTitleText when launching from a supported launcher.\r\n" +
                                 "Note: This will override the contents of customWindowTitleText when launching from a supported launcher.\r\n" +
                                 "Note: enableCustomWindowTitle must be enabled for this to take effect.")
-                        .define("enableUsingTechnicDisplayName", true);
+                        .define("enableUsingAutodetectedDisplayName", true);
             } clientConfigBuilder.pop();
 
             // Display.Icon
             clientConfigBuilder.push("Icon"); {
                 enableCustomIcon = clientConfigBuilder
                         .comment("\r\nEnable this if you want to change the window icon of the Minecraft window.\r\n" +
-                                "Note: The icon needs to be placed in config" + File.separator + "itlt" + File.separator + "icon.png and be no larger than 128px squared.\r\n" +
-                                "Warning: Icon sizes beyond 128px squared can cause blurriness or even crashes on certain operating systems!")
+                                "Note: The icon needs to be placed in config" + File.separator + "itlt" + File.separator + "icon.png.\r\n" +
+                                "Note: For best results, use a square PNG with one of these sizes: 128x128, 96x96, 64x64, 48x48, 32x32, 24x24, 16x16.\r\n" +
+                                "Warning: Icon sizes beyond 128px squared or non-square icons may result in a poor quality image on some operating systems as well as wasting storage space and bandwidth.")
                         .define("enableCustomIcon", false);
                 enableUsingAutodetectedIcon = clientConfigBuilder
                         .comment("\r\nEnable this if you want itlt to automatically use your modpack's icon instead of the icon.png when launching from a supported launcher.\r\n" +

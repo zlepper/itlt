@@ -134,9 +134,8 @@ public class ClientModEvents {
             if (itltDir.exists()) {
                 customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
             } else {
-                itlt.LOGGER.warn("itlt folder in the config folder is missing.");
-                if (itltDir.mkdir()) itlt.LOGGER.info("The folder has been successfully created for you.");
-                else itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
+                if (!itltDir.mkdir())
+                    itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
             }
 
             if (ClientConfig.enableUsingAutodetectedIcon.get()) {
@@ -157,8 +156,14 @@ public class ClientModEvents {
                 if (autoDetectedIcon != null) customIcon = autoDetectedIcon;
             }
 
-            if (customIcon != null && customIcon.exists() && !customIcon.isDirectory())
-                ClientUtils.setWindowIcon(customIcon, mcInstance);
+            if (customIcon != null && customIcon.exists() && !customIcon.isDirectory()) {
+                try {
+                    ClientUtils.setWindowIcon(customIcon, mcInstance);
+                } catch (final IOException e) {
+                    itlt.LOGGER.error("Unable to set the window icon.");
+                    e.printStackTrace();
+                }
+            }
             else itlt.LOGGER.warn("enableCustomIcon is true but icon.png is missing or invalid.");
         }
 

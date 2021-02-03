@@ -4,7 +4,7 @@ buildscript {
         maven { url = "https://dist.creeper.host/Sponge/maven" }
     }
     dependencies {
-        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.0.9"
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.0.15"
         classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
     }
 }
@@ -110,7 +110,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then "net.minecraft" it is assumed
     // that the dep is a ForgeGradle "patcher" dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft "net.minecraftforge:forge:1.16.5-36.0.4"
+    minecraft "net.minecraftforge:forge:1.16.5-36.0.14"
     compile "org.spongepowered:mixin:0.8.2"
     annotationProcessor "org.spongepowered:mixin:0.8.2:processor"
 

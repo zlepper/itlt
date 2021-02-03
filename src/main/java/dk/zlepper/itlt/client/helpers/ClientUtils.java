@@ -334,8 +334,8 @@ public class ClientUtils {
          * - a 48x32 icon would be resized to 48x48 as its longest side (48px) is between 32 and 64
          * - a 140x100 icon would be resized to 128x128 as one of its sides is over 128px
          * - a tiny 12x12 icon would be resized to 16x16 as both sides are under 16px
-         * note that the resizing maintains the existing aspect ratios - a weird 16:9 icon will still look like 16:9
-         * but in a square file and be visually small as a result
+         * note that the resizing should maintain the existing aspect ratios - a weird 16:9 icon will still look like
+         * 16:9 but in a square file and be visually small as a result
          */
         final BufferedImage resizedLarge;
         if ((inputWidth == 128 && inputHeight == 128) || (inputWidth == 96 && inputHeight == 96) ||
@@ -357,7 +357,7 @@ public class ClientUtils {
             // etc...
             resizedLarge = Scalr.resize(inputIcon, 48, 48);
         else if ((inputWidth > 24 && inputWidth < 48) || (inputHeight > 24 && inputHeight < 48))
-            resizedLarge = Scalr.resize(inputIcon, 24, 32);
+            resizedLarge = Scalr.resize(inputIcon, 32, 32);
         else if ((inputWidth > 16 && inputWidth < 32) || (inputHeight > 16 && inputHeight < 32))
             resizedLarge = Scalr.resize(inputIcon, 24, 24);
         else

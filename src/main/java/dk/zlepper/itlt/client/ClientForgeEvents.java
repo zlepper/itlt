@@ -10,10 +10,14 @@ package dk.zlepper.itlt.client;
 //       (purge cache on game close/crash/restart)
 // todo: treat empty returned definitions as suspicious
 
+import com.mojang.realmsclient.RealmsMainScreen;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.itlt;
 import io.lktk.NativeBLAKE3Util;
+import net.minecraft.client.gui.AccessibilityScreen;
+import net.minecraft.client.gui.screen.*;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,13 +34,34 @@ import java.util.stream.Stream;
 @Mod.EventBusSubscriber(modid = itlt.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientForgeEvents {
 
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public static void onGuiOpen(final GuiOpenEvent event) {
+        if (ClientConfig.enableExplicitGC.get()) {
+            final Screen screen = event.getGui();
+            if (screen == null) return;
+            itlt.LOGGER.debug("Screen: " + screen.toString());
+
+            // Tell the GC to run whenever the user pauses the game or opens an opaque bg screen.
+            // Doing this can help reduce memory usage in certain situations and also slightly reduces the chances
+            // of a large GC happening in the middle of gameplay.
+            if ((screen.isPauseScreen() && ClientConfig.doExplicitGCOnPause.get())
+                    || screen instanceof WorldSelectionScreen || screen instanceof MultiplayerScreen
+                    || screen instanceof SleepInMultiplayerScreen || screen instanceof PackScreen
+                    || screen instanceof LanguageScreen || screen instanceof ChatOptionsScreen
+                    || screen instanceof ControlsScreen || screen instanceof AccessibilityScreen
+                    || screen instanceof RealmsMainScreen || screen instanceof StatsScreen) {
+                Runtime.getRuntime().gc();
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     @SuppressWarnings("unchecked") // Casts are checked and handled using a try/catch block for ClassCastExceptions
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
         if (ClientConfig.enableAnticheat.get()) {
             // definition updates
-            HashSet<String> cheatModIds = new HashSet<>();
-            HashSet<String> cheatModChecksums = new HashSet<>();
+            final HashSet<String> cheatModIds = new HashSet<>();
+            final HashSet<String> cheatModChecksums = new HashSet<>();
             try {
                 // grab the latest definitions for the requested checksum type
                 final Map<String, Object> latestDefinitions = ClientUtils.getLatestDefinitions(ClientUtils.ChecksumType.BLAKE3_224);
@@ -58,7 +83,8 @@ public class ClientForgeEvents {
                 e.printStackTrace();
             }
 
-            ArrayList<ModInfo> listOfDetectedCheatMods = new ArrayList<>(0);
+            // assume the best in people until they prove otherwise - set initial capacity of the ArrayList to 0
+            final ArrayList<ModInfo> listOfDetectedCheatMods = new ArrayList<>(0);
 
             final ModList modList = ModList.get();
             final Stream<ModInfo> modInfoStream;
@@ -104,7 +130,7 @@ public class ClientForgeEvents {
                             listOfDetectedCheatMods.add(modInfo);
 
                     } catch (final IOException | NativeBLAKE3Util.InvalidNativeOutput e) {
-                        final StringBuilder warningMsgBuilder = new StringBuilder();
+                        final StringBuilder warningMsgBuilder = new StringBuilder(48);
                         warningMsgBuilder.append("Unable to calculate checksum for \"").append(modFile.getPath()).append("\"");
 
                         final boolean fileNonExistentOrInaccessible =

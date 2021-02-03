@@ -44,7 +44,9 @@ public final class ClientConfig {
             enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
             enableAnticheat,
-            enableAutoRemovalOfCheats;
+            enableAutoRemovalOfCheats,
+            enableExplicitGC,
+            doExplicitGCOnPause;
 
     public static ForgeConfigSpec.ConfigValue<String>
             customWindowTitleText,
@@ -76,6 +78,23 @@ public final class ClientConfig {
 
         // Java section
         clientConfigBuilder.push("Java"); {
+
+            // Java.ExplicitGC
+            clientConfigBuilder.push("ExplicitGC"); {
+
+                enableExplicitGC = clientConfigBuilder
+                        .comment("\r\nEnable this to allow itlt to explicitly request a garbage collection whenever the user pauses the game or opens an screen with an opaque background (e.g. the Resource Packs screen).\r\n" +
+                                "Doing this can help reduce memory usage in certain situations and also slightly reduces the chances of a large GC happening in the middle of gameplay.\r\n" +
+                                "Note: This does not replace automatic GC, it simply requests a GC to run on certain actions in addition to auto GC to help reduce the chances of a large GC sweep.\r\n" +
+                                "TL;DR: Turn this on to help prevent large GC-related lag spikes, turn it off to only rely on the pressure-based automatic GC (Vanilla).")
+                        .define("enableExplicitGC", true);
+
+                doExplicitGCOnPause = clientConfigBuilder
+                        .comment("\r\nWhether or not to run explicit GC when the user pauses the game. Mainly useful to turn off if you usually only have the game paused for a tiny amount of time (e.g. < ~2s).\r\n" +
+                                "Note: enableExplicitGC must be true for this to have any effect.\r\n")
+                        .define("explicitGCOnPause", true);
+
+            } clientConfigBuilder.pop();
 
             // Java.Arch
             clientConfigBuilder.push("Arch"); {

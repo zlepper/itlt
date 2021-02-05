@@ -19,12 +19,13 @@ public class ServerForgeEvents {
 
     @SubscribeEvent
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
-        if (ServerUtils.ConnectingPlayer.isCheating.get()) {
+        if (ServerConfig.enableAnticheat.get() && ServerUtils.ConnectingPlayer.isCheating.get()) {
             final PlayerEntity player = event.getPlayer();
-            if (player instanceof ServerPlayerEntity)
+            if (player instanceof ServerPlayerEntity) {
                 ((ServerPlayerEntity) player).connection.disconnect(ServerUtils.ConnectingPlayer.hasItlt.get() ?
                         new TranslationTextComponent("itlt.multiplayer.disconnect.cheats_not_allowed") :
                         new StringTextComponent("Cheats are not allowed on this server"));
+            }
             ServerUtils.ConnectingPlayer.isCheating.set(false);
         }
     }

@@ -41,5 +41,7 @@
   "itlt.java.memory.max.warning.body": "Warning: For the best experience, this pack must not have more than %sGB but you appear to be allocating %sbGB of RAM.",
   "itlt.java.memory.max.warning.guideButtonText": "Show guide",
   "itlt.java.memory.max.warning.askLaterButtonText": "Ask later",
-  "itlt.java.memory.max.warning.dontAskAgainButtonText": "Don't ask again"
+  "itlt.java.memory.max.warning.dontAskAgainButtonText": "Don't ask again",
+
+  "itlt.multiplayer.disconnect.cheats_not_allowed": "Cheats are not allowed on this server"
 }

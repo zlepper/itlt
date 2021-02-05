@@ -1,6 +1,7 @@
 package dk.zlepper.itlt.client;
 
 import com.google.gson.Gson;
+import dk.zlepper.itlt.client.helpers.LauncherUtils;
 import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.client.helpers.MessageContent;
@@ -49,9 +50,9 @@ public class ClientModEvents {
             ClientUtils.startUIProcess(MessageContent.NeedsNewerJava);
         } else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get()) {
             if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
-                final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
+                final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
                 itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
-                if (detectedLauncher == ClientUtils.LauncherName.CurseClient)
+                if (detectedLauncher == LauncherUtils.LauncherName.CurseClient)
                     itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
                 else ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
@@ -97,21 +98,21 @@ public class ClientModEvents {
             String customWindowTitle = ClientConfig.customWindowTitleText.get();
 
             if (ClientConfig.enableUsingAutodetectedDisplayName.get()) {
-                final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
+                final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
                 itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
                 try {
                     switch (detectedLauncher) {
                         case Technic:
                             // if running from the Technic Launcher, use the pack slug's displayName
-                            customWindowTitle = ClientUtils.getTechnicPackName();
+                            customWindowTitle = LauncherUtils.getTechnicPackName();
                             break;
                         case MultiMC:
                             // if running from the MultiMC launcher, use the instance's user-friendly name
-                            customWindowTitle = ClientUtils.getMultiMCInstanceName();
+                            customWindowTitle = LauncherUtils.getMultiMCInstanceName();
                             break;
                         case CurseClient:
                             // if running from the Curse Client launcher, use the profile's name
-                            customWindowTitle = ClientUtils.getCurseClientProfileName();
+                            customWindowTitle = LauncherUtils.getCurseClientProfileName();
                         default:
                             break;
                     }
@@ -141,14 +142,14 @@ public class ClientModEvents {
 
             if (ClientConfig.enableUsingAutodetectedIcon.get()) {
                 final File autoDetectedIcon;
-                final ClientUtils.LauncherName detectedLauncher = ClientUtils.detectLauncher();
+                final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
                 itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
                 switch (detectedLauncher) {
                     case Technic:
-                        autoDetectedIcon = ClientUtils.getTechnicPackIcon();
+                        autoDetectedIcon = LauncherUtils.getTechnicPackIcon();
                         break;
                     case MultiMC:
-                        autoDetectedIcon = ClientUtils.getMultiMCInstanceIcon();
+                        autoDetectedIcon = LauncherUtils.getMultiMCInstanceIcon();
                         break;
                     default:
                         autoDetectedIcon = null;

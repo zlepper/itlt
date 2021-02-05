@@ -11,7 +11,9 @@ package dk.zlepper.itlt.client;
 // todo: treat empty returned definitions as suspicious
 
 import com.mojang.realmsclient.RealmsMainScreen;
-import dk.zlepper.itlt.client.helpers.ClientUtils;
+import dk.zlepper.itlt.common.AnticheatUtils;
+import dk.zlepper.itlt.common.ChecksumType;
+import dk.zlepper.itlt.client.helpers.ChecksumUtils;
 import dk.zlepper.itlt.itlt;
 import io.lktk.NativeBLAKE3Util;
 import net.minecraft.client.gui.AccessibilityScreen;
@@ -64,7 +66,7 @@ public class ClientForgeEvents {
             final HashSet<String> cheatModChecksums = new HashSet<>();
             try {
                 // grab the latest definitions for the requested checksum type
-                final Map<String, Object> latestDefinitions = ClientUtils.getLatestDefinitions(ClientUtils.ChecksumType.BLAKE3_224);
+                final Map<String, Object> latestDefinitions = AnticheatUtils.getLatestDefinitions(ChecksumType.BLAKE3_224);
                 itlt.LOGGER.debug("latestDefinitions: " + latestDefinitions);
 
                 // try to get the modIds section and fallback to an empty value and show a warning if unable to
@@ -119,7 +121,7 @@ public class ClientForgeEvents {
                     // by file checksum
                     final File modFile = modInfo.getOwningFile().getFile().getFilePath().toFile();
                     try {
-                        final Pair<ClientUtils.ChecksumType, String> modFileChecksum = ClientUtils.getFileChecksum(modFile);
+                        final Pair<ChecksumType, String> modFileChecksum = ChecksumUtils.getFileChecksum(modFile);
                         itlt.LOGGER.debug("");
                         itlt.LOGGER.debug("modId: " + modId);
                         itlt.LOGGER.debug("modFile: " + modFile.toPath().toString());

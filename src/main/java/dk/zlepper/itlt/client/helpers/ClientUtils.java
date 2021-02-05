@@ -1,39 +1,20 @@
 package dk.zlepper.itlt.client.helpers;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
-import io.github.rctcwyvrn.blake3.Blake3;
-import io.seruco.encoding.base62.Base62;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
-import net.minecraft.util.SharedConstants;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.ModList;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import io.lktk.NativeBLAKE3;
-import io.lktk.NativeBLAKE3Util;
-import net.minecraftforge.userdev.FMLDevClientLaunchProvider;
-import net.minecraftforge.userdev.FMLDevServerLaunchProvider;
-import org.apache.commons.lang3.tuple.Pair;
 import org.imgscalr.Scalr;
 
-import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
 public class ClientUtils {
@@ -57,265 +38,6 @@ public class ClientUtils {
         }
 
         return false;
-    }
-
-    private static Path getItltJarPath() {
-        final Path itltJarPath = ModList.get().getModFileById("itlt").getFile().getFilePath();
-        itlt.LOGGER.debug("itltJarPath: " + itltJarPath); // should be something like ???\mcRoot\mods\itlt.jar
-        return itltJarPath;
-    }
-
-    public static LauncherName detectLauncher() {
-        final Path itltJarPath = getItltJarPath();
-
-        // jumping up a few directories should theoretically take us out of the mods folder and into the root folder of
-        // the Twitch launcher. If the file "installedPacks" exists in this folder and there's also a folder called
-        // "modpacks" in here, we know we're running within a Technic Launcher modpack
-        final Path theoreticalTechnicPath = itltJarPath.getParent().getParent().getParent().getParent();
-        final boolean isTechnicLauncher =
-                Files.exists(theoreticalTechnicPath.resolve("installedPacks")) &&
-                Files.exists(theoreticalTechnicPath.resolve("modpacks"));
-        itlt.LOGGER.debug("theoreticalTechnicPath: " + theoreticalTechnicPath);
-        itlt.LOGGER.debug("isTechnicLauncher: " + isTechnicLauncher);
-        if (isTechnicLauncher) return LauncherName.Technic;
-
-        // if the .minecraft folder has mmc-pack.json and instance.cfg files beside it then we know we're running
-        // within a MultiMC modpack.
-        final Path theoreticalMultiMCPath = itltJarPath.getParent().getParent().getParent();
-        final boolean isMultiMCLauncher =
-                Files.exists(theoreticalMultiMCPath.resolve("mmc-pack.json")) &&
-                Files.exists(theoreticalMultiMCPath.resolve("instance.cfg"));
-        itlt.LOGGER.debug("theoreticalMultiMCPath: " + theoreticalMultiMCPath);
-        itlt.LOGGER.debug("isMultiMCLauncher: " + isMultiMCLauncher);
-        if (isMultiMCLauncher) return LauncherName.MultiMC;
-
-        // if the .minecraft folder has .curseclient and minecraftinstance.json files inside it then we know we're
-        // running within the CurseClient
-        final Path theoreticalCurseClientPath = itltJarPath.getParent().getParent();
-        final boolean isCurseClientLauncher =
-                Files.exists(theoreticalCurseClientPath.resolve(".curseclient")) &&
-                Files.exists(theoreticalCurseClientPath.resolve("minecraftinstance.json"));
-        itlt.LOGGER.debug("theoreticalCurseClientPath: " + theoreticalCurseClientPath);
-        itlt.LOGGER.debug("isCurseClientLauncher: " + isCurseClientLauncher);
-        if (isCurseClientLauncher) return LauncherName.CurseClient;
-
-        final Path theoreticalFTBAppPath = itltJarPath.getParent().getParent().getParent().getParent();
-        final boolean isFTBAppLauncher =
-                Files.exists(theoreticalFTBAppPath.resolve("ftbapp.log"));
-        itlt.LOGGER.debug("theoreticalFTBAppPath: " + theoreticalFTBAppPath);
-        itlt.LOGGER.debug("isFTBAppLauncher: " + isFTBAppLauncher);
-        if (isFTBAppLauncher) return LauncherName.FTBApp; // todo: determine if there's any benefit to supporting this launcher
-
-        final boolean isForgeDevEnv = isForgeDevEnv();
-        itlt.LOGGER.debug("isForgeDevEnv: " + isForgeDevEnv);
-        if (isForgeDevEnv) return LauncherName.ForgeDevEnv;
-
-        return LauncherName.Unknown;
-    }
-
-    public static boolean isForgeDevEnv() {
-        try {
-            if (new FMLDevClientLaunchProvider().name().equals("fmldevclient")) return true;
-            if (new FMLDevServerLaunchProvider().name().equals("fmldevserver")) return true;
-        } catch (Exception ignored) {}
-        return false;
-    }
-
-    public enum LauncherName {
-        Unknown,
-        Technic,
-        MultiMC,
-        CurseClient,
-        FTBApp,
-        ForgeDevEnv
-    }
-
-    public static String getTechnicPackName() throws IOException {
-        final Path itltJarPath = getItltJarPath();
-
-        // get the pack slug
-        final String packSlug = itltJarPath.getParent().getParent().getFileName().toString();
-
-        // open the cache.json for the associated slug to get the pack's displayName
-        final Path cacheJsonPath = itltJarPath.resolve("../../../../assets/packs" + packSlug + "/cache.json");
-        final Reader reader = Files.newBufferedReader(cacheJsonPath);
-
-        // convert the cacheJson String to a Map
-        final Type type = new TypeToken<Map<String, Object>>(){}.getType();
-        final Map<String, Object> definitionsMap = new Gson().fromJson(reader, type);
-
-        final String packDisplayName = definitionsMap.get("displayName").toString();
-
-        reader.close();
-
-        itlt.LOGGER.debug("packDisplayName: " + packDisplayName);
-        return packDisplayName;
-    }
-
-    public static String getMultiMCInstanceName() throws IOException {
-        final Path itltJarPath = getItltJarPath();
-
-        final String instanceCfg = itltJarPath.resolve("../../../instance.cfg").toString();
-
-        // attempt to load the instance.cfg file and parse it
-        final Properties parsedInstanceCfg = new Properties();
-        parsedInstanceCfg.load(new FileInputStream(instanceCfg));
-
-        final String instanceName = parsedInstanceCfg.getProperty("name");
-        itlt.LOGGER.debug("instanceName: " + instanceName);
-
-        return instanceName;
-    }
-
-    public static String getCurseClientProfileName() throws IOException {
-        final Path itltJarPath = getItltJarPath();
-
-        // open the minecraftinstance.json file
-        final Reader reader = Files.newBufferedReader(itltJarPath.resolve("../../minecraftinstance.json"));
-
-        // parse the json file to a Map with keys of type String
-        final Type type = new TypeToken<Map<String, Object>>(){}.getType();
-        final Map<String, Object> map = new Gson().fromJson(reader, type);
-
-        // get the "name" key from the Map
-        final String profileName = map.get("name").toString();
-
-        // close the json file
-        reader.close();
-
-        itlt.LOGGER.debug("profileName: " + profileName);
-        return profileName;
-    }
-
-    @Nullable
-    public static File getTechnicPackIcon() {
-        final Path itltJarPath = getItltJarPath();
-
-        // get the pack slug
-        final String packSlug = itltJarPath.getParent().getParent().getFileName().toString();
-
-        // get the icon from the associated pack's slug
-        final Path iconPath = itltJarPath.resolve("../../../../assets/packs/" + packSlug + "/icon.png");
-
-        if (iconPath.toFile().exists()) return iconPath.toFile();
-        else return null;
-    }
-
-    @Nullable
-    public static File getMultiMCInstanceIcon() {
-        final Path itltJarPath = getItltJarPath();
-
-        final Path iconPath = itltJarPath.getParent().getParent().resolve("icon.png");
-
-        if (iconPath.toFile().exists()) return iconPath.toFile();
-        else return null;
-    }
-
-    public static Pair<ChecksumType, String> getFileChecksum(final File file, ChecksumType checksumType)
-            throws IOException, NativeBLAKE3Util.InvalidNativeOutput {
-        // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to the Java implementation
-        if (!NativeBLAKE3.isEnabled())
-            return getFileChecksumFallback(file, checksumType);
-
-        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // default to BLAKE3_224
-
-        // setup the BLAKE3 hasher
-        final NativeBLAKE3 hasher = new NativeBLAKE3();
-        hasher.initDefault();
-
-        final FileInputStream fis = new FileInputStream(file); // open the file to hash
-        byte[] byteArray = new byte[16384]; // create byte array to read data in chunks / as a buffer
-
-        // a 16KB buffer is what the BLAKE3 team seems to recommend as a minimum for best performance
-        // please open an issue on the itlt github with an explanation and correction if I've misunderstood this, I'm
-        // not sure if internally Java works best with 8KB file reads instead or something...
-        // https://github.com/BLAKE3-team/BLAKE3/blob/3a8204f5f38109aae08f4ae58b275663e1cfebab/b3sum/src/main.rs#L256
-
-        // read file data in chunks of 16KB and send it off to the hasher
-        while ((fis.read(byteArray)) != -1) hasher.update(byteArray);
-
-        fis.close(); // we're finished reading the file, so close it
-
-        // get the hasher's output, with the number arg being the number of output bytes, prior to hex encoding
-        // our default is 28, aka BLAKE3-224. for BLAKE3-256, use 32
-        final byte[] bytes;
-        switch (checksumType) {
-            case BLAKE3_256: {
-                bytes = hasher.getOutput(32);
-                break;
-            }
-            case BLAKE3_224:
-            default: {
-                bytes = hasher.getOutput(28);
-                break;
-            }
-        }
-
-        // the NativeBLAKE3 JNI is a C lib so we need to manually tell it to free up the memory now that
-        // we're done with it
-        if (hasher.isValid()) hasher.close();
-
-        // convert to hex
-        /*final StringBuilder sb = new StringBuilder();
-        for (byte aByte : bytes) {
-            sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
-        }*/
-
-        // convert to Base64
-        //final String encodedBase64 = Base64.encodeBase64String(bytes);
-
-        // convert to Base62
-        final Base62 base62 = Base62.createInstance();
-        final String encodedBase62 = new String(base62.encode(bytes));
-
-        // return the completed hash
-        return Pair.of(checksumType, encodedBase62);
-    }
-
-    public static Pair<ChecksumType, String> getFileChecksum(final File file)
-            throws IOException, NativeBLAKE3Util.InvalidNativeOutput {
-        return getFileChecksum(file, ChecksumType.Default);
-    }
-
-    public static Pair<ChecksumType, String> getFileChecksumFallback(final File file, ChecksumType checksumType)
-            throws IOException {
-        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // default to BLAKE3_224
-
-        final Blake3 hasher = Blake3.newInstance();
-
-        final FileInputStream fis = new FileInputStream(file);
-        byte[] byteArray = new byte[16384];
-
-        // read file data in chunks of 16KB and send it off to the hasher
-        while ((fis.read(byteArray)) != -1) hasher.update(byteArray);
-
-        fis.close();
-
-        final byte[] bytes;
-        switch (checksumType) {
-            case BLAKE3_256: {
-                bytes = hasher.digest(32);
-                break;
-            }
-            case BLAKE3_224:
-            default: {
-                bytes = hasher.digest(28);
-                break;
-            }
-        }
-
-        // convert to Base62
-        final Base62 base62 = Base62.createInstance();
-        final String encodedBase62 = new String(base62.encode(bytes));
-
-        // return the completed hash
-        return Pair.of(checksumType, encodedBase62);
-    }
-
-    public enum ChecksumType {
-        BLAKE3_256,
-        BLAKE3_224,
-        Default
     }
 
     public static void setWindowIcon(final File inputIconFile, final Minecraft mcInstance) throws IOException {
@@ -478,6 +200,7 @@ public class ClientUtils {
                 break;
         }
 
+        // todo: Also show this error message in the GUI
         final String errorMessage = "Error: Unable to launch a web browser with the guide. The link is: " + guideURL;
 
         try {
@@ -498,47 +221,5 @@ public class ClientUtils {
                 System.exit(1);
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> getLatestDefinitions(ChecksumType checksumType) throws IOException, ClassCastException {
-        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // wow, an actual use of Java's mutable-by-default function args!
-        final String definitionsURLString =
-                "https://raw.githubusercontent.com/zlepper/itlt/api/forge/v1.0/definitions/" +
-                checksumType.toString().toLowerCase() + ".json";
-
-        // download the definitions and put it in the string "definitionsJson"
-        final URLConnection connection = new URL(definitionsURLString).openConnection();
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-        final String definitionsJson = reader.lines().collect(Collectors.joining("\n"));
-
-        // convert the definitionsJson String to a Map
-        final Type type = new TypeToken<Map<String, Object>>(){}.getType();
-        final Map<String, Object> definitionsMap = new Gson().fromJson(definitionsJson, type);
-
-        // trim off the version patch number, accounting for cases like 1.17.10 that have a double-digit patch number
-        String mcVersion = SharedConstants.getVersion().getName();
-        final String[] splitMcVersion = mcVersion.split(Pattern.quote("."));
-        mcVersion = splitMcVersion[0] + "." + splitMcVersion[1];
-
-        itlt.LOGGER.debug("mcVersion: " + mcVersion);
-        itlt.LOGGER.debug("definitionsMap: " + definitionsMap.toString());
-
-        return Collections.unmodifiableMap(
-                (Map<String, Object>) definitionsMap.getOrDefault(mcVersion, Collections.<String, Object>emptyMap()));
-
-        /* The definitions JSON looks something like this:
-         *  {
-         *      "1.16": {
-         *          "modIds": [ "modid1", "modid2", "modid3" ],
-         *          "checksums": [ "aabc", "e102", "8fc2" ]
-         *      },
-         *      "1.15": {
-         *          (...)
-         *      }
-         *  }
-         *
-         * Patch releases such as 1.16.1, 1.16.2, etc... all point to 1.16
-         */
     }
 }

@@ -15,7 +15,7 @@ package dk.zlepper.itlt.client;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import dk.zlepper.itlt.client.helpers.ClientUtils;
+import dk.zlepper.itlt.common.ChecksumType;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.io.File;
@@ -68,7 +68,7 @@ public final class ClientConfig {
             warnMinJavaVersion,
             parallelModChecksThreshold;
 
-    public static ForgeConfigSpec.ConfigValue<ClientUtils.ChecksumType> preferredChecksumType;
+    public static ForgeConfigSpec.ConfigValue<ChecksumType> preferredChecksumType;
 
     static {
         /* Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to
@@ -86,7 +86,8 @@ public final class ClientConfig {
 
                 enableExplicitGC = clientConfigBuilder
                         .comment("\r\nEnable this to allow itlt to explicitly request a garbage collection whenever " +
-                                    "the user pauses the game or opens an screen with an opaque background (e.g. the Resource Packs screen).",
+                                    "the user pauses the game or opens an screen with an opaque background " +
+                                    "(e.g. the Resource Packs screen).",
 
                                 "Doing this can help reduce memory usage in certain situations and also slightly " +
                                     "reduces the chances of a large GC happening in the middle of gameplay.",
@@ -450,7 +451,7 @@ public final class ClientConfig {
                         .defineInRange("parallelModChecksThreshold", 100, 1, 1024);
                 preferredChecksumType = clientConfigBuilder
                         .comment("")
-                        .defineEnum("preferredChecksumType", ClientUtils.ChecksumType.Default);
+                        .defineEnum("preferredChecksumType", ChecksumType.Default);
             }
         } clientConfigBuilder.pop();
 

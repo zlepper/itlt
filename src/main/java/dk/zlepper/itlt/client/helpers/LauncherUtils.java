@@ -75,9 +75,12 @@ public class LauncherUtils {
 
     public static boolean isForgeDevEnv() {
         try {
+            Class.forName("net.minecraftforge.userdev.FMLDevClientLaunchProvider");
             if (new FMLDevClientLaunchProvider().name().equals("fmldevclient")) return true;
             if (new FMLDevServerLaunchProvider().name().equals("fmldevserver")) return true;
-        } catch (Exception ignored) {}
+        } catch (final ClassNotFoundException | NoClassDefFoundError e) {
+            return false;
+        }
         return false;
     }
 

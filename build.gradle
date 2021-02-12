@@ -150,6 +150,7 @@ dependencies {
 
     // itlt uses the "Imgscalr" library to easily resize icons as needed while preserving their original aspect ratios
     implementation "org.imgscalr:imgscalr-lib:4.2"
+    shade "org.imgscalr:imgscalr-lib:4.2"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

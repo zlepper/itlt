@@ -1,13 +1,13 @@
 [
 {
-  "modid": "${modid}",
+  "modid": "itlt",
   "name": "It's the little things",
   "description": "A mod that does those \"little things\".",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "",
+  "version": "1.9-1.0.0",
+  "mcversion": "1.9",
+  "url": "https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files/all?filter-status=1&filter-game-version=2020709689%3A5946",
   "updateUrl": "",
-  "authorList": ["Zlepper"],
+  "authorList": ["Zlepper", "Paint_Ninja"],
   "credits": "sunshinehunter - Porting to 1.8",
   "logoFile": "",
   "screenshots": [],

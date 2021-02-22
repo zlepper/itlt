@@ -1,13 +1,13 @@
 [
 {
-  "modid": "${modid}",
+  "modid": "itlt",
   "name": "It's the little things",
   "description": "A mod that does those \"little things\".",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "1.10.x-1.0.0",
+  "mcversion": "1.10",
   "url": "",
   "updateUrl": "",
-  "authorList": ["Zlepper"],
+  "authorList": ["Zlepper", "Paint_Ninja"],
   "credits": "sunshinehunter - Porting to 1.8",
   "logoFile": "",
   "screenshots": [],

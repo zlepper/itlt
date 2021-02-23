@@ -23,8 +23,8 @@ public class ChatGuiEventHandler {
 
     @SubscribeEvent
     public void onGuiInitEvent(GuiScreenEvent.InitGuiEvent.Post event){
-        if(event.getGui() instanceof GuiChat) {
-            GuiChat chat = (GuiChat) event.getGui();
+        if(event.gui instanceof GuiChat) {
+            GuiChat chat = (GuiChat) event.gui;
 
             try {
                 Class<?> chatClass = chat.getClass();
@@ -51,7 +51,7 @@ public class ChatGuiEventHandler {
 
     @SubscribeEvent
     public void OnGuiOpenEvent(GuiOpenEvent e) {
-        if(e.getGui() == null && handler != null) {
+        if(e.gui == null && handler != null) {
             try {
                 MinecraftForge.EVENT_BUS.unregister(handler);
             } catch(NullPointerException ex) {

@@ -1,13 +1,7 @@
 package dk.zlepper.itlt.proxies;
 
-import dk.zlepper.itlt.KeyBindings;
-import net.minecraft.client.Minecraft;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.*;
-import org.lwjgl.opengl.DisplayMode;
-
-import java.awt.*;
-import java.lang.reflect.Field;
+import org.lwjgl.opengl.Display;
 
 /**
  * Created by Rasmus on 7/16/2015.

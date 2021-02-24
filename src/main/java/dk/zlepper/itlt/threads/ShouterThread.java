@@ -4,6 +4,7 @@ import dk.zlepper.itlt.Itlt;
 import dk.zlepper.itlt.proxies.ClientProxy;
 
 import javax.swing.*;
+import java.util.logging.Level;
 
 public class ShouterThread extends Thread {
 
@@ -18,7 +19,7 @@ public class ShouterThread extends Thread {
         if(Itlt.proxy instanceof ClientProxy) {
             JOptionPane.showMessageDialog(null, message, "Java version issue", JOptionPane.WARNING_MESSAGE);
         } else {
-            Itlt.logger.warn(message);
+            Itlt.logger.log(Level.WARNING, message);
         }
     }
 }

@@ -1,13 +1,7 @@
 package dk.zlepper.itlt.proxies;
 
-import dk.zlepper.itlt.KeyBindings;
-import net.minecraft.client.Minecraft;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.*;
-import org.lwjgl.opengl.DisplayMode;
-
-import java.awt.*;
-import java.lang.reflect.Field;
+import org.lwjgl.opengl.Display;
 
 /**
  * Created by Rasmus on 7/16/2015.
@@ -30,7 +24,9 @@ public class ClientProxy extends CommonProxy {
             try {
                 Display.setLocation(-7, 0);
                 Display.setDisplayMode(Display.getDesktopDisplayMode());
-            } catch (LWJGLException | IllegalStateException e) {
+            } catch (LWJGLException e) {
+                //e.printStackTrace();
+            } catch (IllegalStateException e) {
                 //e.printStackTrace();
             }
             changed = true;

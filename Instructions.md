@@ -4,12 +4,14 @@
 4. Extract mcp
 5. Get a copy of the Forge 1.5.2 source zip from https://files.minecraftforge.net
 6. Extract it to the root of where you extracted mcp. Once extracted there should be a folder called "forge" alongside the other mcp folders
-7. Run install.cmd or install.sh in the Forge folder
-8. Use the provided fml_libs_dev15.zip to manually resolve any failed downloads when installing
-9. Use the provided fml_libs15.zip to manually resolve any failed downloads when doing startclient.cmd/startclient.sh for the first time
-10. Move the contents of the modsrc folder to the src folder
-11. Import into eclipse, latest version of eclipse surprisingly works fine so no need to worry about getting Eclipse Juno or whatever
-12. The mod's source code is under the dk.zlepper.itlt package in eclipse
+7. Start the Minecraft Launcher and launch Minecraft 1.5.2 at least once, copy the 1.5.2.jar from .minecraft/versions/1.5.2/, paste it into the jars folder of where you extracted mcp.
+8. Rename it from 1.5.2.jar to minecraft.jar. Grab the minecraft_server.jar for 1.5.2 and put it in here also
+9. Run install.cmd or install.sh in the Forge folder
+10. Use the provided fml_libs_dev15.zip to manually resolve any failed downloads when installing
+11. Use the provided fml_libs15.zip to manually resolve any failed downloads when doing startclient.cmd/startclient.sh for the first time
+12. Move the contents of the modsrc folder to the src folder
+13. Import into eclipse, latest version of eclipse surprisingly works fine so no need to worry about getting Eclipse Juno or whatever
+14. The mod's source code is under the dk.zlepper.itlt package in eclipse
 
 ## Testing and building
 1. When you want to test, startclient.bat/startclient.sh should work, if not you'll have to manually build for production and test externally with a Minecraft launcher

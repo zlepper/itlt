@@ -20,3 +20,16 @@ build
 # other
 eclipse
 run
+
+# mcp & legacy forge
+conf
+docs
+forge
+jars
+logs
+src
+reobf
+runtime
+temp
+*.bat
+*.sh

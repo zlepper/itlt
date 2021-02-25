@@ -1,0 +1,2 @@
+Manifest-Version: 1.0
+# FMLCorePlugin: dk.zlepper.itlt.launch.itltCorePlugin # Uncomment this to enable grabbing and using Gson & Apache Commons Lang libs at FML prelaunch

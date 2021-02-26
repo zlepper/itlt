@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptedMinecraftVersions = "[1.5.1,1.5.2]")
+@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptedMinecraftVersions = "[1.4.6,1.4.7]")
 public class Itlt {
     @Mod.Instance("itlt")
     public static Itlt instance;
@@ -75,7 +75,7 @@ public class Itlt {
 
             if (javaBitDetectionProp.getBoolean(false)) {
                 if (!isJava64bit()) {
-                    ShouterThread st = new ShouterThread(javaBitIssueMessageProp.getString());
+                    ShouterThread st = new ShouterThread(javaBitIssueMessageProp.value);
                     st.start();
                 }
             }
@@ -168,13 +168,13 @@ public class Itlt {
                 for (int i = 0; i < c; i++) {
                     ServerData data = serverList.getServerData(i);
 
-                    if (data.serverIP.equals(customServerIpProp.getString())) {
+                    if (data.serverIP.equals(customServerIpProp.value)) {
                         foundServer = true;
                         break;
                     }
                 }
                 if (!foundServer) {
-                    ServerData data = new ServerData(customServerNameProp.getString(), customServerIpProp.getString());
+                    ServerData data = new ServerData(customServerNameProp.value, customServerIpProp.value);
                     serverList.addServerData(data);
                     serverList.saveServerList();
                 }

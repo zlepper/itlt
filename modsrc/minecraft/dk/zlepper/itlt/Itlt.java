@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptedMinecraftVersions = "[1.4.6,1.4.7]")
+@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptedMinecraftVersions = "[1.4.4,1.4.5]")
 public class Itlt {
     @Mod.Instance("itlt")
     public static Itlt instance;

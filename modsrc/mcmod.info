@@ -3,15 +3,15 @@
     "modid": "itlt",
     "name": "It's the little things",
     "description": "A mod that does those \"little things\".",
-    "version": "[1.5.1,1.5.2]",
-    "mcversion": "1.5.x-1.0.0",
+    "version": "1.4.6/1.4.7-1.0.0",
+    "mcversion": "[1.4.6,1.4.7]",
     "url": "https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files",
     "updateUrl": "",
     "authorList": [
       "Zlepper",
       "Paint_Ninja"
     ],
-    "credits": "Thanks to Su5eD on MMD for helping with the MC 1.5 backport",
+    "credits": "Thanks to Su5eD for helping make this backport possible",
     "logoFile": "",
     "screenshots": [],
     "dependencies": []

@@ -11,8 +11,8 @@ import dk.zlepper.itlt.proxies.ClientProxy;
 import dk.zlepper.itlt.proxies.CommonProxy;
 import dk.zlepper.itlt.threads.ShouterThread;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.multiplayer.ServerList;
+import net.minecraft.src.ServerData;
+import net.minecraft.src.ServerList;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.Property;
 //import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptedMinecraftVersions = "[1.4.4,1.4.5]")
+@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptedMinecraftVersions = "[1.3.2]")
 public class Itlt {
     @Mod.Instance("itlt")
     public static Itlt instance;
@@ -60,7 +60,7 @@ public class Itlt {
 
     @Mod.PreInit
     public void preinit(FMLPreInitializationEvent event) {
-        logger = event.getModLog();
+        logger = getModLog();
 
         if (proxy instanceof ClientProxy) {
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
@@ -227,5 +227,9 @@ public class Itlt {
         }
 
         return false;
+    }
+
+    private static Logger getModLog() {
+        return Logger.getLogger(mod.ID);
     }
 }

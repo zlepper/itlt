@@ -1,19 +1,23 @@
 [
 {
-  "modid" : "mod_Itlt",
+  "modid" : "mod_itlt",
   "name" : "It's the little things",
   "version" : "1.2.5-1.0.0",
-  "url" : "http://MinecraftForge.net",
+  "url" : "https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files",
   "credits" : "",
   "authors": [
     "Zlepper",
     "Paint_Ninja"
   ],
-  "description": "",
+  "description": "A mod that does those \"little things\".",
   "logoFile" : "",
   "updateUrl" : "",
   "parent" : "",
   "screenshots": [
+  ],
+  "mcversion": "1.2.5",
+  "dependencies": [
+    "mod_MinecraftForge"
   ]
 }
 ]

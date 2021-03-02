@@ -1,6 +1,6 @@
 package dk.zlepper.itlt.threads;
 
-import dk.zlepper.itlt.Itlt;
+import dk.zlepper.itlt.mod_Itlt;
 import dk.zlepper.itlt.proxies.ClientProxy;
 
 import javax.swing.*;
@@ -16,10 +16,10 @@ public class ShouterThread extends Thread {
 
     @Override
     public void run() {
-        if(Itlt.proxy instanceof ClientProxy) {
+        try {
             JOptionPane.showMessageDialog(null, message, "Java version issue", JOptionPane.WARNING_MESSAGE);
-        } else {
-            Itlt.logger.log(Level.WARNING, message);
+        } catch (Exception e) {
+            mod_Itlt.logger.log(Level.WARNING, message);
         }
     }
 }

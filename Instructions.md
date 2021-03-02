@@ -15,8 +15,7 @@
 2. To build, save your changes in eclipse then run recompile.bat/.sh. Once that's done, run reobfuscate.bat/.sh.
 3. Now manually create the jar either through the JDK's utility or through WinRAR.
 4. With the WinRAR method, you open the existing jar provided in the modSrc or src folders and just drag over the new class stuff inside the minecraft folder inside the reobf folder into the root of the jar. Don't forget the mcmod.info file also!
-5. If you want to use Gson and Apache Commons Lang libs, make a new folder in the jar called "META-INF" and copy over the provided MANIFEST.MF into that folder so that FML can grab the required libs at runtime and it should all just work in production. The mod then needs to be put in the coremods folder instead of the mods folder.
-6. Use the getchangedsrc.bat/.sh to update the modSrc folder for contributing to this repo
+5. Use the getchangedsrc.bat/.sh to update the modSrc folder for contributing to this repo
 
 ## Notes
 - You will probably need to refer to the instructions for MC 1.4 and 1.5 if you get stuck as the steps are similar and I may have forgotten to mention something.

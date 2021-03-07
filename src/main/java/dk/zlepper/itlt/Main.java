@@ -28,8 +28,9 @@ public final class Main {
                 errorMessage = args[6],
                 guideURL = args[7];
 
-        final String[] messageOptions = { args[3], args[4], args[5] };
-        final String[] reducedMessageOptions = { args[3], args[4] };
+        final String[]
+                messageOptions = { args[3], args[4], args[5] },
+                reducedMessageOptions = { args[3], args[4] };
 
         final int selectedOption;
 
@@ -37,7 +38,7 @@ public final class Main {
         // todo: Manually detect Windows 10 and use modern icons for it
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | InstantiationException | IllegalAccessException exception) {
+        } catch (final ClassNotFoundException | UnsupportedLookAndFeelException | InstantiationException | IllegalAccessException ignored) {
             // unable to use system theme, ignore the error and continue using the default java theme
         }
 
@@ -61,7 +62,7 @@ public final class Main {
         E.g.: If the user clicks "Button 2", the int of selectedOption would be 2.
 
         For warnings, Button 0 is likely "Read how-to guide", Button 1 is likely "Remind me later", Button 2 "Don't remind again".
-        Actual warning button labels will vary on what the warning is. For example, Button 0 might actually be "Install 64bit Java now" if the messageContent is WantsJava64bit. */
+        Actual warning button labels will vary on what the warning is. For example, Button 0 might actually be "Install 64bit Java now" if messageContent == WantsJava64bit. */
         if (selectedOption == 0) {
             showGuide(guideURL, errorMessage);
         } else if (selectedOption == 2) {
@@ -79,6 +80,8 @@ public final class Main {
         final JFrame parent = new JFrame();
         parent.setAutoRequestFocus(true);
         parent.setAlwaysOnTop(true);
+        //parent.getContentPane().setBackground(Color.DARK_GRAY);
+        //parent.getContentPane().setForeground(Color.WHITE);
         return parent;
     }
 

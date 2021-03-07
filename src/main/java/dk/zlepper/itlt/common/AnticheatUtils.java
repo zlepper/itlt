@@ -85,6 +85,7 @@ public class AnticheatUtils {
         return reader.lines().collect(Collectors.joining("\n"));
     }
 
+    @SuppressWarnings("unchecked")
     public static Pair<HashSet<String>, HashSet<String>> getDefinitions(ChecksumType checksumType) {
         if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224;
 

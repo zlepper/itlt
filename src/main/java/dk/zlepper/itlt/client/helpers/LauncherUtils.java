@@ -66,6 +66,20 @@ public class LauncherUtils {
         itlt.LOGGER.debug("isFTBAppLauncher: " + isFTBAppLauncher);
         if (isFTBAppLauncher) return LauncherName.FTBApp; // todo: determine if there's any benefit to supporting this launcher
 
+        // todo: test this
+        /*final Path theoreticalGDLauncherPath = itltJarPath.getParent().getParent().getParent().getParent();
+        final boolean isGDLauncher =
+                Files.exists(theoreticalGDLauncherPath.resolve("datastore").resolve("forgeinstallers")) &&
+                        Files.exists(itltJarPath.getParent().resolve("config.json"));
+        itlt.LOGGER.info("theoreticalGDLauncherPath.resolve(\"datastore\").resolve(\"forgeinstallers\"): " + theoreticalGDLauncherPath.resolve("datastore").resolve("forgeInstallers"));
+        itlt.LOGGER.info("itltJarPath.getParent().resolve(\"config.json\"): " + itltJarPath.getParent().getParent().resolve("config.json"));
+        itlt.LOGGER.debug("theoreticalGDLauncherPath: " + theoreticalGDLauncherPath);
+        itlt.LOGGER.debug("isGDLauncher: " + isGDLauncher);
+        if (isGDLauncher) return LauncherName.GDLauncher;
+
+        // todo: support SKLauncher
+        */
+
         final boolean isForgeDevEnv = isForgeDevEnv();
         itlt.LOGGER.debug("isForgeDevEnv: " + isForgeDevEnv);
         if (isForgeDevEnv) return LauncherName.ForgeDevEnv;
@@ -90,6 +104,8 @@ public class LauncherUtils {
         MultiMC,
         CurseClient,
         FTBApp,
+        //GDLauncher,
+        //SKLauncher,
         ForgeDevEnv
     }
 

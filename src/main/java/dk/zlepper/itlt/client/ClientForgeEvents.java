@@ -57,7 +57,6 @@ public class ClientForgeEvents {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    @SuppressWarnings("unchecked") // Casts are checked and handled using a try/catch block for ClassCastExceptions
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
         // don't do anti-cheat stuff if enableAnticheat is false
         if (!ClientConfig.enableAnticheat.get()) return;

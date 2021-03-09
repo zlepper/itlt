@@ -21,7 +21,7 @@ public final class ServerConfig {
         // Anti-cheat section
         serverConfigBuilder.push("Anti-cheat"); {
             enableAnticheat = serverConfigBuilder
-                    .comment("")
+                    .comment("No comment yet")
                     .define("enableAnticheat", true);
 
             // Anti-cheat.Advanced

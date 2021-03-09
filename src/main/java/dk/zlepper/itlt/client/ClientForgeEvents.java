@@ -15,6 +15,7 @@ import dk.zlepper.itlt.common.ChecksumType;
 import dk.zlepper.itlt.client.helpers.ChecksumUtils;
 import dk.zlepper.itlt.itlt;
 import io.lktk.NativeBLAKE3Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AccessibilityScreen;
 import net.minecraft.client.gui.screen.*;
 import net.minecraftforge.api.distmarker.Dist;
@@ -42,15 +43,18 @@ public class ClientForgeEvents {
             if (screen == null) return;
             itlt.LOGGER.debug("Screen: " + screen.toString());
 
-            // Tell the GC to run whenever the user pauses the game or opens an opaque bg screen.
+            // Tell the GC to run whenever the user does certain non-latency-critical actions such as being on the
+            // pause screen or opening an opaque bg screen such as the Resource Pack or Controls screens.
             // Doing this can help reduce memory usage in certain situations and also slightly reduces the chances
             // of a large GC happening in the middle of gameplay.
-            if ((screen.isPauseScreen() && ClientConfig.doExplicitGCOnPause.get())
-                    || screen instanceof WorldSelectionScreen || screen instanceof MultiplayerScreen
-                    || screen instanceof SleepInMultiplayerScreen || screen instanceof PackScreen
-                    || screen instanceof LanguageScreen || screen instanceof ChatOptionsScreen
-                    || screen instanceof ControlsScreen || screen instanceof AccessibilityScreen
-                    || screen instanceof RealmsMainScreen || screen instanceof StatsScreen) {
+            if ((ClientConfig.doExplicitGCOnPause.get() && screen.isPauseScreen())
+                    || (ClientConfig.doExplicitGCOnSleep.get() && screen instanceof SleepInMultiplayerScreen)
+                    || (ClientConfig.doExplicitGCOnMenu.get() && (
+                            screen instanceof WorldSelectionScreen || screen instanceof MultiplayerScreen
+                                    || screen instanceof PackScreen || screen instanceof LanguageScreen
+                                    || screen instanceof ChatOptionsScreen || screen instanceof ControlsScreen
+                                    || screen instanceof AccessibilityScreen || screen instanceof RealmsMainScreen
+                                    || screen instanceof StatsScreen))) {
                 Runtime.getRuntime().gc();
             }
         }
@@ -73,8 +77,8 @@ public class ClientForgeEvents {
         final ModList modList = ModList.get();
         final Stream<ModInfo> modInfoStream;
 
-        // there's a significant overhead involved in parallel streams that may make it run slower than sequential if
-        // you're only doing a small amount of work, therefore we only use it if there's *a lot* of mods to iterate through
+        // there's an overhead involved in parallel streams that may make it run slower than sequential if you're only
+        // doing a small amount of work, so only use it if there's *a lot* of mods to iterate through
         if (modList.getMods().size() > ClientConfig.parallelModChecksThreshold.get()) modInfoStream = modList.getMods().parallelStream();
         else modInfoStream = modList.getMods().stream();
         itlt.LOGGER.debug("isParallel: " + modInfoStream.isParallel());

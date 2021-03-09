@@ -49,7 +49,9 @@ public final class ClientConfig {
             enableAnticheat,
             enableAutoRemovalOfCheats,
             enableExplicitGC,
-            doExplicitGCOnPause;
+            doExplicitGCOnPause,
+            doExplicitGCOnSleep,
+            doExplicitGCOnMenu;
 
     public static ForgeConfigSpec.ConfigValue<String>
             customWindowTitleText,
@@ -109,7 +111,7 @@ public final class ClientConfig {
 
                     doExplicitGCOnPause = clientConfigBuilder
                             .comment(" " ,
-                                    " Whether or not to run explicit GC when the user pauses the game.",
+                                    " Whether or not to run explicit GC when the player pauses the game.",
                                     " ",
                                     " Mainly useful to turn off if you usually only have the game paused for a tiny amount ",
                                     " of time (e.g. less than ~2s).",
@@ -117,6 +119,24 @@ public final class ClientConfig {
                                     " Note: enableExplicitGC must be true for this to have any effect.",
                                     " If enableExplicitGC is false, explicit GC from this mod won't happen regardless.")
                             .define("explicitGCOnPause", true);
+
+                    doExplicitGCOnSleep = clientConfigBuilder
+                            .comment(" ",
+                                    " Whether or not to run explicit GC when the player is sleeping in a bed.",
+                                    " ",
+                                    " Note: enableExplicitGC must be true for this to have any effect.",
+                                    " If enableExplicitGC is false, explicit GC from this mod won't happen regardless.")
+                            .define("explicitGCOnSleep", true);
+
+                    doExplicitGCOnMenu = clientConfigBuilder
+                            .comment(" ",
+                                    " Whether or not to run explicit GC when navigating one of the following opaque",
+                                    " background screens: Singleplayer world selection, Multiplayer server selection,",
+                                    " Resource Pack selection, Language selection, Chat options, controls options,",
+                                    " accessibility options, realms main screen and stats menu.",
+                                    " ",
+                                    " Note: ")
+                            .define("explicitGCOnMenu", true);
 
                 } clientConfigBuilder.pop();
 

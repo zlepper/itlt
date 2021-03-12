@@ -21,7 +21,6 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryPoolMXBean;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,20 +33,12 @@ public class ClientModEvents {
     // get the maximum amount of RAM currently available for allocation to the JVM, including Permgen/Metaspace,
     // rounded to the nearest tenth (e.g. 1.0, 1.1, 1.2...)
     private static float getCurrentMem() {
-        long currentMem = Runtime.getRuntime().maxMemory();
-        currentMem += ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getMax();
-        for (MemoryPoolMXBean memoryMXBean : ManagementFactory.getMemoryPoolMXBeans()) {
-            if (memoryMXBean.getName().equals("Metaspace")) {
-                itlt.LOGGER.info(memoryMXBean.getType());
-                currentMem += memoryMXBean.getUsage().getMax();
-            }
-        }
+        final long currentMem = Runtime.getRuntime().maxMemory() + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getMax();
         return (Math.round(currentMem / 1073741824.0F) * 10) / 10F;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST) // run this as soon as possible to avoid wasting time if a requirement isn't met
     public static void commonInit(final FMLCommonSetupEvent event) {
-
         final int javaVerInt = ClientUtils.getJavaVersion();
         itlt.LOGGER.debug("javaVerInt: " + javaVerInt);
 
@@ -88,8 +79,6 @@ public class ClientModEvents {
         }
 
         // Memory-related requirements and warnings
-        //currentMem = Runtime.getRuntime().maxMemory() / 1073741824.0F;
-
         itlt.LOGGER.debug("currentMem: " + currentMem);
         itlt.LOGGER.debug("reqMinMemoryAmountInGB: " + ClientConfig.reqMinMemoryAmountInGB.get());
         itlt.LOGGER.debug("warnMinMemoryAmountInGB: " + ClientConfig.warnMinMemoryAmountInGB.get());

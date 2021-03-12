@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import dk.zlepper.itlt.client.helpers.LauncherUtils;
 import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
-import dk.zlepper.itlt.client.helpers.MessageContent;
+import dk.zlepper.itlt.client.helpers.Message;
 
 import net.minecraft.client.Minecraft;
 
@@ -16,7 +16,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
@@ -30,24 +29,18 @@ import java.util.regex.Pattern;
 public class ClientModEvents {
 
     public static float currentMem = Runtime.getRuntime().maxMemory() / 1073741824.0F;
-    public static String javaVer = System.getProperty("java.version");
-    public static int javaVerInt;
 
     @SubscribeEvent(priority = EventPriority.HIGHEST) // run this as soon as possible to avoid wasting time if a requirement isn't met
     public static void commonInit(final FMLCommonSetupEvent event) {
-        // Minimum Java version requirement and warning
-        javaVer = System.getProperty("java.version");
-        final String[] splitJavaVer = javaVer.split(Pattern.quote("."));
-        javaVerInt = Integer.parseInt(splitJavaVer[0]);
-        if (javaVerInt == 1) javaVerInt = Integer.parseInt(splitJavaVer[1]); // account for older Java versions that advertise as "1.8" instead of "8".
 
-        itlt.LOGGER.debug("javaVer: " + javaVer);
+        final int javaVerInt = ClientUtils.getJavaVersion();
         itlt.LOGGER.debug("javaVerInt: " + javaVerInt);
+
+        // Minimum Java version requirement and warning
         itlt.LOGGER.debug("requiredMinJavaVerion: " + ClientConfig.requiredMinJavaVersion.get());
         itlt.LOGGER.debug("warnMinJavaVersion: " + ClientConfig.warnMinJavaVersion.get());
-
         if (ClientConfig.enableMinJavaVerRequirement.get() && javaVerInt < ClientConfig.requiredMinJavaVersion.get()) {
-            ClientUtils.startUIProcess(MessageContent.NeedsNewerJava);
+            ClientUtils.startUIProcess(Message.Content.NeedsNewerJava);
         } else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get()) {
             if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
                 final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
@@ -55,9 +48,27 @@ public class ClientModEvents {
                 if (detectedLauncher == LauncherUtils.LauncherName.CurseClient)
                     itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
-                else ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
+                else ClientUtils.startUIProcess(Message.Content.WantsNewerJava);
             } else {
-                ClientUtils.startUIProcess(MessageContent.WantsNewerJava);
+                ClientUtils.startUIProcess(Message.Content.WantsNewerJava);
+            }
+        }
+
+        // Max Java version requirement and warning
+        itlt.LOGGER.debug("requiredMaxJavaVerion: " + ClientConfig.requiredMaxJavaVersion.get());
+        itlt.LOGGER.debug("warnMaxJavaVersion: " + ClientConfig.warnMaxJavaVersion.get());
+        if (ClientConfig.enableMaxJavaVerRequirement.get() && javaVerInt > ClientConfig.requiredMaxJavaVersion.get()) {
+            ClientUtils.startUIProcess(Message.Content.NeedsOlderJava);
+        } else if (ClientConfig.enableMaxJavaVerWarning.get() && javaVerInt > ClientConfig.warnMaxJavaVersion.get()) {
+            if (ClientConfig.selectivelyIgnoreMaxJavaVerWarning.get()) {
+                final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
+                itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
+                if (detectedLauncher == LauncherUtils.LauncherName.CurseClient)
+                    itlt.LOGGER.info("Skipping maxJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
+                            + " launcher which currently does not allow changing Java version beyond Java 8. :(");
+                else ClientUtils.startUIProcess(Message.Content.WantsOlderJava);
+            } else {
+                ClientUtils.startUIProcess(Message.Content.WantsOlderJava);
             }
         }
 
@@ -71,14 +82,14 @@ public class ClientModEvents {
         itlt.LOGGER.debug("warnMaxMemoryAmountInGB: " + ClientConfig.warnMaxMemoryAmountInGB.get());
 
         if (ClientConfig.enableMinMemoryRequirement.get() && currentMem < ClientConfig.reqMinMemoryAmountInGB.get().floatValue())
-            ClientUtils.startUIProcess(MessageContent.NeedsMoreMemory);
+            ClientUtils.startUIProcess(Message.Content.NeedsMoreMemory);
         else if (ClientConfig.enableMinMemoryWarning.get() && currentMem < ClientConfig.warnMinMemoryAmountInGB.get().floatValue())
-            ClientUtils.startUIProcess(MessageContent.WantsMoreMemory);
+            ClientUtils.startUIProcess(Message.Content.WantsMoreMemory);
 
         if (ClientConfig.enableMaxMemoryRequirement.get() && currentMem > ClientConfig.reqMaxMemoryAmountInGB.get().floatValue())
-            ClientUtils.startUIProcess(MessageContent.NeedsLessMemory);
+            ClientUtils.startUIProcess(Message.Content.NeedsLessMemory);
         else if (ClientConfig.enableMaxMemoryWarning.get() && currentMem > ClientConfig.warnMaxMemoryAmountInGB.get().floatValue())
-            ClientUtils.startUIProcess(MessageContent.WantsLessMemory);
+            ClientUtils.startUIProcess(Message.Content.WantsLessMemory);
     }
 
     @SubscribeEvent
@@ -89,8 +100,8 @@ public class ClientModEvents {
         final boolean isJava64bit = mcInstance.isJava64bit();
         itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
         if (!isJava64bit) {
-            if (ClientConfig.enable64bitRequirement.get()) ClientUtils.startUIProcess(MessageContent.NeedsJava64bit);
-            else if (ClientConfig.enable64bitWarning.get()) ClientUtils.startUIProcess(MessageContent.WantsJava64bit);
+            if (ClientConfig.enable64bitRequirement.get()) ClientUtils.startUIProcess(Message.Content.NeedsJava64bit);
+            else if (ClientConfig.enable64bitWarning.get()) ClientUtils.startUIProcess(Message.Content.WantsJava64bit);
         }
 
         // Custom window title text
@@ -113,6 +124,7 @@ public class ClientModEvents {
                         case CurseClient:
                             // if running from the Curse Client launcher, use the profile's name
                             customWindowTitle = LauncherUtils.getCurseClientProfileName();
+                            break;
                         default:
                             break;
                     }

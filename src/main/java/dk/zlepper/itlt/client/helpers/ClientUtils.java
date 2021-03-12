@@ -1,23 +1,40 @@
 package dk.zlepper.itlt.client.helpers;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.ModList;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
 
 public class ClientUtils {
+
+    public static byte getJavaVersion() {
+        final String javaVerStr = System.getProperty("java.version");
+        final String[] splitJavaVer = javaVerStr.split(Pattern.quote("."));
+        byte javaVer = Byte.parseByte(splitJavaVer[0]);
+
+        // account for older Java versions that advertise as "1.8" instead of "8".
+        if (javaVer == 1) javaVer = Byte.parseByte(splitJavaVer[1]);
+
+        return javaVer;
+    }
 
     public static class CustomServerData {
         public String name, IP;
@@ -92,8 +109,8 @@ public class ClientUtils {
     }
 
     public static ByteArrayInputStream convertToInputStream(final BufferedImage bufferedImage) throws IOException {
-        // convert BufferedImage to ByteArrayOutputStream without a double copy behind the scenes
-        // https://stackoverflow.com/a/12253091/3944931
+        // convert BufferedImage to ByteArrayOutputStream without a double copy behind the scenes, only for our
+        // specific use-case. https://stackoverflow.com/a/12253091/3944931
         final ByteArrayOutputStream output = new ByteArrayOutputStream() {
             @Override
             public synchronized byte[] toByteArray() {
@@ -106,123 +123,125 @@ public class ClientUtils {
         return inputStream;
     }
 
-    public static void startUIProcess(final MessageContent messageContent) {
+    public static void startUIProcess(final Message.Content messageContent) {
         final Path modFile = ModList.get().getModFileById("itlt").getFile().getFilePath();
-        final String messageType, messageTitle, messageBody, guideURL, leftButtonText, middleButtonText, rightButtonText;
+        String messageTitle, messageBody, leftButtonText, middleButtonText, rightButtonText, messageGuideError;
 
-        switch (messageContent) {
-            case NeedsJava64bit:
-                messageType = "require";
-                messageTitle = new TranslationTextComponent("itlt.java.arch.require.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.arch.require.body").getUnformattedComponentText();
-                if (ClientConfig.enableCustom64bitJavaGuide.get()) guideURL = ClientConfig.custom64bitJavaGuideURL.get();
-                else guideURL = "https://ozli.ga";
-                leftButtonText = new TranslationTextComponent("itlt.java.arch.require.guideButtonText").getUnformattedComponentText();
-                middleButtonText = new TranslationTextComponent("itlt.java.arch.require.closeButtonText").getUnformattedComponentText();
-                rightButtonText = ".";
-                break;
-            case WantsJava64bit:
-                messageType = "warn";
-                messageTitle = new TranslationTextComponent("itlt.java.arch.warning.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.arch.warning.body").getUnformattedComponentText();
-                if (ClientConfig.enableCustom64bitJavaGuide.get()) guideURL = ClientConfig.custom64bitJavaGuideURL.get();
-                else guideURL = "https://ozli.ga";
-                leftButtonText = new TranslationTextComponent("itlt.java.arch.warning.guideButtonText").getUnformattedComponentText();
-                middleButtonText = new TranslationTextComponent("itlt.java.arch.warning.askLaterButtonText").getUnformattedComponentText();
-                rightButtonText = new TranslationTextComponent("itlt.java.arch.warning.dontAskAgainButtonText").getUnformattedComponentText();
-                break;
-            case NeedsMoreMemory:
-                messageType = "require";
-                messageTitle = new TranslationTextComponent("itlt.java.memory.min.require.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.memory.min.require.body").getUnformattedComponentText()
-                        .replaceFirst("%s", ClientConfig.reqMinMemoryAmountInGB.get().toString())
-                        .replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
+        final String msgTranslationKeyTemplate =
+                "itlt." + messageContent.msgType.name().toLowerCase()
+                        + "." + messageContent.msgDesire.name().toLowerCase()
+                        + "." + messageContent.msgSubject.name().toLowerCase();
+        messageTitle = msgTranslationKeyTemplate + ".title";
+        messageBody = msgTranslationKeyTemplate + ".body";
+        messageGuideError = "itlt.cantOpenGuideErrorMsg";
+
+        leftButtonText = msgTranslationKeyTemplate + ".guideButtonText";
+        if (messageContent.msgType == Message.Type.Needs) {
+            // Requirement messages only have two buttons: show guide and close
+            middleButtonText = msgTranslationKeyTemplate + ".closeButtonText";
+            rightButtonText = ".";
+        } else {
+            // Warning messages have three buttons: show guide, ask later and don't ask again
+            middleButtonText = msgTranslationKeyTemplate + ".askLaterButtonText";
+            rightButtonText = msgTranslationKeyTemplate + ".dontAskAgainButtonText";
+        }
+
+        final String guideURL;
+        switch (messageContent.msgSubject) {
+            case Memory:
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) guideURL = ClientConfig.customMemoryAllocGuideURL.get();
                 else guideURL = "https://ozli.ga";
-                leftButtonText = new TranslationTextComponent("itlt.java.memory.min.require.guideButtonText").getUnformattedComponentText();
-                middleButtonText = new TranslationTextComponent("itlt.java.memory.min.require.closeButtonText").getUnformattedComponentText();
-                rightButtonText = ".";
                 break;
-            case WantsMoreMemory:
-                messageType = "warn";
-                messageTitle = new TranslationTextComponent("itlt.java.memory.min.warning.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.memory.min.warning.body").getUnformattedComponentText()
-                        .replaceFirst("%s", ClientConfig.warnMinMemoryAmountInGB.get().toString())
-                        .replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
-                if (ClientConfig.enableCustomMemoryAllocGuide.get()) guideURL = ClientConfig.customMemoryAllocGuideURL.get();
-                else guideURL = "https://ozli.ga";
-                leftButtonText = new TranslationTextComponent("itlt.java.memory.min.warning.guideButtonText").getUnformattedComponentText();
-                middleButtonText = new TranslationTextComponent("itlt.java.memory.min.warning.askLaterButtonText").getUnformattedComponentText();
-                rightButtonText = new TranslationTextComponent("itlt.java.memory.min.warning.dontAskAgainButtonText").getUnformattedComponentText();
-                break;
-            case NeedsLessMemory:
-                messageType = "require";
-                messageTitle = new TranslationTextComponent("itlt.java.memory.max.require.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.memory.max.require.body").getUnformattedComponentText()
-                        .replaceFirst("%s", ClientConfig.reqMaxMemoryAmountInGB.get().toString())
-                        .replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
-                if (ClientConfig.enableCustomMemoryAllocGuide.get()) guideURL = ClientConfig.customMemoryAllocGuideURL.get();
-                else guideURL = "https://ozli.ga";
-                leftButtonText = new TranslationTextComponent("itlt.java.memory.max.require.guideButtonText").getUnformattedComponentText();
-                middleButtonText = new TranslationTextComponent("itlt.java.memory.max.require.closeButtonText").getUnformattedComponentText();
-                rightButtonText = ".";
-                break;
-            case WantsLessMemory:
-                messageType = "warn";
-                messageTitle = new TranslationTextComponent("itlt.java.memory.max.warning.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.memory.max.warning.body").getUnformattedComponentText()
-                        .replaceFirst("%s", ClientConfig.warnMaxMemoryAmountInGB.get().toString())
-                        .replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
-                if (ClientConfig.enableCustomMemoryAllocGuide.get()) guideURL = ClientConfig.customMemoryAllocGuideURL.get();
-                else guideURL = "https://ozli.ga";
-                leftButtonText = new TranslationTextComponent("itlt.java.memory.max.warning.guideButtonText").getUnformattedComponentText();
-                middleButtonText = new TranslationTextComponent("itlt.java.memory.max.warning.askLaterButtonText").getUnformattedComponentText();
-                rightButtonText = new TranslationTextComponent("itlt.java.memory.max.warning.dontAskAgainButtonText").getUnformattedComponentText();
-                break;
-            case NeedsNewerJava:
-                messageType = "require";
-                messageTitle = new TranslationTextComponent("itlt.java.version.require.title").getString();
-                messageBody = new TranslationTextComponent("itlt.java.version.require.body").getString()
-                        .replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString())
-                        .replaceFirst("%sb", String.valueOf(ClientModEvents.javaVerInt));
-                if (ClientConfig.enableCustomJavaUpgradeGuide.get()) guideURL = ClientConfig.customJavaUpgradeGuideURL.get();
-                else guideURL = "https://ozli.ga";
-                leftButtonText = new TranslationTextComponent("itlt.java.version.require.guideButtonText").getString();
-                middleButtonText = new TranslationTextComponent("itlt.java.version.require.closeButtonText").getString();
-                rightButtonText = ".";
-                break;
-            case WantsNewerJava:
-                messageType = "warn";
-                messageTitle = new TranslationTextComponent("itlt.java.version.warning.title").getUnformattedComponentText();
-                messageBody = new TranslationTextComponent("itlt.java.version.warning.body").getUnformattedComponentText()
-                        .replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString())
-                        .replaceFirst("%sb", String.valueOf(ClientModEvents.javaVerInt));
-                if (ClientConfig.enableCustomJavaUpgradeGuide.get()) guideURL = ClientConfig.customJavaUpgradeGuideURL.get();
-                else guideURL = "https://ozli.ga";
-                leftButtonText = new TranslationTextComponent("itlt.java.version.warning.guideButtonText").getUnformattedComponentText();
-                middleButtonText = new TranslationTextComponent("itlt.java.version.warning.askLaterButtonText").getUnformattedComponentText();
-                rightButtonText = new TranslationTextComponent("itlt.java.version.warning.dontAskAgainButtonText").getUnformattedComponentText();
+            case Java:
+                if (messageContent.msgDesire == Message.Desire.SixtyFourBit) {
+                    if (ClientConfig.enableCustom64bitJavaGuide.get()) guideURL = ClientConfig.custom64bitJavaGuideURL.get();
+                    else guideURL = "https://ozli.ga";
+                } else if (messageContent.msgDesire == Message.Desire.Newer) {
+                    if (ClientConfig.enableCustomJavaUpgradeGuide.get()) guideURL = ClientConfig.customJavaUpgradeGuideURL.get();
+                    else guideURL = "https://ozli.ga";
+                } else {
+                    if (ClientConfig.enableCustomJavaDowngradeGuide.get()) guideURL = ClientConfig.customJavaDowngradeGuideURL.get();
+                    else guideURL = "https://ozli.ga";
+                }
                 break;
             default:
-                messageType = ".";
-                messageTitle = ".";
-                messageBody = ".";
-                guideURL = ".";
-                leftButtonText = ".";
-                middleButtonText = ".";
-                rightButtonText = ".";
+                guideURL = "N/A";
                 break;
         }
 
-        // todo: Also show this error message in the GUI
-        final String errorMessage = "Error: Unable to launch a web browser with the guide. The link is: " + guideURL;
+        // translate the keys manually as they aren't able to be translated by the game until after the main menu's shown
+
+        // determine which language json we need to read
+        final String lang = Minecraft.getInstance().gameSettings.language;
+
+        // read the determined language json embedded inside the itlt jar, falling back to en_us if not found (to match vanilla behaviour)
+        InputStream embeddedLangJsonInStream = itlt.class.getClassLoader().getResourceAsStream("assets/itlt/lang/" + lang + ".json");
+        if (embeddedLangJsonInStream == null)
+            embeddedLangJsonInStream = itlt.class.getClassLoader().getResourceAsStream("assets/itlt/lang/en_us.json");
+
+        // todo: null check
+        final Reader embeddedLangJson = new InputStreamReader(embeddedLangJsonInStream, StandardCharsets.UTF_8);
+
+        // read the json and query what is currently lang keys for each variable
+        // (e.g. messageTitle = "itlt.java.version.warning.title")
+        final Type type = new TypeToken<HashMap<String, String>>(){}.getType();
+        final HashMap<String, String> translationsMap = new Gson().fromJson(embeddedLangJson, type);
+        if (translationsMap != null) {
+            // replace the contents of each variable with the associated key's value,
+            // falling back to the lang's key name if it fails
+            messageTitle = translationsMap.getOrDefault(messageTitle, messageTitle);
+            messageBody = translationsMap.getOrDefault(messageBody, messageBody);
+            leftButtonText = translationsMap.getOrDefault(leftButtonText, leftButtonText);
+            middleButtonText = translationsMap.getOrDefault(middleButtonText, middleButtonText);
+            rightButtonText = translationsMap.getOrDefault(rightButtonText, rightButtonText);
+            messageGuideError = translationsMap.getOrDefault(messageGuideError, messageGuideError);
+
+            // insert some values where they're needed
+            if (messageContent.msgSubject == Message.Subject.Memory)
+                messageBody = messageBody.replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
+            else if (messageContent.msgSubject == Message.Subject.Java)
+                messageBody = messageBody.replaceFirst("%sb", String.valueOf(getJavaVersion()));
+
+            switch (messageContent) {
+                case NeedsMoreMemory:
+                    messageBody = messageBody.replaceFirst("%s", ClientConfig.reqMinMemoryAmountInGB.get().toString());
+                    break;
+                case WantsMoreMemory:
+                    messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMinMemoryAmountInGB.get().toString());
+                    break;
+                case NeedsLessMemory:
+                    messageBody = messageBody.replaceFirst("%s", ClientConfig.reqMaxMemoryAmountInGB.get().toString());
+                    break;
+                case WantsLessMemory:
+                    messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMaxMemoryAmountInGB.get().toString());
+                    break;
+                case NeedsNewerJava:
+                    messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());
+                    messageBody = messageBody.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());
+                    break;
+                case WantsNewerJava:
+                    messageTitle = messageTitle.replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString());
+                    messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString());
+                    break;
+                case NeedsOlderJava:
+                    messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
+                    messageBody = messageBody.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
+                case WantsOlderJava:
+                    messageTitle = messageTitle.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
+                    messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
+                default:
+                    break;
+            }
+        }
+
+        messageGuideError = messageGuideError.replaceFirst("%s", guideURL);
 
         itlt.LOGGER.info("messageContent: " + messageContent.toString());
-        itlt.LOGGER.info("messageType: " + messageType);
+        itlt.LOGGER.info("messageType: " + messageContent.msgType.toString());
         itlt.LOGGER.info("messageTitle: " + messageTitle);
         itlt.LOGGER.info("messageBody: " + messageBody);
-        itlt.LOGGER.info("errorMsg: " + errorMessage);
         itlt.LOGGER.info("guideURL: " + guideURL);
+        itlt.LOGGER.info("messageGuideError: " + messageGuideError);
         itlt.LOGGER.info("left: " + leftButtonText);
         itlt.LOGGER.info("middle: " + middleButtonText);
         itlt.LOGGER.info("right: " + rightButtonText);
@@ -231,23 +250,31 @@ public class ClientUtils {
             final ProcessBuilder builder = new ProcessBuilder(
                     System.getProperty("java.home") + File.separator + "bin" + File.separator + "java",
                     "-Dapple.awt.application.appearance=system", // macOS dark theme support in Java 14+ (JDK-8235363)
-                    "-jar", modFile.toString(), messageType, messageTitle, messageBody, leftButtonText,
-                    middleButtonText, rightButtonText, errorMessage, guideURL);
+                    "-jar", modFile.toString(), messageContent.msgType.toString().toLowerCase(), messageTitle, messageBody,
+                    leftButtonText, middleButtonText, rightButtonText, messageGuideError, guideURL, messageContent.toString());
             builder.inheritIO();
             builder.start();
         } catch (final IOException e) {
             e.printStackTrace();
         } finally {
             // don't allow the pack to continue launching if a requirement isn't met
-            if (messageType.equals("require")) {
+            if (messageContent.msgType == Message.Type.Needs) {
                 itlt.LOGGER.fatal("Can't launch the game as a requirement isn't met. ");
                 itlt.LOGGER.fatal("The unmet requirement is: \"" + messageContent.toString() + "\".");
-                if (messageBody.isEmpty()) itlt.LOGGER.error("The requirement details are blank, " +
-                        "please report this bug on itlt's GitHub issues");
+                if (messageBody.isEmpty())
+                    itlt.LOGGER.error("The requirement details are blank, please report this bug on itlt's GitHub issues");
                 else itlt.LOGGER.error("Requirement details: " + messageBody);
 
                 System.exit(1);
             }
         }
+    }
+
+    // Use Java 11's more efficient Files.readString() if available with a fallback to `new String(Files.readAllBytes(path))`
+    public static String readString(final Path path) throws IOException {
+        // If you're a dev getting a build error here, build with JDK 11+ and set the language level to 8.
+        // As long as the lang level is still 8 it'll run fine on Java 8 - you just need 11+ to build
+        if (getJavaVersion() >= 11) return Files.readString(path);
+        else return new String(Files.readAllBytes(path));
     }
 }

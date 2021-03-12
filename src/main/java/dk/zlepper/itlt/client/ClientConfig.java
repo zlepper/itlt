@@ -13,6 +13,10 @@ package dk.zlepper.itlt.client;
 
 // todo: launch game in fullscreen by default config option (while still respecting the player's choice if they change it)
 
+// todo: account for modpack authors setting the max lower than the min and enabling both, making it impossible to satisfy
+//       a want or need. When this happens, show a tailored error message for this specific scenario or change the
+//       behaviour so that the max warn/need gets disabled when the min is higher (with an updated config comments to note this)
+
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import dk.zlepper.itlt.common.ChecksumType;
@@ -30,7 +34,7 @@ public final class ClientConfig {
             enable64bitWarning,
             enableCustom64bitJavaGuide,
             enableCustomJavaUpgradeGuide,
-            enableCustomJavaDowngradeGuide, // todo
+            enableCustomJavaDowngradeGuide,
             enableMinMemoryRequirement,
             enableMinMemoryWarning,
             enableMaxMemoryRequirement,
@@ -40,6 +44,9 @@ public final class ClientConfig {
             enableMinJavaVerRequirement,
             enableMinJavaVerWarning,
             selectivelyIgnoreMinJavaVerWarning,
+            enableMaxJavaVerRequirement,
+            enableMaxJavaVerWarning,
+            selectivelyIgnoreMaxJavaVerWarning,
             enableCustomWindowTitle,
             enableAppendingToCustomTitle,
             enableUsingAutodetectedDisplayName,
@@ -57,7 +64,7 @@ public final class ClientConfig {
             customWindowTitleText,
             custom64bitJavaGuideURL,
             customJavaUpgradeGuideURL,
-            customJavaDowngradeGuideURL, // todo
+            customJavaDowngradeGuideURL,
             customMemoryAllocGuideURL;
 
     public static ForgeConfigSpec.ConfigValue<Double>
@@ -70,6 +77,8 @@ public final class ClientConfig {
     public static ForgeConfigSpec.ConfigValue<Integer>
             requiredMinJavaVersion,
             warnMinJavaVersion,
+            requiredMaxJavaVersion,
+            warnMaxJavaVersion,
             parallelModChecksThreshold;
 
     public static ForgeConfigSpec.ConfigValue<ChecksumType> preferredChecksumType;
@@ -135,7 +144,10 @@ public final class ClientConfig {
                                     " Resource Pack selection, Language selection, Chat options, controls options,",
                                     " accessibility options, realms main screen and stats menu.",
                                     " ",
-                                    " Note: ")
+                                    " Mainly useful to disable for speedruns that start the timer when the main menu is shown.",
+                                    " ",
+                                    " Note: enableExplicitGC must be true for this to have any effect.",
+                                    " If enableExplicitGC is false, explicit GC from this mod won't happen regardless.")
                             .define("explicitGCOnMenu", true);
 
                 } clientConfigBuilder.pop();
@@ -194,74 +206,162 @@ public final class ClientConfig {
             // Java.Version
             clientConfigBuilder.push("Version"); {
 
-                // Java.Version.Guide
-                clientConfigBuilder.push("Guide"); {
-                    enableCustomJavaUpgradeGuide = clientConfigBuilder
-                            .comment(" ",
-                                    " Enable this if you want to be able to change the link your users are sent to when",
-                                    " they ask for instructions on how to upgrade Java.",
-                                    " ",
-                                    " This is mainly useful for when you're using an unsupported version of this mod and",
-                                    " the default guide is outdated.")
-                            .define("enableCustomJavaUpgradeGuide", false);
-                    customJavaUpgradeGuideURL = clientConfigBuilder
-                            .comment(" ",
-                                    " The URL of the guide you want users to visit when they want 64bit Java.",
-                                    " Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect.",
-                                    " Note: The URL must start with \"https://\" for security reasons.")
-                            .define("customJavaUpgradeGuideURL", "https://ozli.ga");
+                // Java.Version.Min
+                clientConfigBuilder.push("Min"); {
+
+                    // Java.Version.Min.Guide
+                    clientConfigBuilder.push("Guide"); {
+                        enableCustomJavaUpgradeGuide = clientConfigBuilder
+                                .comment(" ",
+                                        " Enable this if you want to be able to change the link your users are sent to when",
+                                        " they ask for instructions on how to upgrade Java.",
+                                        " ",
+                                        " This is mainly useful for when you're using an unsupported version of this mod",
+                                        " and the default guide is outdated.")
+                                .define("enableCustomJavaUpgradeGuide", false);
+                        customJavaUpgradeGuideURL = clientConfigBuilder
+                                .comment(" ",
+                                        " The URL of the guide you want users to visit when they want to upgrade Java.",
+                                        " Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect.",
+                                        " Note: The URL must start with \"https://\" for security reasons.")
+                                .define("customJavaUpgradeGuideURL", "https://ozli.ga");
+                    } clientConfigBuilder.pop();
+
+                    // Java.Version.Min.Requirement
+                    clientConfigBuilder.push("Requirement"); {
+                        enableMinJavaVerRequirement = clientConfigBuilder
+                                .comment(" ",
+                                        " Whether or not to require a certain version of Java to be able to launch the modpack.",
+                                        " ",
+                                        " If someone tries to launch the modpack with a version of Java older than what's",
+                                        " specified in requiredMinJavaVersion, they'll get a message telling them how to",
+                                        " upgrade and that the modpack will close until they relaunch it with more modern Java.",
+                                        " ",
+                                        " Note: This is *separate* from enableMinJavaVerWarning - you can have a separate",
+                                        " version requirement and warning.")
+                                .define("enableMinJavaVerRequirement", true);
+                        requiredMinJavaVersion = clientConfigBuilder
+                                .comment(" ",
+                                        " The minimum version of Java needed to be able to launch the modpack.",
+                                        " ",
+                                        " Note: itlt handles Java version naming scheme differences for you, meaning you can",
+                                        " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
+                                        " while values such as \"15\" will check against \"Java 15\" internally.")
+                                .defineInRange("requiredMinJavaVerion", 8, 6, 127);
+                    } clientConfigBuilder.pop();
+
+                    // Java.Version.Min.Warning
+                    clientConfigBuilder.push("Warning"); {
+                        enableMinJavaVerWarning = clientConfigBuilder
+                                .comment(" ",
+                                        " Whether or not to warn when someone tries to launch the modpack with a version",
+                                        " of Java older than that specified in warnMinJavaVersion.",
+                                        " ",
+                                        " If this is enabled and someone does that, they'll get a message telling them how",
+                                        " to upgrade with the option to ask later and continue launching the modpack.",
+                                        " ",
+                                        " Note: This is *separate* from enableMinJavaVerRequirement - you can have a",
+                                        " separate version requirement and warning.")
+                                .define("enableMinJavaVerWarning", true);
+                        warnMinJavaVersion = clientConfigBuilder
+                                .comment(" ",
+                                        " The minimum recommended version of Java needed to skip the warning message when",
+                                        " launching the modpack.")
+                                .defineInRange("warnMinJavaVersion", 8, 6, 127);
+                        selectivelyIgnoreMinJavaVerWarning = clientConfigBuilder
+                                .comment(" ",
+                                        " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",
+                                        " to be changed beyond Java 8.",
+                                        " ",
+                                        " Enable this option to ignore the MinJavaVerWarning on launchers where the users",
+                                        " are unable to change the version of Java used to launch the game.")
+                                .define("ignoreMinJavaVerWarningWhenVerForced", true);
+                    } clientConfigBuilder.pop();
+
                 } clientConfigBuilder.pop();
 
-                // Java.Version.Requirement
-                clientConfigBuilder.push("Requirement"); {
-                    enableMinJavaVerRequirement = clientConfigBuilder
-                            .comment(" ",
-                                    " Whether or not to require a certain version of Java to be able to launch the modpack.",
-                                    " ",
-                                    " If someone tries to launch the modpack with a version of Java older than what's ",
-                                    " specified in requiredMinJavaVersion, they'll get a message telling them how to",
-                                    " upgrade and that the modpack will close until they relaunch it with more modern Java.",
-                                    " ",
-                                    " Note: This is *separate* from enableMinJavaVerWarning - you can have a separate ",
-                                    " version requirement and warning.")
-                            .define("enableMinJavaVerRequirement", true);
-                    requiredMinJavaVersion = clientConfigBuilder
-                            .comment(" ",
-                                    " The minimum version of Java needed to be able to launch the modpack.",
-                                    " ",
-                                    " Note: itlt handles Java version naming scheme differences for you, meaning you can",
-                                    " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally, while",
-                                    " values such as \"15\" will check against \"Java 15\" internally.")
-                            .defineInRange("requiredMinJavaVerion", 8, 6, 127);
-                } clientConfigBuilder.pop();
+                // Java.Version.Max
+                clientConfigBuilder.push("Max"); {
 
-                // Java.Version.Warning
-                clientConfigBuilder.push("Warning"); {
-                    enableMinJavaVerWarning = clientConfigBuilder
-                            .comment(" ",
-                                    " Whether or not to warn when someone tries to launch the modpack with a version",
-                                    " of Java older than that specified in warnMinJavaVersion.",
-                                    " ",
-                                    " If this is enabled and someone does that, they'll get a message telling them how to",
-                                    " upgrade with the option to ask later and continue launching the modpack.",
-                                    " ",
-                                    " Note: This is *separate* from enableMinJavaVerRequirement - you can have a separate",
-                                    " separate version requirement and warning.")
-                            .define("enableMinJavaVerWarning", true);
-                    warnMinJavaVersion = clientConfigBuilder
-                            .comment(" ",
-                                    " The minimum recommended version of Java needed to skip the warning message when launching",
-                                    " the modpack.")
-                            .defineInRange("warnMinJavaVersion", 8, 6, 127);
-                    selectivelyIgnoreMinJavaVerWarning = clientConfigBuilder
-                            .comment(" ",
-                                    " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",
-                                    " to be changed beyond Java 8.",
-                                    " ",
-                                    " Enable this option to ignore the MinJavaVerWarning on launchers where the users are ",
-                                    " unable to change the version of Java used to launch the game.")
-                            .define("ignoreMinJavaVerWarningWhenVerForced", true);
-                } clientConfigBuilder.pop();
+                    // Java.Version.Max.Guide
+                    clientConfigBuilder.push("Guide"); {
+                        enableCustomJavaDowngradeGuide = clientConfigBuilder
+                                .comment(" ",
+                                        " Enable this if you want to be able to change the link your users are sent to when",
+                                        " they ask for instructions on how to downgrade Java.",
+                                        " ",
+                                        " Note: I recommend stating in your guide why you want your users to use an older",
+                                        " version of Java than what Forge supports (Java 15 works in Forge 1.16.5 at the",
+                                        " time of writing). You should ideally be using the latest supported version of",
+                                        " Java if it works with your mods.",
+                                        " ",
+                                        " This is mainly useful for when you're using an unsupported version of this mod",
+                                        " and the default guide is outdated.")
+                                .define("enableCustomJavaDowngradeGuide", false);
+                        customJavaDowngradeGuideURL = clientConfigBuilder
+                                .comment(" ",
+                                        " The URL of the guide you want users to visit when they want 64bit Java.",
+                                        " Note: enableCustomJavaDowngradeGuide must be enabled for this to take effect.",
+                                        " Note: The URL must start with \"https://\" for security reasons.")
+                                .define("customJavaDowngradeGuideURL", "https://ozli.ga");
+                    } clientConfigBuilder.pop();
+
+                    // Java.Version.Max.Requirement
+                    clientConfigBuilder.push("Requirement"); {
+                        enableMaxJavaVerRequirement = clientConfigBuilder
+                                .comment(" ",
+                                        " Whether or not to require a certain version of Java to be able to launch the modpack.",
+                                        " ",
+                                        " If someone tries to launch the modpack with a version of Java newer than what's",
+                                        " specified in requiredMaxJavaVersion, they'll get a message telling them how to",
+                                        " downgrade and that the modpack will close until they relaunch it with older Java.",
+                                        " ",
+                                        " Note: If your version of Forge doesn't support the max version of Java you're",
+                                        " trying to prevent, this mod won't be able to kick into action and show the message",
+                                        " to users.",
+                                        " ",
+                                        " Note: This is *separate* from enableMaxJavaVerWarning - you can have a separate ",
+                                        " version requirement and warning.")
+                                .define("enableMaxJavaVerRequirement", false);
+                        requiredMaxJavaVersion = clientConfigBuilder
+                                .comment(" ",
+                                        " The maximum version of Java needed to be able to launch the modpack.",
+                                        " ",
+                                        " Note: itlt handles Java version naming scheme differences for you, meaning you can",
+                                        " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
+                                        " while values such as \"15\" will check against \"Java 15\" internally.")
+                                .defineInRange("requiredMaxJavaVerion", 15, 6, 127);
+                    } clientConfigBuilder.pop();
+
+                    // Java.Version.Max.Warning
+                    clientConfigBuilder.push("Warning"); {
+                        enableMaxJavaVerWarning = clientConfigBuilder
+                                .comment(" ",
+                                        " Whether or not to warn when someone tries to launch the modpack with a version",
+                                        " of Java newer than that specified in warnMaxJavaVersion.",
+                                        " ",
+                                        " If this is enabled and someone does that, they'll get a message telling them how",
+                                        " to downgrade with the option to ask later and continue launching the modpack.",
+                                        " ",
+                                        " Note: This is *separate* from enableMaxJavaVerRequirement - you can have a",
+                                        " separate version requirement and warning.")
+                                .define("enableMaxJavaVerWarning", false);
+                        warnMaxJavaVersion = clientConfigBuilder
+                                .comment(" ",
+                                        " The minimum recommended version of Java needed to skip the warning message when",
+                                        " launching the modpack.")
+                                .defineInRange("warnMaxJavaVersion", 15, 6, 127);
+                        selectivelyIgnoreMaxJavaVerWarning = clientConfigBuilder
+                                .comment(" ",
+                                        " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",
+                                        " to be changed from Java 8.",
+                                        " ",
+                                        " Enable this option to ignore the MaxJavaVerWarning on launchers where the users",
+                                        " are unable to change the version of Java used to launch the game.")
+                                .define("ignoreMaxJavaVerWarningWhenVerForced", true);
+                    } clientConfigBuilder.pop();
+
+                } clientConfigBuilder.pop(); // end of Java.Version.Max
 
             } clientConfigBuilder.pop(); // end of Java.Version
 

@@ -197,23 +197,28 @@ public class ClientUtils {
             messageGuideError = translationsMap.getOrDefault(messageGuideError, messageGuideError);
 
             // insert some values where they're needed
-            if (messageContent.msgSubject == Message.Subject.Memory)
-                messageBody = messageBody.replaceFirst("%sb", String.valueOf(ClientModEvents.currentMem));
-            else if (messageContent.msgSubject == Message.Subject.Java)
+            if (messageContent.msgSubject == Message.Subject.Memory) {
+                messageBody = messageBody.replaceFirst("%sb", ClientConfig.getSimplifiedDoubleStr(ClientModEvents.currentMem));
+            } else if (messageContent.msgSubject == Message.Subject.Java) {
                 messageBody = messageBody.replaceFirst("%sb", String.valueOf(getJavaVersion()));
+            }
 
             switch (messageContent) {
                 case NeedsMoreMemory:
-                    messageBody = messageBody.replaceFirst("%s", ClientConfig.reqMinMemoryAmountInGB.get().toString());
+                    messageBody = messageBody.replaceFirst("%s",
+                            ClientConfig.getSimplifiedDoubleStr(ClientConfig.reqMinMemoryAmountInGB.get()));
                     break;
                 case WantsMoreMemory:
-                    messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMinMemoryAmountInGB.get().toString());
+                    messageBody = messageBody.replaceFirst("%s",
+                            ClientConfig.getSimplifiedDoubleStr(ClientConfig.warnMinMemoryAmountInGB.get()));
                     break;
                 case NeedsLessMemory:
-                    messageBody = messageBody.replaceFirst("%s", ClientConfig.reqMaxMemoryAmountInGB.get().toString());
+                    messageBody = messageBody.replaceFirst("%s",
+                            ClientConfig.getSimplifiedDoubleStr(ClientConfig.reqMaxMemoryAmountInGB.get()));
                     break;
                 case WantsLessMemory:
-                    messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMaxMemoryAmountInGB.get().toString());
+                    messageBody = messageBody.replaceFirst("%s",
+                            ClientConfig.getSimplifiedDoubleStr(ClientConfig.warnMaxMemoryAmountInGB.get()));
                     break;
                 case NeedsNewerJava:
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());

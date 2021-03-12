@@ -83,6 +83,13 @@ public final class ClientConfig {
 
     public static ForgeConfigSpec.ConfigValue<ChecksumType> preferredChecksumType;
 
+    /** Simplify floats to ints when they represent the same value (e.g. show "1" instead of "1.0") **/
+    public static String getSimplifiedDoubleStr(final double doubleNum) {
+        if (doubleNum == (int) doubleNum)
+            return String.valueOf((int) doubleNum);
+        else return String.valueOf(doubleNum);
+    }
+
     static {
         /* Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to
          * avoid confusion to the user.

@@ -137,7 +137,8 @@ public class ClientModEvents {
 
             // set the new window title
             if (!customWindowTitle.equals(""))
-                mcInstance.getMainWindow().setWindowTitle(customWindowTitle + " (" + mcInstance.getWindowTitle() + ")");
+                // func_230148_b_ == setWindowTitle, func_230149_ax_ == getWindowTitle
+                mcInstance.getMainWindow().func_230148_b_(customWindowTitle + " (" + mcInstance.func_230149_ax_() + ")");
         }
 
         // Custom window icon

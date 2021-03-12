@@ -10,6 +10,7 @@ public class WarningPreferences {
     //static boolean shouldShowWarning = true;
     public final Properties properties = new Properties();
 
+    // todo: create itlt folder in the config folder if not already there
     public WarningPreferences() {
         // create the warning preferences file if it doesn't already exists
         if (!warningPrefsFile.exists()) {

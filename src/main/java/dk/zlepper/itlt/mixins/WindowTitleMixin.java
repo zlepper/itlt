@@ -11,7 +11,8 @@ public class WindowTitleMixin {
     /**
      * @author Paint_Ninja
      * @reason Restores the ability to change the Minecraft window title
+     * func_230150_b_ == setDefaultMinecraftTitle
      */
-    @Inject(method = "setDefaultMinecraftTitle", at = @At(value = "HEAD"), cancellable = true)
-    private void setDefaultMinecraftTitle(CallbackInfo ci) { ci.cancel(); }
+    @Inject(method = "func_230150_b_", at = @At(value = "HEAD"), cancellable = true)
+    private void func_230150_b_(CallbackInfo ci) { ci.cancel(); }
 }

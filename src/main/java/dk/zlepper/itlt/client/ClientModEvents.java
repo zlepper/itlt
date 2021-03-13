@@ -25,10 +25,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static dk.zlepper.itlt.client.ClientConfig.makeItltFolderIfNeeded;
+
 @Mod.EventBusSubscriber(modid=itlt.MOD_ID, value=Dist.CLIENT, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ClientModEvents {
 
     public static float currentMem = getCurrentMem();
+    public static File itltDir = null;
 
     // get the maximum amount of RAM currently available for allocation to the JVM, including Permgen/Metaspace,
     // rounded to the nearest tenth (e.g. 1.0, 1.1, 1.2...)
@@ -39,6 +42,8 @@ public class ClientModEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST) // run this as soon as possible to avoid wasting time if a requirement isn't met
     public static void commonInit(final FMLCommonSetupEvent event) {
+        itltDir = makeItltFolderIfNeeded();
+
         final int javaVerInt = ClientUtils.getJavaVersion();
         itlt.LOGGER.debug("javaVerInt: " + javaVerInt);
 
@@ -149,13 +154,7 @@ public class ClientModEvents {
         if (ClientConfig.enableCustomIcon.get()) {
             File customIcon = null;
 
-            final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
-            if (itltDir.exists()) {
-                customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
-            } else {
-                if (!itltDir.mkdir())
-                    itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
-            }
+            if (itltDir != null) customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
 
             if (ClientConfig.enableUsingAutodetectedIcon.get()) {
                 final File autoDetectedIcon;

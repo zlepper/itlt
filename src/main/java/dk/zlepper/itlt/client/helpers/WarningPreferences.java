@@ -7,10 +7,8 @@ public class WarningPreferences {
 
     private static final String warningPrefsFileStr = "config/itlt/warning.properties";
     private static final File warningPrefsFile = new File(warningPrefsFileStr);
-    //static boolean shouldShowWarning = true;
     public final Properties properties = new Properties();
 
-    // todo: create itlt folder in the config folder if not already there
     public WarningPreferences() {
         // create the warning preferences file if it doesn't already exists
         if (!warningPrefsFile.exists()) {

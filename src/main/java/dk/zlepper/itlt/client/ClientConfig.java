@@ -20,10 +20,14 @@ package dk.zlepper.itlt.client;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import dk.zlepper.itlt.common.ChecksumType;
+import dk.zlepper.itlt.itlt;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.loading.FMLPaths;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class ClientConfig {
     private static final ForgeConfigSpec.Builder clientConfigBuilder = new ForgeConfigSpec.Builder();
@@ -88,6 +92,17 @@ public final class ClientConfig {
         if (doubleNum == (int) doubleNum)
             return String.valueOf((int) doubleNum);
         else return String.valueOf(doubleNum);
+    }
+
+    /** Returns the path as a File if it already exists or has been successfully created. Returns null otherwise **/
+    @Nullable
+    public static File makeItltFolderIfNeeded() {
+        final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
+        if (!itltDir.exists() && !itltDir.mkdir()) {
+            itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
+            return null;
+        }
+        return itltDir;
     }
 
     static {

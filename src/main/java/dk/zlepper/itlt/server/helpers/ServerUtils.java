@@ -1,7 +1,6 @@
 package dk.zlepper.itlt.server.helpers;
 
 import dk.zlepper.itlt.common.AnticheatUtils;
-import dk.zlepper.itlt.common.ChecksumType;
 import net.minecraftforge.fml.network.FMLHandshakeMessages;
 import net.minecraftforge.fml.network.NetworkEvent;
 

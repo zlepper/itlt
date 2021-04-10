@@ -10,6 +10,7 @@ package dk.zlepper.itlt.client;
  */
 
 // todo: investigate relaunching the game with modern Java when available on the system on launchers that force Java 8
+// todo progress: proof-of-concept done with Trailblaze, determined it's too much work for now
 
 // todo: launch game in fullscreen by default config option (while still respecting the player's choice if they change it)
 
@@ -131,8 +132,9 @@ public final class ClientConfig {
                                     " Doing this can help reduce memory usage in certain situations and also slightly",
                                     " reduces the chances of a large GC happening in the middle of early gameplay.",
                                     " ",
-                                    " Note: For best performance with this option, include -XX:+AlwaysPreTouch in your JVM",
-                                    " args. Don't include said JVM arg for lower physical memory usage.",
+                                    " Note: For best performance with this option, include -XX:+AlwaysPreTouch in your",
+                                    " JVM args and have Xms and Xmx be the same value. Omit the AlwaysPreTouch arg for",
+                                    " lower physical memory usage.",
                                     " ",
                                     " Warning: This option has no effect if the -XX:+DisableExplicitGC JVM arg is present.",
                                     " ",
@@ -147,16 +149,14 @@ public final class ClientConfig {
                                     " Mainly useful to turn off if you usually only have the game paused for a tiny amount ",
                                     " of time (e.g. less than ~2s).",
                                     " ",
-                                    " Note: enableExplicitGC must be true for this to have any effect.",
-                                    " If enableExplicitGC is false, explicit GC from this mod won't happen regardless.")
+                                    " Note: enableExplicitGC must be true for this to have any effect.")
                             .define("explicitGCOnPause", true);
 
                     doExplicitGCOnSleep = clientConfigBuilder
                             .comment(" ",
                                     " Whether or not to run explicit GC when the player is sleeping in a bed.",
                                     " ",
-                                    " Note: enableExplicitGC must be true for this to have any effect.",
-                                    " If enableExplicitGC is false, explicit GC from this mod won't happen regardless.")
+                                    " Note: enableExplicitGC must be true for this to have any effect.")
                             .define("explicitGCOnSleep", true);
 
                     doExplicitGCOnMenu = clientConfigBuilder
@@ -168,8 +168,7 @@ public final class ClientConfig {
                                     " ",
                                     " Mainly useful to disable for speedruns that start the timer when the main menu is shown.",
                                     " ",
-                                    " Note: enableExplicitGC must be true for this to have any effect.",
-                                    " If enableExplicitGC is false, explicit GC from this mod won't happen regardless.")
+                                    " Note: enableExplicitGC must be true for this to have any effect.")
                             .define("explicitGCOnMenu", true);
 
                 } clientConfigBuilder.pop();
@@ -502,7 +501,7 @@ public final class ClientConfig {
                                 .comment(" ",
                                         " Enable this to show a warning when not enough RAM is left over for the OS and",
                                         " drivers to use.",
-
+                                        " ",
                                         " This is useful for warning users that are allocating so much RAM that there ",
                                         " isn't enough left over for other important processes to use without hitting",
                                         " the much slower swap space, hurting performance as a result.")
@@ -539,7 +538,7 @@ public final class ClientConfig {
                                 " Enable this if you want the game's version to be appended to the end of your",
                                 " customWindowTitleText.",
                                 " ",
-                                " For example: \"ModpackName (Minecraft* 1.16.3)\")",
+                                " For example: \"ModpackName (Minecraft* 1.16.5)\"",
                                 " Note: This is enabled by default because Mojang went out of their way to prevent",
                                 " modders from changing the window title easily - this setting is a reasonable",
                                 " middle-ground where both modpack authors' and Mojang's preferences are respected.",

@@ -41,7 +41,7 @@ public final class Main {
         } catch (final IllegalAccessException e) {
             // Don't show the illegal access stacktrace on Java 16+
             if (ClientUtils.getJavaVersion() > 15)
-                System.err.println("Warn: Please run with JVM's \"allow illegal access\" flag for the best experience on Windows.");
+                System.err.println("Warn: Please run with JVM's \"permit illegal access\" flag for the best experience on Windows.");
             else e.printStackTrace();
             return null;
         } catch (final InvocationTargetException | NoSuchMethodException | ClassNotFoundException | ClassCastException e) {

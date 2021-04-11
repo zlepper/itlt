@@ -10,12 +10,11 @@ package dk.zlepper.itlt.client;
 // todo: treat empty returned definitions as suspicious
 
 import com.mojang.realmsclient.RealmsMainScreen;
+import dk.zlepper.itlt.client.helpers.ChecksumUtils;
 import dk.zlepper.itlt.common.AnticheatUtils;
 import dk.zlepper.itlt.common.ChecksumType;
-import dk.zlepper.itlt.client.helpers.ChecksumUtils;
 import dk.zlepper.itlt.itlt;
 import io.lktk.NativeBLAKE3Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AccessibilityScreen;
 import net.minecraft.client.gui.screen.*;
 import net.minecraftforge.api.distmarker.Dist;
@@ -25,13 +24,15 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 @Mod.EventBusSubscriber(modid = itlt.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientForgeEvents {
@@ -74,13 +75,13 @@ public class ClientForgeEvents {
         // assume the best in people until they prove otherwise - set the initial capacity of the ArrayList to 0
         final ArrayList<ModInfo> listOfDetectedCheatMods = new ArrayList<>(0);
 
-        final ModList modList = ModList.get();
+        final List<ModInfo> modInfoList = ModList.get().getMods();
         final Stream<ModInfo> modInfoStream;
 
         // there's an overhead involved in parallel streams that may make it run slower than sequential if you're only
         // doing a small amount of work, so only use it if there's *a lot* of mods to iterate through
-        if (modList.getMods().size() > ClientConfig.parallelModChecksThreshold.get()) modInfoStream = modList.getMods().parallelStream();
-        else modInfoStream = modList.getMods().stream();
+        if (modInfoList.size() > ClientConfig.parallelModChecksThreshold.get()) modInfoStream = modInfoList.parallelStream();
+        else modInfoStream = modInfoList.stream();
         itlt.LOGGER.debug("isParallel: " + modInfoStream.isParallel());
 
         modInfoStream.forEach(modInfo -> {
@@ -99,33 +100,86 @@ public class ClientForgeEvents {
                 // known cheat modIds from definition file
                 if (cheatModIds.contains(modId)) listOfDetectedCheatMods.add(modInfo);
 
-                // by file checksum
-                final File modFile = modInfo.getOwningFile().getFile().getFilePath().toFile();
+                // by class checksum
+                final ModFile modFile = modInfo.getOwningFile().getFile();
+                itlt.LOGGER.debug("-----");
+                itlt.LOGGER.debug("modId: " + modId);
+                itlt.LOGGER.debug("modFile: " + modFile.getFilePath());
+
                 try {
-                    final Pair<ChecksumType, String> modFileChecksum = ChecksumUtils.getFileChecksum(modFile);
-                    itlt.LOGGER.debug("");
-                    itlt.LOGGER.debug("modId: " + modId);
-                    itlt.LOGGER.debug("modFile: " + modFile.toPath().toString());
-                    itlt.LOGGER.debug("modFileChecksum: " + modFileChecksum.toString());
+                    final ZipFile zipFile = new ZipFile(modFile.getFilePath().toFile());
 
-                    // known cheat checksums from definition file
-                    if (cheatModChecksums.contains(modFileChecksum.getRight())) listOfDetectedCheatMods.add(modInfo);
+                    // for each file in the jar
+                    final Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+                    while (enumeration.hasMoreElements()) {
+                        final ZipEntry entry = enumeration.nextElement();
+                        final String entryName = entry.getName();
 
+                        // Skip the assets folder and non-class files
+                        if (entryName.startsWith("assets/") || !entryName.endsWith(".class")) continue;
+
+                        // Log the path of the class file found in the jar
+                        itlt.LOGGER.debug("modClassFilePath: " + entryName);
+
+                        // Extract the class file from the jar to a byte[]
+                        final BufferedInputStream bufferedInputStream = new BufferedInputStream(zipFile.getInputStream(entry));
+                        final int bufferSize = bufferedInputStream.available();
+                        itlt.LOGGER.debug("bufferSize: " + bufferSize);
+                        final byte[] entryBytes = new byte[bufferSize];
+                        final int readResult = bufferedInputStream.read(entryBytes, 0, bufferSize);
+                        bufferedInputStream.close();
+
+                        // https://www.jrebel.com/blog/solution-smallest-java-class-file-challenge
+                        // discovered min is around 38, putting 32 here just to be sure
+                        if (readResult < 32)
+                            if (readResult == 0) throw new IOException("Read zero bytes, expected ~" + bufferSize);
+                            else throw new IOException("Read fewer bytes than the theoretical minimum of a valid class file");
+
+                        // Hash the byte array
+                        final Pair<ChecksumType, String> modClassChecksum = ChecksumUtils.getChecksum(entryBytes);
+                        itlt.LOGGER.debug("modClassChecksum: " + modClassChecksum.toString());
+
+                        // if the mod class' checksum is in the definition file, add it to the list of detected cheat mods
+                        if (cheatModChecksums.contains(modClassChecksum.getRight())) listOfDetectedCheatMods.add(modInfo);
+                    }
+
+                    zipFile.close();
                 } catch (final IOException | NativeBLAKE3Util.InvalidNativeOutput e) {
-                    final StringBuilder warningMsgBuilder = new StringBuilder(48);
-                    warningMsgBuilder.append("Unable to calculate checksum for \"").append(modFile.getPath()).append("\"");
-
-                    final boolean fileNonExistentOrInaccessible =
-                            !modFile.exists() || e.getMessage().toLowerCase().contains("access is denied");
-
-                    if (fileNonExistentOrInaccessible)
-                        warningMsgBuilder.append(" because itlt can't find or access it on the filesystem.");
-
-                    itlt.LOGGER.warn(warningMsgBuilder.toString());
-                    if (!fileNonExistentOrInaccessible) e.printStackTrace();
+                    itlt.LOGGER.warn("Unable to calculate checksum for a class in \"" + modFile.getFilePath() + "\"");
+                    e.printStackTrace();
                 }
+
+                /*
+                modInfo.getOwningFile().getFile().getScanResult().getClasses().forEach(classData -> {
+
+                    SerializableClassData serializableClassData = null;
+                    try {
+                        final Field clazz = ModFileScanData.ClassData.class.getDeclaredField("clazz");
+                        clazz.setAccessible(true);
+
+                        final Field interfaces = ModFileScanData.ClassData.class.getDeclaredField("interfaces");
+                        interfaces.setAccessible(true);
+
+                        serializableClassData = new SerializableClassData((Type) clazz.get(classData), (Set<Type>) interfaces.get(classData));
+                    } catch (final NoSuchFieldException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        itlt.LOGGER.debug("modClass: " + serializableClassData.toString());
+                        final Pair<ChecksumType, String> modClassChecksum = ChecksumUtils.getChecksum(ObjectSerializer.get().toBytes(serializableClassData));
+                        itlt.LOGGER.debug("modClassChecksum: " + modClassChecksum.toString());
+
+
+                    } catch (final NativeBLAKE3Util.InvalidNativeOutput e) {
+                        itlt.LOGGER.warn("Unable to calculate checksum for a class in \"" + modFile.getFilePath() + "\"");
+                        e.printStackTrace();
+                    }
+                });
+                 */
             }
         });
+        itlt.LOGGER.debug("-----");
 
         listOfDetectedCheatMods.forEach(cheatMod ->
                 itlt.LOGGER.debug("Found cheat mod: \"" + cheatMod.getOwningFile().getFile().getFileName() + "\""));

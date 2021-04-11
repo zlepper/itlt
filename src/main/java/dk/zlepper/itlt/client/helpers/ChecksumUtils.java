@@ -12,13 +12,71 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class ChecksumUtils {
-    public static Pair<ChecksumType, String> getFileChecksum(final File file, ChecksumType checksumType)
+
+    private static final Base62 base62 = Base62.createInstance();
+
+    public static Pair<ChecksumType, String> getChecksum(final byte[] byteArray, final ChecksumType checksumType)
+        throws NativeBLAKE3Util.InvalidNativeOutput {
+        // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to the Java implementation
+        if (!NativeBLAKE3.isEnabled())
+            return getChecksumFallback(byteArray, checksumType);
+
+        // setup the BLAKE3 hasher
+        final NativeBLAKE3 hasher = new NativeBLAKE3();
+        hasher.initDefault();
+        hasher.update(byteArray);
+
+        // get the hasher's output, with the number arg being the number of output bytes, prior to hex encoding
+        // our default is 28, aka BLAKE3-224. for BLAKE3-256, use 32
+        final byte[] bytes;
+        if (checksumType == ChecksumType.BLAKE3_256) bytes = hasher.getOutput(32);
+        else bytes = hasher.getOutput(28); // BLAKE3_224, Default
+
+        // the NativeBLAKE3 JNI is a C lib so we need to manually tell it to free up the memory now that
+        // we're done with it
+        if (hasher.isValid()) hasher.close();
+
+        // convert to hex
+        /*final StringBuilder sb = new StringBuilder();
+        for (byte aByte : bytes) {
+            sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
+        }*/
+
+        // convert to Base64
+        //final String encodedBase64 = Base64.encodeBase64String(bytes);
+
+        // convert to Base62
+        final String encodedBase62 = new String(base62.encode(bytes));
+
+        // return the completed hash
+        return Pair.of(checksumType, encodedBase62);
+    }
+
+    public static Pair<ChecksumType, String> getChecksum(final byte[] byteArray)
+            throws NativeBLAKE3Util.InvalidNativeOutput {
+        return getChecksum(byteArray, ChecksumType.Default);
+    }
+
+    public static Pair<ChecksumType, String> getChecksumFallback(final byte[] byteArray, final ChecksumType checksumType) {
+        final Blake3 hasher = Blake3.newInstance();
+        hasher.update(byteArray);
+
+        final byte[] bytes;
+        if (checksumType == ChecksumType.BLAKE3_256) bytes = hasher.digest(32);
+        else bytes = hasher.digest(28); // BLAKE3_224, Default
+
+        // convert to Base62
+        final String encodedBase62 = new String(base62.encode(bytes));
+
+        // return the completed hash
+        return Pair.of(checksumType, encodedBase62);
+    }
+
+    public static Pair<ChecksumType, String> getFileChecksum(final File file, final ChecksumType checksumType)
             throws IOException, NativeBLAKE3Util.InvalidNativeOutput {
         // for systems where the NativeBLAKE3 lib has not been compiled for, fallback to the Java implementation
         if (!NativeBLAKE3.isEnabled())
             return getFileChecksumFallback(file, checksumType);
-
-        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // default to BLAKE3_224
 
         // setup the BLAKE3 hasher
         final NativeBLAKE3 hasher = new NativeBLAKE3();
@@ -40,17 +98,8 @@ public class ChecksumUtils {
         // get the hasher's output, with the number arg being the number of output bytes, prior to hex encoding
         // our default is 28, aka BLAKE3-224. for BLAKE3-256, use 32
         final byte[] bytes;
-        switch (checksumType) {
-            case BLAKE3_256: {
-                bytes = hasher.getOutput(32);
-                break;
-            }
-            case BLAKE3_224:
-            default: {
-                bytes = hasher.getOutput(28);
-                break;
-            }
-        }
+        if (checksumType == ChecksumType.BLAKE3_256) bytes = hasher.getOutput(32);
+        else bytes = hasher.getOutput(28); // BLAKE3_224, Default
 
         // the NativeBLAKE3 JNI is a C lib so we need to manually tell it to free up the memory now that
         // we're done with it
@@ -78,10 +127,8 @@ public class ChecksumUtils {
         return getFileChecksum(file, ChecksumType.Default);
     }
 
-    public static Pair<ChecksumType, String> getFileChecksumFallback(final File file, ChecksumType checksumType)
+    public static Pair<ChecksumType, String> getFileChecksumFallback(final File file, final ChecksumType checksumType)
             throws IOException {
-        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // default to BLAKE3_224
-
         final Blake3 hasher = Blake3.newInstance();
 
         final FileInputStream fis = new FileInputStream(file);
@@ -93,20 +140,10 @@ public class ChecksumUtils {
         fis.close();
 
         final byte[] bytes;
-        switch (checksumType) {
-            case BLAKE3_256: {
-                bytes = hasher.digest(32);
-                break;
-            }
-            case BLAKE3_224:
-            default: {
-                bytes = hasher.digest(28);
-                break;
-            }
-        }
+        if (checksumType == ChecksumType.BLAKE3_256) bytes = hasher.digest(32);
+        else bytes = hasher.digest(28); // BLAKE3_224, Default
 
         // convert to Base62
-        final Base62 base62 = Base62.createInstance();
         final String encodedBase62 = new String(base62.encode(bytes));
 
         // return the completed hash

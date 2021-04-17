@@ -231,9 +231,11 @@ public class ClientUtils {
                 case NeedsOlderJava:
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
                     messageBody = messageBody.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
+                    break;
                 case WantsOlderJava:
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
                     messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
+                    break;
                 default:
                     break;
             }
@@ -265,7 +267,7 @@ public class ClientUtils {
             // don't allow the pack to continue launching if a requirement isn't met
             if (messageContent.msgType == Message.Type.Needs) {
                 itlt.LOGGER.fatal("Can't launch the game as a requirement isn't met. ");
-                itlt.LOGGER.fatal("The unmet requirement is: \"" + messageContent.toString() + "\".");
+                itlt.LOGGER.fatal("The unmet requirement is: \"" + messageContent + "\".");
                 if (messageBody.isEmpty())
                     itlt.LOGGER.error("The requirement details are blank, please report this bug on itlt's GitHub issues");
                 else itlt.LOGGER.error("Requirement details: " + messageBody);

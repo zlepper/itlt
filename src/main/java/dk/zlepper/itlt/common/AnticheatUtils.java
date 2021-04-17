@@ -125,22 +125,27 @@ public class AnticheatUtils {
         return getDefinitions(ChecksumType.None).getLeft();
     }
 
-    public static boolean hasModIdListGotKnownCheats(final List<String> modList, final HashSet<String> cheatModIds) {
+    public static boolean hasModIdListGotKnownCheats(final List<String> modList, final Set<String> cheatModIds) {
         for (final String s : modList) {
-            final String modId = s.toLowerCase();
+            if (hasModIdStringGotKnownCheats(s, cheatModIds)) return true;
+        }
+        return false;
+    }
 
-            // skip Forge and MC modIds from checks (they're a part of every FML setup afaik)
-            if (!modId.equals("forge") && !modId.equals("minecraft")) {
+    public static boolean hasModIdStringGotKnownCheats(final String modId, final Set<String> cheatModIds) {
+        final String lowercaseModId = modId.toLowerCase();
 
-                // simple algorithm for xray modIds and a hard-coded list of known cheat modIds
-                if ((modId.contains("xray") && !modId.contains("anti"))
-                        || modId.equals("forgehax") || modId.equals("forgewurst")) {
-                    return true;
-                }
+        // skip Forge and MC modIds from checks (they're a part of every FML setup afaik)
+        if (!lowercaseModId.equals("forge") && !lowercaseModId.equals("minecraft")) {
 
-                // known cheat modIds from definition file
-                if (cheatModIds.contains(modId)) return true;
+            // simple algorithm for xray modIds and a hard-coded list of known cheat modIds
+            if ((lowercaseModId.contains("xray") && !lowercaseModId.contains("anti"))
+                    || lowercaseModId.equals("forgehax") || lowercaseModId.equals("forgewurst")) {
+                return true;
             }
+
+            // known cheat modIds from definition file
+            if (cheatModIds.contains(lowercaseModId)) return true;
         }
         return false;
     }

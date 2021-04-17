@@ -19,7 +19,7 @@ public class ServerUtils {
         //ctx.get().getNetworkManager().closeChannel(new StringTextComponent("Connection closed - cheats are not allowed on this server"));
         if (clientModList.getModList().contains("itlt")) ConnectingPlayer.hasItlt.set(true);
         ConnectingPlayer.isCheating.set(
-                AnticheatUtils.hasModIdListGotKnownCheats(clientModList.getModList(),
-                AnticheatUtils.getModIdDefinitions()));
+                AnticheatUtils.hasModIdListGotKnownCheats(clientModList.getModList(), AnticheatUtils.getModIdDefinitions())
+        );
     }
 }

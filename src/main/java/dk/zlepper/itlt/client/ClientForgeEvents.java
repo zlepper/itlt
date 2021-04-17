@@ -42,7 +42,7 @@ public class ClientForgeEvents {
         if (ClientConfig.enableExplicitGC.get()) {
             final Screen screen = event.getGui();
             if (screen == null) return;
-            itlt.LOGGER.debug("Screen: " + screen.toString());
+            itlt.LOGGER.debug("Screen: " + screen);
 
             // Tell the GC to run whenever the user does certain non-latency-critical actions such as being on the
             // pause screen or opening an opaque bg screen such as the Resource Pack or Controls screens.
@@ -91,14 +91,8 @@ public class ClientForgeEvents {
             // skip Forge and MC modIds from checks (they're a part of every FML setup afaik)
             if (!modId.equals("forge") && !modId.equals("minecraft")) {
 
-                // simple algorithm for xray modIds and a hard-coded list of known cheat modIds
-                if ((modId.contains("xray") && !modId.contains("anti"))
-                        || modId.equals("forgehax") || modId.equals("forgewurst")) {
+                if (AnticheatUtils.hasModIdStringGotKnownCheats(modId, cheatModIds))
                     listOfDetectedCheatMods.add(modInfo);
-                }
-
-                // known cheat modIds from definition file
-                if (cheatModIds.contains(modId)) listOfDetectedCheatMods.add(modInfo);
 
                 // by class checksum
                 final ModFile modFile = modInfo.getOwningFile().getFile();
@@ -116,7 +110,8 @@ public class ClientForgeEvents {
                         final String entryName = entry.getName();
 
                         // Skip the assets folder and non-class files
-                        if (entryName.startsWith("assets/") || !entryName.endsWith(".class")) continue;
+                        if (!entryName.endsWith(".class")) continue;
+                        if (entryName.startsWith("assets/") && !entryName.endsWith(".class")) continue;
 
                         // Log the path of the class file found in the jar
                         itlt.LOGGER.debug("modClassFilePath: " + entryName);
@@ -130,7 +125,7 @@ public class ClientForgeEvents {
                         bufferedInputStream.close();
 
                         // https://www.jrebel.com/blog/solution-smallest-java-class-file-challenge
-                        // discovered min is around 38, putting 32 here just to be sure
+                        // discovered min is around 38, putting 32 here just to be safe
                         if (readResult < 32)
                             if (readResult == 0) throw new IOException("Read zero bytes, expected ~" + bufferSize);
                             else throw new IOException("Read fewer bytes than the theoretical minimum of a valid class file");
@@ -148,35 +143,6 @@ public class ClientForgeEvents {
                     itlt.LOGGER.warn("Unable to calculate checksum for a class in \"" + modFile.getFilePath() + "\"");
                     e.printStackTrace();
                 }
-
-                /*
-                modInfo.getOwningFile().getFile().getScanResult().getClasses().forEach(classData -> {
-
-                    SerializableClassData serializableClassData = null;
-                    try {
-                        final Field clazz = ModFileScanData.ClassData.class.getDeclaredField("clazz");
-                        clazz.setAccessible(true);
-
-                        final Field interfaces = ModFileScanData.ClassData.class.getDeclaredField("interfaces");
-                        interfaces.setAccessible(true);
-
-                        serializableClassData = new SerializableClassData((Type) clazz.get(classData), (Set<Type>) interfaces.get(classData));
-                    } catch (final NoSuchFieldException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-
-                    try {
-                        itlt.LOGGER.debug("modClass: " + serializableClassData.toString());
-                        final Pair<ChecksumType, String> modClassChecksum = ChecksumUtils.getChecksum(ObjectSerializer.get().toBytes(serializableClassData));
-                        itlt.LOGGER.debug("modClassChecksum: " + modClassChecksum.toString());
-
-
-                    } catch (final NativeBLAKE3Util.InvalidNativeOutput e) {
-                        itlt.LOGGER.warn("Unable to calculate checksum for a class in \"" + modFile.getFilePath() + "\"");
-                        e.printStackTrace();
-                    }
-                });
-                 */
             }
         });
         itlt.LOGGER.debug("-----");

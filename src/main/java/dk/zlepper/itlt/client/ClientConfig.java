@@ -99,11 +99,16 @@ public final class ClientConfig {
     @Nullable
     public static File makeItltFolderIfNeeded() {
         final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
-        if (!itltDir.exists() && !itltDir.mkdir()) {
+        if (!itltDir.exists() && (enableCustomIcon.get() || areAnyWarningsEnabled()) && !itltDir.mkdir()) {
             itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
             return null;
         }
         return itltDir;
+    }
+
+    public static boolean areAnyWarningsEnabled() {
+        return enableMinMemoryWarning.get() || enableMaxMemoryWarning.get() ||
+                enableMinJavaVerWarning.get() || enableMaxJavaVerWarning.get() || enable64bitWarning.get();
     }
 
     static {

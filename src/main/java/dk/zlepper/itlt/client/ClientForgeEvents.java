@@ -67,12 +67,12 @@ public class ClientForgeEvents {
         if (!ClientConfig.enableAnticheat.get()) return;
 
         // grab the definitions
-        final Pair<HashSet<String>, HashSet<String>> definitions =
+        final Pair<Set<String>, Set<String>> definitions =
                 AnticheatUtils.getDefinitions(ClientConfig.preferredChecksumType.get());
-        final Set<String> cheatModIds = Collections.unmodifiableSet(definitions.getLeft());
-        final Set<String> cheatModChecksums = Collections.unmodifiableSet(definitions.getRight());
+        final Set<String> cheatModIds = definitions.getLeft();
+        final Set<String> cheatModChecksums = definitions.getRight();
 
-        // assume the best in people until they prove otherwise - set the initial capacity of the ArrayList to 0
+        // initial capacity is set to 0 as I don't expect most people to have cheats installed
         final ArrayList<ModInfo> listOfDetectedCheatMods = new ArrayList<>(0);
 
         final List<ModInfo> modInfoList = ModList.get().getMods();

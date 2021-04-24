@@ -25,7 +25,7 @@ public class AnticheatUtils {
 
     @SuppressWarnings("unchecked")
     public static Map<String, Object> getDefinitionsMap(ChecksumType checksumType) throws IOException, ClassCastException {
-        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // wow, an actual use of Java's mutable-by-default function args!
+        if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224; // wow, an actual use of Java's mutable-by-default method parameters!
 
         final Map<String, Object> definitionsMap;
 
@@ -86,7 +86,7 @@ public class AnticheatUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static Pair<HashSet<String>, HashSet<String>> getDefinitions(ChecksumType checksumType) {
+    public static Pair<Set<String>, Set<String>> getDefinitions(ChecksumType checksumType) {
         if (checksumType == ChecksumType.Default) checksumType = ChecksumType.BLAKE3_224;
 
         final HashSet<String> cheatModIds = new HashSet<>();
@@ -118,10 +118,10 @@ public class AnticheatUtils {
         if (checksumType != ChecksumType.None && cheatModChecksums.isEmpty())
             itlt.LOGGER.warn("checksums section missing from latest definitions");
 
-        return Pair.of(cheatModIds, cheatModChecksums);
+        return Pair.of(Collections.unmodifiableSet(cheatModIds), Collections.unmodifiableSet(cheatModChecksums));
     }
 
-    public static HashSet<String> getModIdDefinitions() {
+    public static Set<String> getModIdDefinitions() {
         return getDefinitions(ChecksumType.None).getLeft();
     }
 

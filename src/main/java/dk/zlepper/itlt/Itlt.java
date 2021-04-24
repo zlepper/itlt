@@ -68,10 +68,6 @@ public final class Itlt {
             }
         }
 
-        String windowDisplayTitle = Config.DISPLAY_WINDOW_DISPLAY_TITLE.get();
-
-        GLFW.glfwSetWindowTitle(mcInstance.mainWindow.getHandle(), windowDisplayTitle);
-
         if (Config.DISPLAY_LOAD_CUSTOM_ICON.get()) {
             File di = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
             LOGGER.info(di);
@@ -99,6 +95,7 @@ public final class Itlt {
             }
         }
 
+        String windowDisplayTitle = Config.DISPLAY_WINDOW_DISPLAY_TITLE.get();
         if (Config.DISPLAY_USE_TECHNIC_DISPLAY_NAME.get()) {
             Path assets = getAssetDir();
 
@@ -122,9 +119,10 @@ public final class Itlt {
                 }
             }
         }
+        GLFW.glfwSetWindowTitle(mcInstance.mainWindow.getHandle(), windowDisplayTitle);
 
         if (Config.SERVER_ADD_DEDICATED_SERVER.get()) {
-            ServerList serverList = new ServerList(mcInstance);
+            final ServerList serverList = new ServerList(mcInstance);
             final int c = serverList.countServers();
             boolean foundServer = false;
             for (int i = 0; i < c; i++) {
@@ -137,16 +135,16 @@ public final class Itlt {
             }
             if (!foundServer) {
                 // The last boolean determines if it is a lan server (true), or an actual multiplayer server (false)
-                ServerData data = new ServerData(Config.SERVER_SERVER_NAME.get(), Config.SERVER_SERVER_IP.get(), false);
+                final ServerData data = new ServerData(Config.SERVER_SERVER_NAME.get(), Config.SERVER_SERVER_IP.get(), false);
                 serverList.addServerData(data);
                 serverList.saveServerList();
             }
         }
     }
 
-    private void SetWindowIcon(File icon) {
-        try(InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
-            try(InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
+    private void SetWindowIcon(final File icon) {
+        try(final InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
+            try(final InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
                 Minecraft.getInstance().mainWindow.setWindowIcon(is1, is2);
                 LOGGER.info("Set window icon without issues");
             }

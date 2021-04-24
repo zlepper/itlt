@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
         jcenter()
         mavenCentral()
     }
@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.14.4-1.0.5'
+version = '1.14.4-1.0.6'
 group = 'dk.zlepper.itlt' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'itlt'
 

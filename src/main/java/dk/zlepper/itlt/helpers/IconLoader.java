@@ -30,7 +30,7 @@ public class IconLoader
      * @return An array of ByteBuffers containing the pixel data for the icon in
      *         varying sizes.
      *************************************************************************/
-    public static ByteBuffer[] load(String filepath)
+    public static ByteBuffer[] load(final String filepath)
     {
         return load(new File(filepath));
     }
@@ -44,7 +44,7 @@ public class IconLoader
      * @return An array of ByteBuffers containing the pixel data for the icon in
      *         various sizes (as recommended by the OS).
      *************************************************************************/
-    public static ByteBuffer[] load(File fil)
+    public static ByteBuffer[] load(final File fil)
     {
         BufferedImage image = null;
         try
@@ -86,14 +86,14 @@ public class IconLoader
      *
      * @return A ByteBuffer of pixel data at the indicated size.
      *************************************************************************/
-    private static ByteBuffer loadInstance(BufferedImage image, int dimension)
+    private static ByteBuffer loadInstance(final BufferedImage image, final int dimension)
     {
-        BufferedImage scaledIcon = new BufferedImage(dimension, dimension,
+        final BufferedImage scaledIcon = new BufferedImage(dimension, dimension,
                 BufferedImage.TYPE_INT_ARGB_PRE);
-        Graphics2D g = scaledIcon.createGraphics();
-        double ratio = getIconRatio(image, scaledIcon);
-        double width = image.getWidth() * ratio;
-        double height = image.getHeight() * ratio;
+        final Graphics2D g = scaledIcon.createGraphics();
+        final double ratio = getIconRatio(image, scaledIcon);
+        final double width = image.getWidth() * ratio;
+        final double height = image.getHeight() * ratio;
         g.drawImage(image, (int) ((scaledIcon.getWidth() - width) / 2),
                 (int) ((scaledIcon.getHeight() - height) / 2), (int) (width),
                 (int) (height), null);
@@ -114,9 +114,9 @@ public class IconLoader
      * @return The amount to scale the source image to fit it onto the icon
      *         appropriately.
      *************************************************************************/
-    private static double getIconRatio(BufferedImage src, BufferedImage icon)
+    private static double getIconRatio(final BufferedImage src, final BufferedImage icon)
     {
-        double ratio = 1;
+        double ratio;
         if (src.getWidth() > icon.getWidth())
             ratio = (double) (icon.getWidth()) / src.getWidth();
         else
@@ -144,7 +144,7 @@ public class IconLoader
      *
      * @return A ByteBuffer that contains the pixel data of the supplied image.
      *************************************************************************/
-    public static ByteBuffer convertToByteBuffer(BufferedImage image)
+    public static ByteBuffer convertToByteBuffer(final BufferedImage image)
     {
         byte[] buffer = new byte[image.getWidth() * image.getHeight() * 4];
         int counter = 0;

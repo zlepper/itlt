@@ -67,12 +67,6 @@ public final class Itlt {
             }
         }
 
-        String windowDisplayTitle = Config.DISPLAY_WINDOW_DISPLAY_TITLE.get();
-
-        //GLFW.glfwSetWindowTitle(Minecraft.getInstance().getMainWindow().getHandle(), windowDisplayTitle);
-        mcInstance.getMainWindow().func_230148_b_(windowDisplayTitle);
-        //LOGGER.info("Set window title");
-
         if (Config.DISPLAY_LOAD_CUSTOM_ICON.get()) {
             File di = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
             LOGGER.info(di);
@@ -100,6 +94,7 @@ public final class Itlt {
             }
         }
 
+        String windowDisplayTitle = Config.DISPLAY_WINDOW_DISPLAY_TITLE.get();
         if (Config.DISPLAY_USE_TECHNIC_DISPLAY_NAME.get()) {
             Path assets = getAssetDir();
 
@@ -123,9 +118,10 @@ public final class Itlt {
                 }
             }
         }
+        mcInstance.getMainWindow().func_230148_b_(windowDisplayTitle);
 
         if (Config.SERVER_ADD_DEDICATED_SERVER.get()) {
-            ServerList serverList = new ServerList(Minecraft.getInstance());
+            final ServerList serverList = new ServerList(Minecraft.getInstance());
             final int c = serverList.countServers();
             boolean foundServer = false;
             for (int i = 0; i < c; i++) {
@@ -137,19 +133,17 @@ public final class Itlt {
                 }
             }
             if (!foundServer) {
-                // I have no clue what the last boolean is for.
-                // Possibly decides if it's a lan server, or an actual multiplayer server.
-                // Settings it to false should make it a multiplayer server
-                ServerData data = new ServerData(Config.SERVER_SERVER_NAME.get(), Config.SERVER_SERVER_IP.get(), false);
+                // The last boolean determines if it is a lan server (true), or an actual multiplayer server (false)
+                final ServerData data = new ServerData(Config.SERVER_SERVER_NAME.get(), Config.SERVER_SERVER_IP.get(), false);
                 serverList.addServerData(data);
                 serverList.saveServerList();
             }
         }
     }
 
-    private void SetWindowIcon(File icon) {
-        try(InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
-            try(InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
+    private void SetWindowIcon(final File icon) {
+        try(final InputStream is1 = new FileInputStream(icon.getAbsoluteFile())) {
+            try(final InputStream is2 = new FileInputStream(icon.getAbsoluteFile())) {
                 Minecraft.getInstance().getMainWindow().setWindowIcon(is1, is2);
                 LOGGER.info("Set window icon without issues");
             }

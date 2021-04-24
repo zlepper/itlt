@@ -1,4 +1,4 @@
-function initializeCoreMod(){
+function initializeCoreMod() {
     var opcodes = Java.type("org.objectweb.asm.Opcodes");
     var InsnNode = Java.type("org.objectweb.asm.tree.InsnNode");
 

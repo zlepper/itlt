@@ -15,23 +15,23 @@
 
 ## Contents
 
--   Introduction
--   Main classes
--   Features
-    -   Java environment warnings and requirements system
-        -   What?
-        -   Where?
-        -   Q&A
-        -   How do I...
-    -   Branding customisation
-        -   What?
-        -   Where?
-        -   Q&A
-        -   How do I...
--   To-do lists
-    -   Things I still need to document
-    -   Things left to-do with the existing code
-    -   New features to consider adding later
+-   [Introduction](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#introduction)
+-   [Main classes](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#main-classes)
+-   [Features]
+    -   [Java environment warnings and requirements system](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#java-environment-warnings-and-requirements-system)
+        -   [What?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#what)
+        -   [Where?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#where)
+        -   [Q&A](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#qa)
+        -   [How do I...](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#how-do-i)
+    -   [Branding customisation](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#branding-customisation)
+        -   [What?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#what-1)
+        -   [Where?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#where-1)
+        -   [Q&A](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#qa-1)
+        -   [How do I...](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#how-do-i-1)
+-   [To-do lists](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#to-do-lists)
+    -   [Things I still need to document here](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#things-i-still-need-to-document-here)
+    -   [Things left to-do with the existing code](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#things-left-to-do-with-the-existing-code)
+    -   [New features to consider adding later](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#new-features-to-consider-adding-later)
 
 ## Introduction
 
@@ -54,16 +54,18 @@ See the warnings feature brief for details on which to use and when. If you're n
 | Ingame      | Constructed when inside a Forge environment in the game                | itlt.java  |
 | Plain Java  | Constructed when the jar's launched directly by `java -jar` or similar | Main.java  |
 
-## Java environment warnings and requirements system
+## Features
 
-### What?
+### Java environment warnings and requirements system
+
+#### What?
 
 -   Modpack authors can set requirements and warnings relating to the Java environment their pack is started in
     -   Requirements prevent the game from starting if not met and lets the user know why
     -   Warnings tell the player if something isn't ideal but still lets them play
         -   Warnings are not shown if the launcher the player's using doesn't allow them to change what the warning is asking for
 
-### Where?
+#### Where?
 
 -   Handled in `client.ClientModEvents#commonInit` (`FMLCommonSetupEvent`)
 -   Has calls to:
@@ -75,7 +77,7 @@ See the warnings feature brief for details on which to use and when. If you're n
     -   `client.helpers.Message.Content` (e.g. NeedsNewerJava, WantsNewerJava, NeedsLessMemory, etc...)
     -   `LauncherUtils.LauncherName` (e.g. CurseClient, Technic, MultiMC, etc...)
 
-### Q&A:
+#### Q&A:
 
 -   Why not `FMLClientSetupEvent`?
     -   When a requirement isn't met the game is intentionally stopped. As such, using the FMLCommonSetupEvent which runs earlier helps avoid wasting people's time by letting them know if a requirement isn't met sooner than if I used the FMLClientSetupEvent here
@@ -96,7 +98,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   Why are the `isJava64bit` warning and requirements handled in `client.ClientModEvents#clientInit` (`FMLClientSetupEvent`) separate from all the rest?
     -   It calls `Minecraft#isJava64bit()` which isn't available until this stage in the mod loading process
 
-### How do I...
+#### How do I...
 
 -   Add a new requirement?
     1. Add to the Subject and/or Desire enums in `client.helpers.Message`
@@ -110,15 +112,15 @@ See the warnings feature brief for details on which to use and when. If you're n
     -   Look at `Main.java` and adjust the Swing code as desired
     -   You can change args sent to the GUI through `ClientUtils#startUIProcess()`
 
-## Branding customisation
+### Branding customisation
 
-### What?
+#### What?
 
 -   Modpack authors can add to the existing game's branding to help distinguish it from other modpacks on the same Minecraft version
     -   Window title can either be customised manually or set to auto-detect based on how it's named in the launcher the game was started from. Or no custom window title at all if prefered (this'll keep the Vanilla one).
     -   Same with the custom icon
 
-### Where?
+#### Where?
 
 -   Handled in `client.ClientModEvents#clientInit` (`FMLClientSetupEvent`)
 -   Has calls to:
@@ -133,7 +135,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   Uses enums from:
     -   `LauncherUtils.LauncherName` (e.g. CurseClient, Technic, MultiMC, etc...)
 
-### Q&A:
+#### Q&A:
 
 -   How does `LauncherUtils#detectLauncher()` work?
     -   Each launcher lays out the directory structure differently and manages isolating separate Minecraft installs in their own way.
@@ -146,7 +148,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   What does `LauncherUtils#getCurseClientProfileName()` do?
     -   It parses the `.minecraftinstance.json` and grabs the value associated to the `name` key
 
-### How do I...
+#### How do I...
 
 -   Add detection for another/new launcher?
     1. Determine what's unique about how the launcher organises modpacks
@@ -170,7 +172,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ## To-do lists
 
-### Things I still need to document
+### Things I still need to document here
 
 -   Custom server list entries (found in `client.ClientModEvents#clientInit`)
 -   Explicit GC (found in `client.ClientForgeEvents#onGuiOpen`)

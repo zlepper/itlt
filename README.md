@@ -1,8 +1,5 @@
 https://www.curseforge.com/minecraft/mc-mods/its-the-little-things
 
-### Note
-This v2 branch dynamically uses more modern Java features when available and falls back to Java 8 equivalents when not.
+### Contributors and devs
 
-In order for this to build properly, you need to build with JDK 11 (or newer) with the language level set to **8**.
-
-**When built properly, this mod still works just fine on Java 8**.
+Our [Technical Documentation](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md) may be of use to you; it provides a technical overview as well as to-do lists and various details about how stuff works and how to add or change stuff.

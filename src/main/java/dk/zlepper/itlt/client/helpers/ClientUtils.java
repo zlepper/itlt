@@ -276,12 +276,4 @@ public class ClientUtils {
             }
         }
     }
-
-    // Use Java 11's more efficient Files.readString() if available with a fallback to `new String(Files.readAllBytes(path))`
-    public static String readString(final Path path) throws IOException {
-        // If you're a dev getting a build error here, build with JDK 11+ and set the language level to 8.
-        // As long as the lang level is still 8 it'll run fine on Java 8 - you just need 11+ javac to build
-        if (getJavaVersion() >= 11) return Files.readString(path);
-        else return new String(Files.readAllBytes(path));
-    }
 }

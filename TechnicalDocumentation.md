@@ -17,7 +17,7 @@
 
 -   [Introduction](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#introduction)
 -   [Main classes](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#main-classes)
--   [Features]
+-   [Features](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#features)
     -   [Java environment warnings and requirements system](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#java-environment-warnings-and-requirements-system)
         -   [What?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#what)
         -   [Where?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#where)

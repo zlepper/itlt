@@ -2,13 +2,6 @@ package dk.zlepper.itlt.client;
 
 // todo: being able to imc to the itlt mod and get a crash report back if it was your fault
 
-/* todo: change format of enableAppendingToCustomTitle from "packName (Minecraft* version)"
-         to "Minecraft* version - packName" and account for Vanilla changing the title depending on the menu
-         (e.g. "Minecraft* 1.15.2 (Multiplayer) - My Fancy Modpack v2.0").
-         Doing this is in theory the best middle-ground approach. An option to change between the old and new
-         appending formats is probably a good idea as well.
- */
-
 // todo: investigate relaunching the game with modern Java when available on the system on launchers that force Java 8
 // todo progress: proof-of-concept done with Trailblaze, determined it's too much work for now
 
@@ -16,7 +9,7 @@ package dk.zlepper.itlt.client;
 
 // todo: account for modpack authors setting the max lower than the min and enabling both, making it impossible to satisfy
 //       a want or need. When this happens, show a tailored error message for this specific scenario or change the
-//       behaviour so that the max warn/need gets disabled when the min is higher (with an updated config comments to note this)
+//       behaviour so that the max warn/need gets disabled when the min is higher (with updated config comments to note this)
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -53,7 +46,6 @@ public final class ClientConfig {
             enableMaxJavaVerWarning,
             selectivelyIgnoreMaxJavaVerWarning,
             enableCustomWindowTitle,
-            enableAppendingToCustomTitle,
             enableUsingAutodetectedDisplayName,
             enableCustomIcon,
             enableUsingAutodetectedIcon,
@@ -70,7 +62,8 @@ public final class ClientConfig {
             custom64bitJavaGuideURL,
             customJavaUpgradeGuideURL,
             customJavaDowngradeGuideURL,
-            customMemoryAllocGuideURL;
+            customMemoryAllocGuideURL,
+            autoDetectedDisplayNameFallback;
 
     public static ForgeConfigSpec.ConfigValue<Double>
             reqMinMemoryAmountInGB,
@@ -79,7 +72,7 @@ public final class ClientConfig {
             warnMaxMemoryAmountInGB,
             warnNearMaxMemoryWarningInGB;
 
-    public static ForgeConfigSpec.ConfigValue<Integer>
+    public static ForgeConfigSpec.IntValue
             requiredMinJavaVersion,
             warnMinJavaVersion,
             requiredMaxJavaVersion,
@@ -534,32 +527,43 @@ public final class ClientConfig {
                         .define("enableCustomWindowTitle", true);
                 customWindowTitleText = clientConfigBuilder
                         .comment(" ",
-                                " The name you want your Minecraft window to be.",
+                                " The name you want your Minecraft window to be. Put \"%mc\" to include the original",
+                                " window title's contents to help identify the Minecraft version for example.",
+                                " ",
+                                " Warning: Mojang went out of their way to prevent modders from easily changing the",
+                                " window title, they clearly don't want people changing their branding entirely.",
+                                " Please make sure you keep the \"%mc\" in your customWindowTitleText as a sign of respect.",
+                                " Keeping it also helps others troubleshoot your pack by knowing what Minecraft version",
+                                " it's based on - especially useful if your modpack has multiple major releases that",
+                                " span across different Minecraft versions.",
+                                " ",
+                                " Note: Put \"%autoName\" for your modpack's display name to be automatically detected",
+                                " and used when launching from a supported launcher.",
+                                " ",
+                                " Examples:",
+                                " - \"ModpackName - %mc\" = \"ModpackName - Minecraft* 1.16.5\"",
+                                " - \"%mc - ModpackName\" = \"Minecraft* 1.16.5 - ModpackName\"",
+                                " - \"ModpackName (%mc)\" = \"ModpackName (Minecraft* 1.16.5)\"",
+                                " - \"%autoName (%mc)\" = \"ModpackName (Minecraft* 1.16.5)\"",
+                                " - \"ModpackName v2 based on %mc\" = \"ModpackName v2 based on Minecraft* 1.16.5\"",
                                 " ",
                                 " Note: enableCustomWindowTitle must be enabled for this to take effect.")
-                        .define("customWindowTitleText", "");
-                enableAppendingToCustomTitle = clientConfigBuilder
-                        .comment(" ",
-                                " Enable this if you want the game's version to be appended to the end of your",
-                                " customWindowTitleText.",
-                                " ",
-                                " For example: \"ModpackName (Minecraft* 1.16.5)\"",
-                                " Note: This is enabled by default because Mojang went out of their way to prevent",
-                                " modders from changing the window title easily - this setting is a reasonable",
-                                " middle-ground where both modpack authors' and Mojang's preferences are respected.",
-                                " ",
-                                "Note: I recommend leaving this enabled out of respect if you do enableCustomWindowTitle.")
-                        .define("enableAppendingToCustomTitle", true);
+                        .define("customWindowTitleText", "%autoName - %mc");
                 enableUsingAutodetectedDisplayName = clientConfigBuilder
                         .comment(" ",
-                                " Whether or not to automatically use your modpack's display name instead of the ",
-                                " customWindowTitleText when launching from a supported launcher.",
+                                " Whether or not to automatically replace \"%autoName\" in customWindowTitleText with",
+                                " your modpack's display name when launching from a supported launcher.",
                                 " ",
-                                " Note: This will override the contents of customWindowTitleText when launching from a",
-                                " supported launcher.",
-
-                                "Note: enableCustomWindowTitle must be enabled for this to take effect.")
+                                " Note: enableCustomWindowTitle must be enabled for this to take effect.")
                         .define("enableUsingAutodetectedDisplayName", true);
+                autoDetectedDisplayNameFallback = clientConfigBuilder
+                        .comment(" ",
+                                " The text to use in place of %autoDetect if we're unable to automatically detect your",
+                                " modpack's display name.",
+                                " ",
+                                " Note: This value will always be used for %autoName if enableUsingAutodetectedDisplayName",
+                                " is disabled, regardless of whether or not the pack is launched from a supported launcher.")
+                        .define("autoDetectedDisplayNameFallback", "modpackName");
             } clientConfigBuilder.pop();
 
             // Display.Icon

@@ -117,37 +117,41 @@ public class ClientModEvents {
         if (ClientConfig.enableCustomWindowTitle.get()) {
             String customWindowTitle = ClientConfig.customWindowTitleText.get();
 
-            if (ClientConfig.enableUsingAutodetectedDisplayName.get()) {
+            String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
+            if (customWindowTitle.contains("%autoName")) {
                 final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
                 itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
                 try {
                     switch (detectedLauncher) {
                         case Technic:
                             // if running from the Technic Launcher, use the pack slug's displayName
-                            customWindowTitle = LauncherUtils.getTechnicPackName();
+                            autoDetectedDisplayName = LauncherUtils.getTechnicPackName();
                             break;
                         case MultiMC:
                             // if running from the MultiMC launcher, use the instance's user-friendly name
-                            customWindowTitle = LauncherUtils.getMultiMCInstanceName();
+                            autoDetectedDisplayName = LauncherUtils.getMultiMCInstanceName();
                             break;
                         case CurseClient:
                             // if running from the Curse Client launcher, use the profile's name
-                            customWindowTitle = LauncherUtils.getCurseClientProfileName();
+                            autoDetectedDisplayName = LauncherUtils.getCurseClientProfileName();
                             break;
                         default:
                             break;
                     }
                 } catch (final IOException e) {
-                    itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to customWindowTitleText in the config.");
+                    itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
                     e.printStackTrace();
                 }
             }
+            customWindowTitle = customWindowTitle.replaceFirst("%autoName", autoDetectedDisplayName);
+
+            // replace %mc with the Vanilla window title from getWindowTitle() (func_230149_ax_ == getWindowTitle)
+            customWindowTitle = customWindowTitle.replaceFirst("%mc", mcInstance.func_230149_ax_());
+
             itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
 
-            // set the new window title
-            if (!customWindowTitle.equals(""))
-                // func_230148_b_ == setWindowTitle, func_230149_ax_ == getWindowTitle
-                mcInstance.getMainWindow().func_230148_b_(customWindowTitle + " (" + mcInstance.func_230149_ax_() + ")");
+            // set the new window title (func_230148_b_ == setWindowTitle)
+            if (!customWindowTitle.isEmpty()) mcInstance.getMainWindow().func_230148_b_(customWindowTitle);
         }
 
         // Custom window icon

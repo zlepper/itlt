@@ -189,7 +189,6 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ### Things left to-do with the existing code
 
--   HIGH PRIORITY: Change format of enableAppendingToCustomTitle from "packName (Minecraft* version)" to "Minecraft* version - packName"
 -   Investigate organising the LauncherUtils better
     -   `new DetectedLauncher().getFriendlyName()`?
     -   `LauncherUtils.MultiMC.getFriendlyName()` and have `LauncherUtils.MultiMC` implement `LauncherUtils.DetectedLauncher`?

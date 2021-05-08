@@ -132,39 +132,12 @@ dependencies {
     compile "org.spongepowered:mixin:0.8.2"
     annotationProcessor "org.spongepowered:mixin:0.8.2:processor"
 
-    // itlt uses the "BLAKE3-JNI" library for BLAKE3 checksum calculations with a fallback to a slower pure Java lib.
-    // Unfortunately, the library published on Maven Central is compiled for a version of Java newer than 8
-    // so we can't use it as we need Java 8 support. :(
-    //implementation 'io.lktk:blake3jni:0.2.2' // https://github.com/sken77/BLAKE3jni
-
-    // The workaround is to instead manually build it with Java 8, include it in the libs folder (which I've
-    // also included in this repo) and then include the library it depends on.
-    //
-    // If you're a contributor or dev looking at the itlt source code, you shouldn't need to worry about any of
-    // this unless you want to recompile blake3jni with support for more platforms as I've handled it for you :)
-    compile files("libs/blake3jni-0.2.2.jar")
-    shade files("libs/blake3jni-0.2.2.jar")
-    implementation "org.scijava:native-lib-loader:2.3.5"
-    shade "org.scijava:native-lib-loader:2.3.5"
-
-    // if the player's system is not supported by my compile of blake3jni, fallback to a basic unoptimised
-    // implementation written in pure Java
-    //implementation "io.github.rctcwyvrn:blake3:1.3" // https://github.com/rctcwyvrn/blake3
-
-    // again, the published one on Maven Central is compiled for a version of Java newer than 8 so we can't use it.
-    // time to manually build and bundle again...
-    compile files("libs/blake3-1.3.jar")
-    shade files("libs/blake3-1.3.jar")
-
     // itlt uses the "Base62" library for Base62 encoding of checksums
     // Why not Base64? Base62 is purely letters and numbers (no special characters like +, /, =, etc) and lacks the
     // padding requirement of Base64. These things allow for similar encoding efficiency to Base64 while also looking
     // prettier as well as looking less scary to a technophobe
     implementation "io.seruco.encoding:base62:0.1.3" // https://github.com/seruco/base62
     shade "io.seruco.encoding:base62:0.1.3"
-
-    // just so I have a mod to test the hashing with and to take optimised screenshots in-game from the dev environment
-    //implementation fg.deobf("curse.maven:nicephore-401014:3168940")
 
     // itlt uses the "Imgscalr" library to easily resize icons as needed while preserving their original aspect ratios
     implementation "org.imgscalr:imgscalr-lib:4.2"

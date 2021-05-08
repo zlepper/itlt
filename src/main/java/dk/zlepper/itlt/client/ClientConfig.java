@@ -13,7 +13,6 @@ package dk.zlepper.itlt.client;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import dk.zlepper.itlt.common.ChecksumType;
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -50,8 +49,6 @@ public final class ClientConfig {
             enableCustomIcon,
             enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
-            enableAnticheat,
-            enableAutoRemovalOfCheats,
             enableExplicitGC,
             doExplicitGCOnPause,
             doExplicitGCOnSleep,
@@ -76,10 +73,7 @@ public final class ClientConfig {
             requiredMinJavaVersion,
             warnMinJavaVersion,
             requiredMaxJavaVersion,
-            warnMaxJavaVersion,
-            parallelModChecksThreshold;
-
-    public static ForgeConfigSpec.ConfigValue<ChecksumType> preferredChecksumType;
+            warnMaxJavaVersion;
 
     /** Simplify floats to ints when they represent the same value (e.g. show "1" instead of "1.0") **/
     public static String getSimplifiedDoubleStr(final double doubleNum) {
@@ -598,51 +592,6 @@ public final class ClientConfig {
             enableCustomServerListEntries = clientConfigBuilder
                     .comment(" No comment yet") // todo
                     .define("enableCustomServerListEntries", false);
-        } clientConfigBuilder.pop();
-
-        // Anti-cheat section
-        clientConfigBuilder.push("Anti-cheat"); { //.comment("No silver bullet, but definitely helps combat against some cheaters. Intended to compliment a full server-side anti-cheat mod/plugin.\r\n");
-            enableAnticheat = clientConfigBuilder
-                    .comment(" ",
-                            " Whether or not to detect and report known cheats to servers with itlt installed" +
-                            " and anti-cheat enabled.",
-                            " ",
-                            " Note: Disabling this won't suddenly allow you to cheat on said servers - it'll simply",
-                            " prevent you from joining some of them at all.",
-                            " ",
-                            " Note: Depending on the server, you may be able to join it with cheats installed even if",
-                            " anti-cheat is enabled on the server. The action the server takes towards cheaters is",
-                            " down to the server's staff.")
-                    .define("enableAnticheat", true);
-            enableAutoRemovalOfCheats = clientConfigBuilder
-                    .comment(" ",
-                            " Enable this if you want itlt to automatically delete known cheat mods so that they don't",
-                            " run on next launch.",
-                            " ",
-                            " This feature is intended to prevent accidental cheating on servers.",
-                            " You'll probably want to disable this setting if you want to cheat on singleplayer.",
-                            " ",
-                            " Note: enableAnticheat must be enabled for this to take effect.")
-                    .define("enableAutoRemovalOfCheats", false);
-
-            // Anti-cheat.Advanced
-            clientConfigBuilder.push("Advanced"); {
-                parallelModChecksThreshold = clientConfigBuilder
-                        .comment(" ",
-                                " To check if a known cheat mod is present, itlt needs to iterate through each mod.",
-                                " These checks are pretty fast, but can still benefit from multithreading if there's",
-                                " *a lot* of mods.",
-                                " ",
-                                " Here you can change the threshold for how many mods are needed before multithreading's",
-                                " attempted. The default is >100 mods.",
-                                " ",
-                                " Warning: There's an overhead associated with multithreading so having the threshold too",
-                                " low can actually hurt performance.")
-                        .defineInRange("parallelModChecksThreshold", 100, 1, 1024);
-                preferredChecksumType = clientConfigBuilder
-                        .comment(" No comment yet")
-                        .defineEnum("preferredChecksumType", ChecksumType.Default);
-            }
         } clientConfigBuilder.pop();
 
         // Build the config

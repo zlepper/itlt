@@ -198,6 +198,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   HIGH PRIORITY: Cleanup the icon resizing stuff
     -   Look into using `client.helpers.IconLoader` instead of shadowing in the Scalr library
 -   Revisit the custom server list entries feature
+-   logo.png referenced in mods.toml but not shown in mods menu yet
 
 ### New features to consider adding later
 

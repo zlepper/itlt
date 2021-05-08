@@ -1,7 +1,6 @@
 package dk.zlepper.itlt;
 
 import dk.zlepper.itlt.client.ClientConfig;
-import dk.zlepper.itlt.server.ServerConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -22,8 +21,5 @@ public final class itlt {
 
         modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientConfig);
         ClientConfig.loadConfig(ClientConfig.clientConfig, FMLPaths.CONFIGDIR.get().resolve("itlt-client.toml"));
-
-        modLoadingContext.registerConfig(ModConfig.Type.SERVER, ServerConfig.serverConfig);
-        ServerConfig.loadConfig(ServerConfig.serverConfig, FMLPaths.CONFIGDIR.get().resolve("itlt-server.toml"));
     }
 }

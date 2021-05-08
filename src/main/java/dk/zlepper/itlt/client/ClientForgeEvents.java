@@ -9,8 +9,6 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 @Mod.EventBusSubscriber(modid = itlt.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientForgeEvents {
@@ -30,10 +28,10 @@ public class ClientForgeEvents {
                     || (ClientConfig.doExplicitGCOnSleep.get() && screen instanceof SleepInMultiplayerScreen)
                     || (ClientConfig.doExplicitGCOnMenu.get() && (
                             screen instanceof WorldSelectionScreen || screen instanceof MultiplayerScreen
-                                    || screen instanceof PackScreen || screen instanceof LanguageScreen
-                                    || screen instanceof ChatOptionsScreen || screen instanceof ControlsScreen
-                                    || screen instanceof AccessibilityScreen || screen instanceof RealmsMainScreen
-                                    || screen instanceof StatsScreen))) {
+                                    || screen instanceof ServerListScreen || screen instanceof PackScreen
+                                    || screen instanceof LanguageScreen || screen instanceof ChatOptionsScreen
+                                    || screen instanceof ControlsScreen || screen instanceof AccessibilityScreen
+                                    || screen instanceof RealmsMainScreen || screen instanceof StatsScreen))) {
                 Runtime.getRuntime().gc();
             }
         }

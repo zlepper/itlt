@@ -125,13 +125,15 @@ public final class ClientConfig {
                                     " reduces the chances of a large GC happening in the middle of early gameplay.",
                                     " ",
                                     " Note: For best performance with this option, include -XX:+AlwaysPreTouch in your",
-                                    " JVM args and have Xms and Xmx be the same value. Omit the AlwaysPreTouch arg for",
-                                    " lower physical memory usage.",
+                                    " JVM args and have Xms and Xmx be the same value. Omit/don't include the AlwaysPreTouch",
+                                    " arg for lower physical memory usage (thus allowing other apps to use memory the game isn't",
+                                    " currently using, at the cost of memory allocation slowdowns when the game needs it).",
                                     " ",
                                     " Warning: This option has no effect if the -XX:+DisableExplicitGC JVM arg is present.",
                                     " ",
-                                    " Turn this on to help prevent and/or reduce GC-related lag spikes, turn it off to only",
-                                    " rely on the pressure-based automatic GC (Vanilla behaviour).")
+                                    " Turn this on to help prevent and/or reduce GC-related lag spikes, turn it off for",
+                                    " Vanilla behaviour (only rely on the pressure-based automatic GC). This is off by",
+                                    " default as it may actually hurt performance if Xms and Xmx aren't the same!")
                             .define("enableExplicitGC", false);
 
                     doExplicitGCOnPause = clientConfigBuilder
@@ -139,7 +141,7 @@ public final class ClientConfig {
                                     " Whether or not to run explicit GC when the player pauses the game.",
                                     " ",
                                     " Mainly useful to turn off if you usually only have the game paused for a tiny amount ",
-                                    " of time (e.g. less than ~2s).",
+                                    " of time (i.e. less than ~2s).",
                                     " ",
                                     " Note: enableExplicitGC must be true for this to have any effect.")
                             .define("explicitGCOnPause", true);

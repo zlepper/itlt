@@ -1,7 +1,8 @@
 package dk.zlepper.itlt.client;
 
 import com.google.gson.Gson;
-import dk.zlepper.itlt.client.helpers.LauncherUtils;
+import dk.zlepper.itlt.client.launchers.LauncherUtils;
+import dk.zlepper.itlt.client.launchers.DetectedLauncher;
 import dk.zlepper.itlt.itlt;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.client.helpers.Message;
@@ -32,6 +33,7 @@ public class ClientModEvents {
 
     public static float currentMem = getCurrentMem();
     public static File itltDir = null;
+    public static DetectedLauncher detectedLauncher = LauncherUtils.getDetectedLauncher();
 
     // get the maximum amount of RAM currently available for allocation to the JVM, including Permgen/Metaspace,
     // rounded to the nearest tenth (e.g. 1.0, 1.1, 1.2...)
@@ -47,6 +49,8 @@ public class ClientModEvents {
         final int javaVerInt = ClientUtils.getJavaVersion();
         itlt.LOGGER.debug("javaVerInt: " + javaVerInt);
 
+        itlt.LOGGER.info("detectedLauncher: " + detectedLauncher);
+
         // Minimum Java version requirement and warning
         itlt.LOGGER.debug("requiredMinJavaVerion: " + ClientConfig.requiredMinJavaVersion.get());
         itlt.LOGGER.debug("warnMinJavaVersion: " + ClientConfig.warnMinJavaVersion.get());
@@ -54,9 +58,7 @@ public class ClientModEvents {
             ClientUtils.startUIProcess(Message.Content.NeedsNewerJava);
         } else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get()) {
             if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
-                final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
-                itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
-                if (detectedLauncher == LauncherUtils.LauncherName.CurseClient)
+                if (!detectedLauncher.supportsChangingJavaVersion())
                     itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
                 else ClientUtils.startUIProcess(Message.Content.WantsNewerJava);
@@ -72,9 +74,7 @@ public class ClientModEvents {
             ClientUtils.startUIProcess(Message.Content.NeedsOlderJava);
         } else if (ClientConfig.enableMaxJavaVerWarning.get() && javaVerInt > ClientConfig.warnMaxJavaVersion.get()) {
             if (ClientConfig.selectivelyIgnoreMaxJavaVerWarning.get()) {
-                final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
-                itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
-                if (detectedLauncher == LauncherUtils.LauncherName.CurseClient)
+                if (!detectedLauncher.supportsChangingJavaVersion())
                     itlt.LOGGER.info("Skipping maxJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
                 else ClientUtils.startUIProcess(Message.Content.WantsOlderJava);
@@ -118,26 +118,10 @@ public class ClientModEvents {
             String customWindowTitle = ClientConfig.customWindowTitleText.get();
 
             String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
-            if (customWindowTitle.contains("%autoName")) {
-                final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
-                itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
+            if (ClientConfig.enableUsingAutodetectedDisplayName.get() && customWindowTitle.contains("%autoName")) {
                 try {
-                    switch (detectedLauncher) {
-                        case Technic:
-                            // if running from the Technic Launcher, use the pack slug's displayName
-                            autoDetectedDisplayName = LauncherUtils.getTechnicPackName();
-                            break;
-                        case MultiMC:
-                            // if running from the MultiMC launcher, use the instance's user-friendly name
-                            autoDetectedDisplayName = LauncherUtils.getMultiMCInstanceName();
-                            break;
-                        case CurseClient:
-                            // if running from the Curse Client launcher, use the profile's name
-                            autoDetectedDisplayName = LauncherUtils.getCurseClientProfileName();
-                            break;
-                        default:
-                            break;
-                    }
+                    final String tmp = detectedLauncher.getModpackDisplayName();
+                    if (tmp != null) autoDetectedDisplayName = tmp;
                 } catch (final IOException e) {
                     itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
                     e.printStackTrace();
@@ -162,19 +146,7 @@ public class ClientModEvents {
 
             if (ClientConfig.enableUsingAutodetectedIcon.get()) {
                 final File autoDetectedIcon;
-                final LauncherUtils.LauncherName detectedLauncher = LauncherUtils.detectLauncher();
-                itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.toString());
-                switch (detectedLauncher) {
-                    case Technic:
-                        autoDetectedIcon = LauncherUtils.getTechnicPackIcon();
-                        break;
-                    case MultiMC:
-                        autoDetectedIcon = LauncherUtils.getMultiMCInstanceIcon();
-                        break;
-                    default:
-                        autoDetectedIcon = null;
-                        break;
-                }
+                autoDetectedIcon = detectedLauncher.getModpackIcon();
                 if (autoDetectedIcon != null) customIcon = autoDetectedIcon;
             }
 

@@ -526,8 +526,9 @@ public final class ClientConfig {
                                 " The name you want your Minecraft window to be. Put \"%mc\" to include the original",
                                 " window title's contents to help identify the Minecraft version for example.",
                                 " ",
-                                " Warning: Mojang went out of their way to prevent modders from easily changing the",
-                                " window title, they clearly don't want people changing their branding entirely.",
+                                " Warning: Mojang have asked people to not change their branding entirely and made it",
+                                " harder for modders to change it at all as of MC 1.15 and newer. They clearly don't like",
+                                " people taking full credit for their work and I understand that.",
                                 " Please make sure you keep the \"%mc\" in your customWindowTitleText as a sign of respect.",
                                 " Keeping it also helps others troubleshoot your pack by knowing what Minecraft version",
                                 " it's based on - especially useful if your modpack has multiple major releases that",
@@ -559,7 +560,7 @@ public final class ClientConfig {
                                 " ",
                                 " Note: This value will always be used for %autoName if enableUsingAutodetectedDisplayName",
                                 " is disabled, regardless of whether or not the pack is launched from a supported launcher.")
-                        .define("autoDetectedDisplayNameFallback", "modpackName");
+                        .define("autoDetectedDisplayNameFallback", "ModpackName");
             } clientConfigBuilder.pop();
 
             // Display.Icon

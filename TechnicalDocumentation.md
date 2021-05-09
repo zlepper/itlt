@@ -117,56 +117,61 @@ See the warnings feature brief for details on which to use and when. If you're n
 #### What?
 
 -   Modpack authors can add to the existing game's branding to help distinguish it from other modpacks on the same Minecraft version
-    -   Window title can either be customised manually or set to auto-detect based on how it's named in the launcher the game was started from. Or no custom window title at all if prefered (this'll keep the Vanilla one).
-    -   Same with the custom icon
+    -   Window title can either be customised with a static string or to include placeholders such as "%autoName" to auto-detect based on how it's named in the launcher the game was started from. Or no custom window title at all if prefered (this'll keep the Vanilla one).
+    -   Same with the custom icon - can either be:
+        - Static icon based on a PNG file
+        - Dynamic icon auto-detected by a supported launcher
+        - Vanilla icon (no custom icon)
 
 #### Where?
 
 -   Handled in `client.ClientModEvents#clientInit` (`FMLClientSetupEvent`)
 -   Has calls to:
     -   `ClientConfig` to grab config values related to branding customisation
-    -   `LauncherUtils#detectLauncher()` to get the launcher used to start the game
-    -   `LauncherUtils#getTechnicPackName()` to get the Technic pack slug's displayName
-    -   `LauncherUtils#getMultiMCInstanceName()` to get the MultiMC instance's user-friendly name
-    -   `LauncherUtils#getCurseClientProfileName()` to get the Curse Client profile's name
-    -   `LauncherUtils#getTechnicPackIcon()` to get the Technic pack slug's icon
-    -   `LauncherUtils#getMultiMCInstanceIcon()` to get the MultiMC instance's icon
+    -   `LauncherUtils#getDetectedLauncher()` to get the launcher used to start the game
+    -   `DetectedLauncher#getModpackDisplayName()` to get the modpack's user-friendly display name
+    -   `DetectedLauncher#getModpackIcon()` to get the modpack's icon
     -   `ClientUtils#setWindowIcon()` to set the custom window icon
--   Uses enums from:
-    -   `LauncherUtils.LauncherName` (e.g. CurseClient, Technic, MultiMC, etc...)
+-   Uses classes that implement the following interfaces:
+    -   `DetectedLauncher` (implemented by `CurseClient`, `Technic`, `MultiMC`, etc...)
 
 #### Q&A:
 
--   How does `LauncherUtils#detectLauncher()` work?
+-   How does `LauncherUtils#getDetectedLauncher()` work?
     -   Each launcher lays out the directory structure differently and manages isolating separate Minecraft installs in their own way.
     -   itlt uses this to detect what launcher started the game. For example, the Technic Launcher stores modpacks in a dedicated "modpacks" folder, MultiMC puts `mmc-pack.json` and `instance.cfg` files inside the install's `.minecraft` folder, and so on...
     -   If there's a better way of doing this I'd love to know. Checking the existance of stuff on file system isn't ideal.
--   What does `LauncherUtils#getTechnicPackName()` do?
+    -   Once it has determined the launcher, it returns a new instance of the relevant launcher class that implements `client.launchers.DetectedLauncher`
+        - Launcher classes that don't support a feature yet (such as getting the modpack's icon) should `return null` on the appropriate methods and itlt should handle it gracefully
+        - The use of instancing and implementing an interface with a bunch of classes helps reduce the amount of logic code in this case as we don't need to check what launcher we're running on before running launcher-specific modpack display name detection code.
+-   What does `Technic#getModpackDisplayName()` do?
     -   It parses the Technic Launcher's `cache.json` file for our packSlug and grabs the value associated to the `displayName` key
--   What does `LauncherUtils#getMultiMCInstanceName()` do?
+-   What does `MultiMC#getModpackDisplayName()` do?
     -   It parses the MultiMC `instance.cfg` file in the root `.minecraft` folder we're running from and grabs the value associated to the `name` key
--   What does `LauncherUtils#getCurseClientProfileName()` do?
+-   What does `CurseClient#getModpackDisplayName()` do?
     -   It parses the `.minecraftinstance.json` and grabs the value associated to the `name` key
+-   What's the inheritance model and how does it work in this case?
+    -   `LauncherUtils#getDetectedLauncher()` returns a new instance of a class that implements DetectedLauncher.
+    -   Said class `@Override`s relevant methods
+    -   itlt does calls on your methods as it gets returned a `DetectedLauncher` type and knows what methods to call
 
 #### How do I...
 
 -   Add detection for another/new launcher?
     1. Determine what's unique about how the launcher organises modpacks
-    2. Add a new enum to `LauncherUtils.LauncherName`
-    3. Add detection code to `LauncherUtils#detectLauncher()` and return your LauncherName enum added in step 2 if detected
+    2. Create a new class in `client.launchers` that `implements DetectedLauncher`
+    3. Make `getModpackDisplayName()` and `getModpackIcon()` both `return null` and annotate them with `@Nullable` and `@Override` until you implement that functionality
+    3. Add detection code to `LauncherUtils#getDetectedLauncher()` and return your launcher class added in step 2 if detected
 -   Support custom window title auto-detection on an existing launcher?
     1. Determine how the launcher stores the friendly display name for the currently running modpack
-    2. Implement it as a new method in `LauncherUtils` with the name `get(launcherName)(whateverTheyCallMCInstalls)Name()` that returns a `String`
-        - For example, MultiMC calls different installs of the game "instances", so we name the method `getMultiMCInstanceName()`
-        - For example, Technic Launcher calls different installs of the game "packs", so we name the method `getTechnicPackName()`
-    3. Add a new case to the `switch (detectedLauncher)` statement inside the `ClientConfig.enableUsingAutodetectedDisplayName.get()` if block and call your method, assigning its result to the `customWindowTitle` variable
+    2. Implement `getModpackDisplayName()` in the existing launcher class you're interested in, found in `client.launchers` (e.g. `client.launchers.MultiMC`).
+        - If you return null, itlt should fallback to `ClientConfig.autoDetectedDisplayNameFallback.get()`
 -   Support custom window title auto-detection on a new launcher?
     -   First add detection for the new launcher, then follow the instructions for doing it on an existing launcher
 -   Support custom icon auto-detection on an existing launcher?
     1. Determine how the launcher stores the icon for the currently running modpack
-    2. Implement it as a new method in `LauncherUtils` with the name `get(launcherName)(whateverTheyCallMCInstalls)Icon()` that returns a `File`
-        - For example, MultiMC calls different installs of the game "instances", so we name the method `getMultiMCInstanceIcon()`
-    3. Add a new case to the `switch (detectedLauncher)` statement inside the `ClientConfig.enableUsingAutodetectedIcon.get()` if block and call your method, assigning its result to the `autoDetectedIcon` variable
+    2. Implement `getModpackIcon()` in the existing launcher class you're interested in, found in `client.launchers` (e.g. `client.launchers.Technic`).
+        - If you return null, itlt should fallback to the file at `config\itlt\icon.png`. If that's also missing, it'll log a warning and carry on with the Vanilla icon
 -   Support custom icon auto-detection on a new launcher?
     -   First add detection for the new launcher, then follow the instructions for doing it on an existing launcher
 
@@ -189,9 +194,6 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ### Things left to-do with the existing code
 
--   Investigate organising the LauncherUtils better
-    -   `new DetectedLauncher().getFriendlyName()`?
-    -   `LauncherUtils.MultiMC.getFriendlyName()` and have `LauncherUtils.MultiMC` implement `LauncherUtils.DetectedLauncher`?
 -   Redo the anti-cheat stuff
     -   It works, but there's lots of signs of me trying to get it all to work and trying new concepts in-place rather than in isolation. The whole thing could do with a cleanup really
     -   Measure if there's actually a performance benefit for using BLAKE3-JNI instead of the pure Java implementation or if the overhead of JNI and the benefits of JVM's JIT narrows the gap. If there isn't much perf benefit then removing it from being shadowed would be good.
@@ -210,3 +212,9 @@ See the warnings feature brief for details on which to use and when. If you're n
     -   Show a GUI before the game has finished loading if jars have a file name ending in ".optional" (i.e. "modid.optional.jar" or "modid.optional.jar.disabled") and toggle the ".disabled" file extension before mod loading depending on the user's preference on first launch
     -   Add a client-side command, menu button or at least a config option for users to toggle so they can get the optional mods prompt again if they change their mind about any of their selection
     -   Be smart enough to also enable dependencies for optional mods when needed
+-   Server list menu system
+    - When joining a server that also has itlt and has this feature configured, instead of joining into a world on a hub server, show another screen similar to the server list but with a list of servers offered by said hub server
+    - The idea is that you can bypass a server's hub world and quickly join any of the servers through a multiplayer server list-like menu rather than running around a hub world
+    - Server hub replies with a json of IPs and Names on join and kicks player. Client renders and shows a separate multiplayer server list containing only the entries from the server hub's json with a button to go back to the main server list
+-   Support Java build numbers (e.g. Java 8u51, Java 8u200, etc...)
+-   Support Vanilla's window title changing depending on what you're doing (e.g. "Minecraft 1.16.5 (Multiplayer)" when you click Multiplayer). Currently it's static and stays the same from when you first start the game.

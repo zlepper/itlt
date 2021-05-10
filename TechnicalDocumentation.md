@@ -15,23 +15,23 @@
 
 ## Contents
 
--   [Introduction](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#introduction)
--   [Main classes](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#main-classes)
--   [Features](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#features)
-    -   [Java environment warnings and requirements system](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#java-environment-warnings-and-requirements-system)
-        -   [What?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#what)
-        -   [Where?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#where)
-        -   [Q&A](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#qa)
-        -   [How do I...](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#how-do-i)
-    -   [Branding customisation](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#branding-customisation)
-        -   [What?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#what-1)
-        -   [Where?](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#where-1)
-        -   [Q&A](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#qa-1)
-        -   [How do I...](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#how-do-i-1)
--   [To-do lists](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#to-do-lists)
-    -   [Things I still need to document here](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#things-i-still-need-to-document-here)
-    -   [Things left to-do with the existing code](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#things-left-to-do-with-the-existing-code)
-    -   [New features to consider adding later](https://github.com/zlepper/itlt/blob/1.16-2.0-rewrite/TechnicalDocumentation.md#new-features-to-consider-adding-later)
+-   [Introduction](#introduction)
+-   [Main classes](#main-classes)
+-   [Features](#features)
+    -   [Java environment warnings and requirements system](#java-environment-warnings-and-requirements-system)
+        -   [What?](#what)
+        -   [Where?](#where)
+        -   [Q&A](#qa)
+        -   [How do I...](#how-do-i)
+    -   [Branding customisation](#branding-customisation)
+        -   [What?](#what-1)
+        -   [Where?](#where-1)
+        -   [Q&A](#qa-1)
+        -   [How do I...](#how-do-i-1)
+-   [To-do lists](#to-do-lists)
+    -   [Things I still need to document here](#things-i-still-need-to-document-here)
+    -   [Things left to-do with the existing code](#things-left-to-do-with-the-existing-code)
+    -   [New features to consider adding later](#new-features-to-consider-adding-later)
 
 ## Introduction
 
@@ -70,12 +70,13 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   Handled in `client.ClientModEvents#commonInit` (`FMLCommonSetupEvent`)
 -   Has calls to:
     -   `ClientUtils#getJavaVersion()` to get normalised Java version (e.g. 1.8 -> 8, but 11 is still -> 11)
-    -   `LauncherUtils#detectLauncher()` to get the launcher used to start the game
+    -   `LauncherUtils#getDetectedLauncher()` to get the launcher used to start the game
     -   `ClientConfig` to grab config values related to the requirements and warnings system
     -   `ClientUtils#startUIProcess()` to show pop-ups as needed
 -   Uses enums from:
     -   `client.helpers.Message.Content` (e.g. NeedsNewerJava, WantsNewerJava, NeedsLessMemory, etc...)
-    -   `LauncherUtils.LauncherName` (e.g. CurseClient, Technic, MultiMC, etc...)
+-   Uses classes that implement the following interfaces:
+    -   `DetectedLauncher` (implemented by `CurseClient`, `Technic`, `MultiMC`, etc...)
 
 #### Q&A:
 
@@ -93,6 +94,10 @@ See the warnings feature brief for details on which to use and when. If you're n
     -   It uses the arguments fed to it to determine which pop-up window GUI to make with Swing
     -   If it detects it's on Windows, it tries some reflection to make it use the correct Windows iconography rather than an outdated one embedded inside the JDK in order to make the GUI look nicer and more native, with a graceful fallback
     -   Warning preferences (such as remembering "Don't warn about this again") are handled by `client.helpers.WarningPreferences` which `Main.java` `ClientUtils#startUIProcess()`
+-   Why start a new Java process for showing the UI rather than calling `Main.java` directly?
+    - LWJGL and AWT (which Swing is based on) do not play nice together on the same thread.
+    - MacOS requires both to be on the first thread of a process to work properly.
+    - Having the UI on a separate process allows the UI to persist after the game is stopped (needed for the requirements feature)
 -   What does `WarningPreferences.java` do?
     -   It's a wrapper around `java.util.Properties` with support for booleans and creating the file if not already present
 -   Why are the `isJava64bit` warning and requirements handled in `client.ClientModEvents#clientInit` (`FMLClientSetupEvent`) separate from all the rest?

@@ -158,7 +158,7 @@ public final class ClientConfig {
                                     " Whether or not to run explicit GC when navigating one of the following opaque",
                                     " background screens: Singleplayer world selection, Multiplayer server selection,",
                                     " Resource Pack selection, Language selection, Chat options, controls options,",
-                                    " accessibility options, realms main screen and stats menu.",
+                                    " accessibility options, Realms main screen and stats menu.",
                                     " ",
                                     " Mainly useful to disable for speedruns that start the timer when the main menu is shown.",
                                     " ",
@@ -398,9 +398,9 @@ public final class ClientConfig {
                                     " The URL of the guide you want users to visit when they want to change their memory",
                                     " allocation settings.",
                                     " ",
-                                    "Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect",
+                                    " Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect",
                                     " ",
-                                    "Note: The URL must start with \"https://\" for security reasons.")
+                                    " Note: The URL must start with \"https://\" for security reasons.")
                             .define("customMemoryAllocGuideURL", "https://ozli.ga");
                 } clientConfigBuilder.pop();
 
@@ -568,6 +568,7 @@ public final class ClientConfig {
                 enableCustomIcon = clientConfigBuilder
                         .comment(" ",
                                 " Enable this if you want to change the window icon of the Minecraft window.",
+                                " ",
                                 " Note: The icon needs to be placed in config" + File.separator + "itlt" + File.separator + "icon.png.",
                                 " ",
                                 " Note: For best results, use a square PNG with one of these sizes: 128x128, 96x96, ",
@@ -593,15 +594,24 @@ public final class ClientConfig {
         // Server list section
         clientConfigBuilder.push("ServerList"); {
             enableCustomServerListEntries = clientConfigBuilder
-                    .comment(" No comment yet") // todo
+                    .comment(" ",
+                            " Enable this to have itlt add default servers to the Multiplayer list from a JSON file.",
+                            " ",
+                            " Note: The JSON needs to be placed in config" + File.separator + "itlt" + File.separator + "servers.json",
+                            " ",
+                            " Warning: This feature is experimental and may change in future v2.x releases. Check the",
+                            " changelog before updating if you use this. The changelog will make any breaking changes",
+                            " to this feature clear. If there's no mention of this feature in the changelog, rest assured",
+                            " you can update without needing to make any changes to your servers.json.",
+                            " ")
                     .define("enableCustomServerListEntries", false);
-        } clientConfigBuilder.pop();
+        } clientConfigBuilder.pop(); // end of Server list section
 
         // Build the config
         clientConfig = clientConfigBuilder.build();
     }
 
-    public static void loadConfig(ForgeConfigSpec spec, final Path path) {
+    public static void loadConfig(final ForgeConfigSpec spec, final Path path) {
         final CommentedFileConfig configData = CommentedFileConfig.builder(path)
                 .sync()
                 .autosave()

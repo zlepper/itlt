@@ -58,9 +58,12 @@ public class ClientModEvents {
             ClientUtils.startUIProcess(Message.Content.NeedsNewerJava);
         } else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get()) {
             if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
-                if (!detectedLauncher.supportsChangingJavaVersion())
+                if (!detectedLauncher.supportsChangingJavaVersion()) {
                     itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
+                    itlt.LOGGER.info("If you are seeing this and your launcher does allow it, update itlt.");
+                    itlt.LOGGER.info("If already up-to-date, let us know by filing an issue on itlt's Github issues");
+                }
                 else ClientUtils.startUIProcess(Message.Content.WantsNewerJava);
             } else {
                 ClientUtils.startUIProcess(Message.Content.WantsNewerJava);
@@ -74,9 +77,12 @@ public class ClientModEvents {
             ClientUtils.startUIProcess(Message.Content.NeedsOlderJava);
         } else if (ClientConfig.enableMaxJavaVerWarning.get() && javaVerInt > ClientConfig.warnMaxJavaVersion.get()) {
             if (ClientConfig.selectivelyIgnoreMaxJavaVerWarning.get()) {
-                if (!detectedLauncher.supportsChangingJavaVersion())
+                if (!detectedLauncher.supportsChangingJavaVersion()) {
                     itlt.LOGGER.info("Skipping maxJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
+                    itlt.LOGGER.info("If you are seeing this and your launcher does allow it, update itlt.");
+                    itlt.LOGGER.info("If already up-to-date, let us know by filing an issue on itlt's Github issues");
+                }
                 else ClientUtils.startUIProcess(Message.Content.WantsOlderJava);
             } else {
                 ClientUtils.startUIProcess(Message.Content.WantsOlderJava);
@@ -145,8 +151,7 @@ public class ClientModEvents {
             if (itltDir != null) customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
 
             if (ClientConfig.enableUsingAutodetectedIcon.get()) {
-                final File autoDetectedIcon;
-                autoDetectedIcon = detectedLauncher.getModpackIcon();
+                final File autoDetectedIcon = detectedLauncher.getModpackIcon();
                 if (autoDetectedIcon != null) customIcon = autoDetectedIcon;
             }
 
@@ -162,42 +167,47 @@ public class ClientModEvents {
         }
 
         // Custom server list entries
-        // todo: revisit this at another time to simplify and cleanup the code
         if (ClientConfig.enableCustomServerListEntries.get()) {
             final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
 
-            if (itltDir.exists()) {
-                final Path customServersJsonPath = Paths.get(itltDir.getAbsolutePath(), "servers.json");
-                if (customServersJsonPath.toFile().exists()) {
-                    String customServersJson = null;
-                    try {
-                        customServersJson = new String(Files.readAllBytes(customServersJsonPath));
-                    } catch (final IOException e) {
-                        itlt.LOGGER.error("Unable to read the contents of " + customServersJsonPath);
-                        e.printStackTrace();
-                    }
-
-                    if (customServersJson != null) {
-                        ClientUtils.CustomServerData[] featuredList = new Gson().fromJson(customServersJson, ClientUtils.CustomServerData[].class);
-                        if (featuredList != null) {
-                            ServerList serverList = new ServerList(mcInstance);
-                            for (ClientUtils.CustomServerData customServerEntry : featuredList) {
-                                ServerData servertoAdd = new ServerData(customServerEntry.name, customServerEntry.IP, false);
-                                if (customServerEntry.forceResourcePack != null && customServerEntry.forceResourcePack)
-                                    servertoAdd.setResourceMode(ServerData.ServerResourceMode.ENABLED);
-                                if (!ClientUtils.alreadyInServerList(servertoAdd, serverList)) {
-                                    itlt.LOGGER.info("Adding custom server entry");
-                                    serverList.addServerData(servertoAdd);
-                                    serverList.saveServerList();
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
+            if (!itltDir.exists()) {
                 itlt.LOGGER.warn("itlt folder in the config folder is missing.");
                 if (itltDir.mkdir()) itlt.LOGGER.info("The folder has been successfully created for you.");
                 else itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
+                return;
+            }
+
+            final Path customServersJsonPath = Paths.get(itltDir.getAbsolutePath(), "servers.json");
+            final File customServersJsonFile = customServersJsonPath.toFile();
+            if (!customServersJsonFile.exists() || customServersJsonFile.isDirectory()) {
+                itlt.LOGGER.warn("enableCustomServerListEntries is true but servers.json is missing or invalid.");
+                return;
+            }
+
+            try {
+                // read the file
+                final String customServersJson = ClientUtils.readString(customServersJsonPath);
+
+                // parse it into an array of CustomServerData classes
+                final ClientUtils.CustomServerData[] featuredList = new Gson().fromJson(customServersJson, ClientUtils.CustomServerData[].class);
+                if (featuredList != null) {
+                    final ServerList serverList = new ServerList(mcInstance);
+
+                    for (final ClientUtils.CustomServerData customServerEntry : featuredList) {
+                        final ServerData serverToAdd = new ServerData(customServerEntry.name, customServerEntry.address, false);
+                        if (customServerEntry.forceResourcePack)
+                            serverToAdd.setResourceMode(ServerData.ServerResourceMode.ENABLED);
+
+                        if (!ClientUtils.alreadyInServerList(serverToAdd, serverList)) {
+                            itlt.LOGGER.info("Adding custom server entry");
+                            serverList.addServerData(serverToAdd);
+                            serverList.saveServerList();
+                        }
+                    }
+                }
+            } catch (final IOException e) {
+                itlt.LOGGER.error("Unable to read the contents of " + customServersJsonPath);
+                e.printStackTrace();
             }
         }
     }

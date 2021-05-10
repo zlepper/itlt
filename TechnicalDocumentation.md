@@ -204,8 +204,9 @@ See the warnings feature brief for details on which to use and when. If you're n
     -   Measure if there's actually a performance benefit for using BLAKE3-JNI instead of the pure Java implementation or if the overhead of JNI and the benefits of JVM's JIT narrows the gap. If there isn't much perf benefit then removing it from being shadowed would be good.
 -   HIGH PRIORITY: Cleanup the icon resizing stuff
     -   Look into using `client.helpers.IconLoader` instead of shadowing in the Scalr library
--   Revisit the custom server list entries feature
 -   logo.png referenced in mods.toml but not shown in mods menu yet
+-   Write up website guides and make them the warning system defaults rather than pointing to the placeholder "https://ozli.ga"
+-   Verify guide URLs in the config and actually make sure they start with "https://"
 
 ### New features to consider adding later
 
@@ -222,4 +223,5 @@ See the warnings feature brief for details on which to use and when. If you're n
     - The idea is that you can bypass a server's hub world and quickly join any of the servers through a multiplayer server list-like menu rather than running around a hub world
     - Server hub replies with a json of IPs and Names on join and kicks player. Client renders and shows a separate multiplayer server list containing only the entries from the server hub's json with a button to go back to the main server list
 -   Support Java build numbers (e.g. Java 8u51, Java 8u200, etc...)
--   Support Vanilla's window title changing depending on what you're doing (e.g. "Minecraft 1.16.5 (Multiplayer)" when you click Multiplayer). Currently it's static and stays the same from when you first start the game.
+-   Support Vanilla's window title changing depending on what you're doing (e.g. "Minecraft 1.16.5 (Multiplayer)" when you click Multiplayer). Currently it's static and stays the same as when you first start the game.
+-   Anti-piracy feature (detect and block known pirated launchers by default)

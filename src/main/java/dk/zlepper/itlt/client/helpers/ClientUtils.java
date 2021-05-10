@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -36,8 +37,8 @@ public class ClientUtils {
     }
 
     public static class CustomServerData {
-        public String name, IP;
-        public Boolean forceResourcePack;
+        public String name, address;
+        public boolean forceResourcePack;
     }
 
     public static boolean alreadyInServerList(final ServerData server, final ServerList list) {
@@ -109,7 +110,7 @@ public class ClientUtils {
 
     public static ByteArrayInputStream convertToInputStream(final BufferedImage bufferedImage) throws IOException {
         // convert BufferedImage to ByteArrayOutputStream without a double copy behind the scenes, only for our
-        // specific use-case. https://stackoverflow.com/a/12253091/3944931
+        // specific use-case. https://stackoverflow.com/a/12253091/3944931 (warning: unsafe - not suitable for all use-cases!)
         final ByteArrayOutputStream output = new ByteArrayOutputStream() {
             @Override
             public synchronized byte[] toByteArray() {
@@ -274,5 +275,20 @@ public class ClientUtils {
                 System.exit(1);
             }
         }
+    }
+
+    /**
+     * Use Java 11's more efficient Files.readString() if available with a fallback to `new String(Files.readAllBytes(path))`
+     */
+    @SuppressWarnings("Since15") // technically Since11 but IntelliJ doesn't recognise that
+    public static String readString(final Path path) throws IOException {
+        // If you're a dev getting a build error here, build with JDK 11+ and set the language level to 8. In IntelliJ
+        // you can do this by going to File -> Project Structure and setting the SDK to 11 and the language level to 8.
+
+        // If you're still having trouble, make sure Gradle is using the Project SDK at Gradle -> Spanner -> Gradle Settings
+        // As long as the lang level is still 8 it'll run fine on Java 8 - you just need 11+ javac to build
+
+        if (getJavaVersion() >= 11) return Files.readString(path);
+        else return new String(Files.readAllBytes(path));
     }
 }

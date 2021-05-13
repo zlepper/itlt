@@ -122,6 +122,7 @@ repositories {
         content { includeGroup "curse.maven" }
     }
     mavenCentral()
+    maven { url = "https://repository.mulesoft.org/nexus/content/repositories/public/" }
 }
 
 dependencies {
@@ -135,6 +136,10 @@ dependencies {
     // itlt uses the "Imgscalr" library to easily resize icons as needed while preserving their original aspect ratios
     implementation "org.imgscalr:imgscalr-lib:4.2"
     shade "org.imgscalr:imgscalr-lib:4.2"
+
+    // itlt uses the "Image4j" library to read .ico files
+    implementation "com.github.imcdonagh:image4j:0.7.2"
+    shade "com.github.imcdonagh:image4j:0.7.2"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

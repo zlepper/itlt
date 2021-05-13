@@ -60,7 +60,8 @@ public final class ClientConfig {
             customJavaUpgradeGuideURL,
             customJavaDowngradeGuideURL,
             customMemoryAllocGuideURL,
-            autoDetectedDisplayNameFallback;
+            autoDetectedDisplayNameFallback,
+            configVersion;
 
     public static ForgeConfigSpec.ConfigValue<Double>
             reqMinMemoryAmountInGB,
@@ -606,6 +607,15 @@ public final class ClientConfig {
                             " ")
                     .define("enableCustomServerListEntries", false);
         } clientConfigBuilder.pop(); // end of Server list section
+
+        // Internal section
+        clientConfigBuilder.push("Internal"); {
+            configVersion = clientConfigBuilder
+                    .comment(" ",
+                            " The version of itlt that created this config file. Intended to be used for migrating",
+                            " config changes when you update the mod. Please don't touch this, this is for itlt itself to change.")
+                    .define("configVersion", "2.0.0");
+        } clientConfigBuilder.pop();
 
         // Build the config
         clientConfig = clientConfigBuilder.build();

@@ -13,15 +13,25 @@ import net.minecraftforge.fml.ModList;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
+import net.sf.image4j.codec.ico.ICODecoder;
 import org.imgscalr.Scalr;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.system.MemoryStack;
 
 import javax.imageio.ImageIO;
+
+import static net.sf.image4j.codec.ico.ICODecoder.read;
 
 public class ClientUtils {
 
@@ -55,6 +65,57 @@ public class ClientUtils {
         }
 
         return false;
+    }
+
+    public static void setWindowIconNew(final File inputIconFile, final Minecraft mcInstance) throws IOException {
+        // load all of the images inside the `.ico` file as a list of `BufferedImage`s
+        final List<BufferedImage> bufferedImageList = ICODecoder.read(inputIconFile);
+
+        // convert from List<BufferedImage> to List<InputStream> and filter out invalid image types
+        final List<InputStream> iconsList = new ArrayList<>();
+        for (final BufferedImage bufferedImage : bufferedImageList) {
+            final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            // only convert icons that are 8bit per channel, non-premultiplied RGBA as that's what GLFW expects
+            // icons that aren't converted are not included in the List<InputStream>
+            if (bufferedImage.getType() == BufferedImage.TYPE_INT_ARGB) {
+                ImageIO.write(bufferedImage, "png", outStream);
+                iconsList.add(new ByteArrayInputStream(outStream.toByteArray()));
+                outStream.close();
+            }
+        }
+
+        final MemoryStack memoryStack = MemoryStack.stackPush();
+        final GLFWImage.Buffer buffer = GLFWImage.mallocStack(iconsList.size(), memoryStack);
+
+        final IntBuffer intBufferX = memoryStack.mallocInt(1);
+        final IntBuffer intBufferY = memoryStack.mallocInt(1);
+        final IntBuffer intBufferChannels = memoryStack.mallocInt(1);
+
+        int iconCounter = 0;
+        int errorCounter = 0;
+        // load each icon in the iconsList and append it to the GLFWImage.Buffer, keeping track of any errors that
+        // may occur when trying to load each icon
+        for (final InputStream inStream : iconsList) {
+            final ByteBuffer byteBuffer = mcInstance.getMainWindow().loadIcon(inStream, intBufferX, intBufferY, intBufferChannels);
+            if (byteBuffer == null) {
+                errorCounter++;
+                continue;
+            }
+            buffer.position(iconCounter);
+            buffer.width(intBufferX.get(0));
+            buffer.height(intBufferY.get(0));
+            buffer.pixels(byteBuffer);
+            iconCounter++;
+        }
+
+        if (errorCounter == iconsList.size()) {
+            // if there was an error loading all of the icons inside the .ico, throw an error and don't try setting the
+            // window icon as an empty buffer
+            throw new IOException("Unable to load icon(s)");
+        } else {
+            buffer.position(0);
+            GLFW.glfwSetWindowIcon(mcInstance.getMainWindow().handle, buffer);
+        }
     }
 
     public static void setWindowIcon(final File inputIconFile, final Minecraft mcInstance) throws IOException {

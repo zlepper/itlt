@@ -1,5 +1,6 @@
 package dk.zlepper.itlt;
 
+import com.sun.jna.Platform;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.client.helpers.WarningPreferences;
 
@@ -64,7 +65,7 @@ public final class Main {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
             // Manually detect Windows and use modern icons for it
-            if (System.getProperty("os.name").startsWith("Windows")) {
+            if (Platform.isWindows()) {
                 infoIcon = getWindowsSystemIcon("imageres", 81, 32);
                 warningIcon = getWindowsSystemIcon("imageres", 84, 32);
                 errorIcon = getWindowsSystemIcon("imageres", 98, 32);

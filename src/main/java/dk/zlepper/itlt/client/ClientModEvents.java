@@ -148,7 +148,8 @@ public class ClientModEvents {
         if (ClientConfig.enableCustomIcon.get()) {
             File customIcon = null;
 
-            if (itltDir != null) customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
+            //if (itltDir != null) customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
+            if (itltDir != null) customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.ico").toFile();
 
             if (ClientConfig.enableUsingAutodetectedIcon.get()) {
                 final File autoDetectedIcon = detectedLauncher.getModpackIcon();
@@ -157,7 +158,8 @@ public class ClientModEvents {
 
             if (customIcon != null && customIcon.exists() && !customIcon.isDirectory()) {
                 try {
-                    ClientUtils.setWindowIcon(customIcon, mcInstance);
+                    //ClientUtils.setWindowIcon(customIcon, mcInstance);
+                    ClientUtils.setWindowIconNew(customIcon, mcInstance);
                 } catch (final IOException e) {
                     itlt.LOGGER.error("Unable to set the window icon.");
                     e.printStackTrace();

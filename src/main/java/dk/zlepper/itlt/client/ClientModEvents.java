@@ -11,6 +11,8 @@ import net.minecraft.client.Minecraft;
 
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
+import net.minecraft.resources.ResourcePackType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,6 +23,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -144,28 +147,50 @@ public class ClientModEvents {
             if (!customWindowTitle.isEmpty()) mcInstance.getMainWindow().func_230148_b_(customWindowTitle);
         }
 
+        // Enhanced window icon
+        if (ClientConfig.enableEnhancedVanillaIcon.get()) {
+            try {
+                final InputStream enhancedIcon = mcInstance.getPackFinder().getVanillaPack()
+                        .getResourceStream(ResourcePackType.CLIENT_RESOURCES, new ResourceLocation("icons/minecraft.icns"));
+                ClientUtils.setWindowIcon(enhancedIcon, mcInstance, itltDir, "icns");
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         // Custom window icon
         if (ClientConfig.enableCustomIcon.get()) {
             File customIcon = null;
 
-            //if (itltDir != null) customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
-            if (itltDir != null) customIcon = Paths.get(itltDir.getAbsolutePath(), "icon.ico").toFile();
+            // check if an icon file exists in the itltDir and use it if it does, prioritising
+            // ico over icns and icns over png
+            if (itltDir != null) {
+                final File icoIcon = Paths.get(itltDir.getAbsolutePath(), "icon.ico").toFile();
+                final File icnsIcon = Paths.get(itltDir.getAbsolutePath(), "icon.icns").toFile();
+                final File pngIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
 
-            if (ClientConfig.enableUsingAutodetectedIcon.get()) {
-                final File autoDetectedIcon = detectedLauncher.getModpackIcon();
-                if (autoDetectedIcon != null) customIcon = autoDetectedIcon;
+                if (icoIcon.exists() && !icoIcon.isDirectory()) customIcon = icoIcon;
+                else if (icnsIcon.exists() && !icnsIcon.isDirectory()) customIcon = icnsIcon;
+                else if (pngIcon.exists() && !pngIcon.isDirectory()) customIcon = pngIcon;
             }
 
-            if (customIcon != null && customIcon.exists() && !customIcon.isDirectory()) {
+            // prioritise the auto-detected modpack icon if available
+            if (ClientConfig.enableUsingAutodetectedIcon.get()) {
+                final File autoDetectedIcon = detectedLauncher.getModpackIcon();
+                if (autoDetectedIcon != null && autoDetectedIcon.exists() && !autoDetectedIcon.isDirectory())
+                    customIcon = autoDetectedIcon;
+            }
+
+            if (customIcon != null) {
                 try {
-                    //ClientUtils.setWindowIcon(customIcon, mcInstance);
-                    ClientUtils.setWindowIconNew(customIcon, mcInstance);
+                    ClientUtils.setWindowIcon(customIcon, mcInstance);
                 } catch (final IOException e) {
                     itlt.LOGGER.error("Unable to set the window icon.");
                     e.printStackTrace();
                 }
+            } else {
+                itlt.LOGGER.warn("enableCustomIcon is true but icon.png is missing or invalid.");
             }
-            else itlt.LOGGER.warn("enableCustomIcon is true but icon.png is missing or invalid.");
         }
 
         // Custom server list entries

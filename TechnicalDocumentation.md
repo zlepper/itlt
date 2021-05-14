@@ -207,6 +207,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   logo.png referenced in mods.toml but not shown in mods menu yet
 -   Write up website guides and make them the warning system defaults rather than pointing to the placeholder "https://ozli.ga"
 -   Verify guide URLs in the config and actually make sure they start with "https://"
+-   Update mods.toml description and maybe add updateChecker support, too
 
 ### New features to consider adding later
 

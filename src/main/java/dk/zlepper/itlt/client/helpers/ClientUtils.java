@@ -1,5 +1,8 @@
 package dk.zlepper.itlt.client.helpers;
 
+import com.github.gino0631.icns.IcnsIcons;
+import com.github.gino0631.icns.IcnsParser;
+import com.github.gino0631.icns.IcnsType;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import dk.zlepper.itlt.client.ClientConfig;
@@ -16,20 +19,22 @@ import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.image4j.codec.ico.ICODecoder;
-import org.imgscalr.Scalr;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import javax.swing.*;
 
 import static net.sf.image4j.codec.ico.ICODecoder.read;
 
@@ -67,21 +72,61 @@ public class ClientUtils {
         return false;
     }
 
-    public static void setWindowIconNew(final File inputIconFile, final Minecraft mcInstance) throws IOException {
-        // load all of the images inside the `.ico` file as a list of `BufferedImage`s
-        final List<BufferedImage> bufferedImageList = ICODecoder.read(inputIconFile);
+    public static void setWindowIcon(final InputStream inputIconInStream, final Minecraft mcInstance,
+                                     final File itltDir, final String fileExtension) throws IOException {
+        // write the InputStream to a temporary file
+        Files.copy(inputIconInStream, Paths.get(itltDir.getAbsolutePath(), "temp." + fileExtension), StandardCopyOption.REPLACE_EXISTING);
+        final File tmpIconFile = new File(itltDir.getAbsolutePath(), "temp." + fileExtension);
 
-        // convert from List<BufferedImage> to List<InputStream> and filter out invalid image types
+        // use the temporary file to set the window icon
+        setWindowIcon(tmpIconFile, mcInstance);
+
+        // delete the temporary file now that we're done with it, if unable then delete it once the game quits
+        if (!tmpIconFile.delete()) tmpIconFile.deleteOnExit();
+    }
+
+    public static void setWindowIcon(final File inputIconFile, final Minecraft mcInstance) throws IOException {
         final List<InputStream> iconsList = new ArrayList<>();
-        for (final BufferedImage bufferedImage : bufferedImageList) {
-            final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            // only convert icons that are 8bit per channel, non-premultiplied RGBA as that's what GLFW expects
-            // icons that aren't converted are not included in the List<InputStream>
-            if (bufferedImage.getType() == BufferedImage.TYPE_INT_ARGB) {
-                ImageIO.write(bufferedImage, "png", outStream);
-                iconsList.add(new ByteArrayInputStream(outStream.toByteArray()));
-                outStream.close();
+
+        final String inputIconFilenameAndExt = inputIconFile.getName().toLowerCase();
+        if (inputIconFilenameAndExt.endsWith(".ico")) {
+            // load all of the images inside the `.ico` file as a list of `BufferedImage`s
+            final List<BufferedImage> bufferedImageList = ICODecoder.read(inputIconFile);
+
+            // convert from List<BufferedImage> to List<InputStream> and filter out invalid image types
+            for (final BufferedImage bufferedImage : bufferedImageList) {
+                final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                // only convert icons that are 8bit per channel, non-premultiplied RGBA as that's what GLFW expects.
+                // icons that aren't converted are not included in the List<InputStream>
+                if (bufferedImage.getType() == BufferedImage.TYPE_INT_ARGB) {
+                    ImageIO.write(bufferedImage, "png", outStream);
+                    iconsList.add(new ByteArrayInputStream(outStream.toByteArray()));
+                    outStream.close();
+                }
             }
+        } else if (inputIconFilenameAndExt.endsWith(".icns")) {
+            // load all of the images inside the `.icns` file directly as a list of `InputStream`s
+            for (final IcnsIcons.Entry entry : IcnsIcons.load(inputIconFile.toPath()).getEntries()) {
+                itlt.LOGGER.debug("---");
+                itlt.LOGGER.debug("Entry: " + entry);
+                itlt.LOGGER.debug("Type: " + entry.getType());
+                itlt.LOGGER.debug("OSType: " + entry.getOsType());
+                //if (!entry.getType().hasMask())
+                final IcnsType entryType = entry.getType();
+                if (entryType == IcnsType.ICNS_128x128_JPEG_PNG_IMAGE || entryType == IcnsType.ICNS_128x128_2X_JPEG_PNG_IMAGE ||
+                        entryType == IcnsType.ICNS_256x256_JPEG_PNG_IMAGE || entryType == IcnsType.ICNS_256x256_2X_JPEG_PNG_IMAGE ||
+                        entryType == IcnsType.ICNS_32x32_JPEG_PNG_IMAGE || entryType == IcnsType.ICNS_32x32_2X_JPEG_PNG_IMAGE ||
+                        entryType == IcnsType.ICNS_16x16_JPEG_PNG_IMAGE || entryType == IcnsType.ICNS_16x16_2X_JPEG_PNG_IMAGE ||
+                        entryType == IcnsType.ICNS_64x64_JPEG_PNG_IMAGE ) {
+                    iconsList.add(entry.newInputStream());
+                } else if (!entry.getType().hasMask()) {
+                    // todo: convert to a PNG before adding
+                    //itlt.LOGGER.debug("imageIO type: " + ImageIO.read(entry.newInputStream()).getType());
+                }
+            }
+        } else if (inputIconFilenameAndExt.endsWith(".png")) {
+            // load the `.png` file directly as an `InputStream`
+            iconsList.add(new FileInputStream(inputIconFile));
         }
 
         final MemoryStack memoryStack = MemoryStack.stackPush();
@@ -91,10 +136,10 @@ public class ClientUtils {
         final IntBuffer intBufferY = memoryStack.mallocInt(1);
         final IntBuffer intBufferChannels = memoryStack.mallocInt(1);
 
-        int iconCounter = 0;
-        int errorCounter = 0;
         // load each icon in the iconsList and append it to the GLFWImage.Buffer, keeping track of any errors that
         // may occur when trying to load each icon
+        short iconCounter = 0;
+        short errorCounter = 0;
         for (final InputStream inStream : iconsList) {
             final ByteBuffer byteBuffer = mcInstance.getMainWindow().loadIcon(inStream, intBufferX, intBufferY, intBufferChannels);
             if (byteBuffer == null) {
@@ -110,7 +155,7 @@ public class ClientUtils {
 
         if (errorCounter == iconsList.size()) {
             // if there was an error loading all of the icons inside the .ico, throw an error and don't try setting the
-            // window icon as an empty buffer
+            // window icon as an empty buffer.
             throw new IOException("Unable to load icon(s)");
         } else {
             buffer.position(0);
@@ -118,6 +163,7 @@ public class ClientUtils {
         }
     }
 
+    /*
     public static void setWindowIcon(final File inputIconFile, final Minecraft mcInstance) throws IOException {
         final BufferedImage inputIcon = ImageIO.read(inputIconFile);
 
@@ -137,6 +183,7 @@ public class ClientUtils {
          * note that the resizing should maintain the existing aspect ratios - a weird 16:9 icon will still look like
          * 16:9 but in a square file and be visually small as a result
          */
+    /*
         final BufferedImage resizedLarge;
         if ((inputWidth == 128 && inputHeight == 128) || (inputWidth == 96 && inputHeight == 96) ||
             (inputWidth == 64 && inputHeight == 64)   || (inputWidth == 48 && inputHeight == 48) ||
@@ -168,6 +215,7 @@ public class ClientUtils {
 
         mcInstance.getMainWindow().setWindowIcon(convertToInputStream(resizedSmall), convertToInputStream(resizedLarge));
     }
+    */
 
     public static ByteArrayInputStream convertToInputStream(final BufferedImage bufferedImage) throws IOException {
         // convert BufferedImage to ByteArrayOutputStream without a double copy behind the scenes, only for our

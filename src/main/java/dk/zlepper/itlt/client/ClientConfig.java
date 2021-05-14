@@ -46,6 +46,7 @@ public final class ClientConfig {
             selectivelyIgnoreMaxJavaVerWarning,
             enableCustomWindowTitle,
             enableUsingAutodetectedDisplayName,
+            enableEnhancedVanillaIcon,
             enableCustomIcon,
             enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
@@ -87,7 +88,7 @@ public final class ClientConfig {
     @Nullable
     public static File makeItltFolderIfNeeded() {
         final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
-        if (!itltDir.exists() && (enableCustomIcon.get() || areAnyWarningsEnabled()) && !itltDir.mkdir()) {
+        if (!itltDir.exists() && (enableCustomIcon.get() || enableEnhancedVanillaIcon.get() || areAnyWarningsEnabled()) && !itltDir.mkdir()) {
             itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
             return null;
         }
@@ -566,6 +567,14 @@ public final class ClientConfig {
 
             // Display.Icon
             clientConfigBuilder.push("Icon"); {
+                enableEnhancedVanillaIcon = clientConfigBuilder
+                        .comment(" ",
+                                " Enable this if you want itlt to use its HiDPI-aware (aka Retina support) icon setting",
+                                " feature with the Vanilla game icon, obtained directly from the game's resources.",
+                                " ",
+                                " Turning this on should give you a more crisp and detailed icon on higher resolution displays,",
+                                " rather than the comparatively blurry 32px PNG that is normally used.")
+                        .define("enableEnhancedVanillaIcon", true);
                 enableCustomIcon = clientConfigBuilder
                         .comment(" ",
                                 " Enable this if you want to change the window icon of the Minecraft window.",
@@ -574,6 +583,8 @@ public final class ClientConfig {
                                 " ",
                                 " Note: For best results, use a square PNG with one of these sizes: 128x128, 96x96, ",
                                 " 64x64, 48x48, 32x32, 24x24, 16x16.",
+                                " ",
+                                " Note: This will override the enableEnhancedVanillaIcon when a valid custom icon is found.",
                                 " ",
                                 " Warning: Icon sizes beyond 128px squared or non-square icons may result in a poor ",
                                 " quality image on some operating systems as well as wasting storage space and bandwidth.")

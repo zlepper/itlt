@@ -2,10 +2,14 @@ buildscript {
     repositories {
         maven { url = "https://maven.minecraftforge.net" }
         maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
+        mavenCentral()
+        maven { url = "https://maven.google.com/" }
     }
     dependencies {
         classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.1.+", changing: true
         classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
+        //classpath 'net.sf.proguard:proguard-gradle:6.2.2'
+        classpath 'com.guardsquare:proguard-gradle:7.1.0-beta3'
     }
 }
 plugins {
@@ -133,13 +137,13 @@ dependencies {
     compile "org.spongepowered:mixin:0.8.2"
     annotationProcessor "org.spongepowered:mixin:0.8.2:processor"
 
-    // itlt uses the "Imgscalr" library to easily resize icons as needed while preserving their original aspect ratios
-    implementation "org.imgscalr:imgscalr-lib:4.2"
-    shade "org.imgscalr:imgscalr-lib:4.2"
-
-    // itlt uses the "Image4j" library to read .ico files
+    // itlt uses the "image4j" library to read .ico files
     implementation "com.github.imcdonagh:image4j:0.7.2"
     shade "com.github.imcdonagh:image4j:0.7.2"
+
+    // itlt uses the "ICNS Core" library to read .icns files
+    implementation "com.github.gino0631:icns-core:1.1"
+    shade "com.github.gino0631:icns-core:1.1"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -160,7 +164,7 @@ jar {
 }
 
 shadowJar {
-    archiveClassifier.set("")
+    archiveClassifier.set("fat")
     configurations = [project.configurations.shade]
     relocate "lib.group", "${project.group}.shadow.lib.group" // ensure repackaged packages have unique names
 }
@@ -171,6 +175,43 @@ reobf {
 
 tasks.build.dependsOn reobfShadowJar
 jar.finalizedBy("reobfShadowJar")
+//jar.finalizedBy("shrinkJar")
+
+task pgShrinkJar(type: proguard.gradle.ProGuardTask, dependsOn: reobfShadowJar) {
+    ext {
+        inputJar = file("${buildDir}/libs/${archivesBaseName}-${version}-fat.jar")
+        outDir = file("${buildDir}/libs/proguard")
+        shrunkJar = "${outDir}/${jar.archiveBaseName}.jar"
+        config = "proguard.pro"
+    }
+    inputs.file inputJar
+    inputs.file config
+
+    outDir.mkdirs()
+
+    injars inputJar
+    outjars shrunkJar
+    libraryjars configurations.compile
+
+    // Automatically handle the Java version of this build.
+    if (System.getProperty('java.version').startsWith('1.')) {
+        // Before Java 9, the runtime classes were packaged in a single jar file.
+        libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+    } else {
+        // As of Java 9, the runtime classes are packaged in modular jmod files.
+        libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.getProperty('java.home')}/jmods/java.desktop.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.getProperty('java.home')}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.getProperty('java.home')}/jmods/jdk.unsupported.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    }
+
+    configuration config
+}
+
+task shrinkJar(type: Jar, dependsOn: pgShrinkJar) {
+    archiveClassifier.set("shrunk")
+    from zipTree(pgShrinkJar.shrunkJar)
+}
 
 mixin {
     add sourceSets.main, "itlt.refmap.json"

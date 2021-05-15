@@ -2,14 +2,10 @@ buildscript {
     repositories {
         maven { url = "https://maven.minecraftforge.net" }
         maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
-        mavenCentral()
-        maven { url = "https://maven.google.com/" }
     }
     dependencies {
         classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.1.+", changing: true
         classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
-        //classpath 'net.sf.proguard:proguard-gradle:6.2.2'
-        classpath 'com.guardsquare:proguard-gradle:7.1.0-beta3'
     }
 }
 plugins {
@@ -133,85 +129,89 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then "net.minecraft" it is assumed
     // that the dep is a ForgeGradle "patcher" dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft "net.minecraftforge:forge:1.16.5-36.1.16"
-    compile "org.spongepowered:mixin:0.8.2"
+    minecraft "net.minecraftforge:forge:1.16.5-36.1.18"
+    implementation "org.spongepowered:mixin:0.8.2"
     annotationProcessor "org.spongepowered:mixin:0.8.2:processor"
 
     // itlt uses the "image4j" library to read .ico files
     implementation "com.github.imcdonagh:image4j:0.7.2"
     shade "com.github.imcdonagh:image4j:0.7.2"
 
-    // itlt uses the "ICNS Core" library to read .icns files
-    implementation "com.github.gino0631:icns-core:1.1"
-    shade "com.github.gino0631:icns-core:1.1"
+    // itlt uses the "Apache Commons Imaging" library to read .icns files
+    /*implementation "org.apache.commons:commons-imaging:1.0-alpha2"
+    shade "org.apache.commons:commons-imaging:1.0-alpha2"*/
+    // due to it being such a big library and not supporting class removal, I've made a single method return null,
+    // removed jpeg, tiff, examples and tests and then compiled it. This fork supports removing classes for formats we
+    // don't use, therefore allowing us to drastically reduce the shrunk jar's filesize
+    implementation files("thirdPartyLibs/commons-imaging-1.0-alpha2-custom.jar")
+    shade files("thirdPartyLibs/commons-imaging-1.0-alpha2-custom.jar")
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
-jar {
-    manifest {
+ext {
+    MANIFEST = manifest {
         attributes([
-            "Specification-Title": "itlt",
-            "Specification-Vendor": "Paint_Ninja",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": project.version,
-            "Implementation-Vendor" : "Paint_Ninja",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs": "itlt.mixins.json",
-            "Main-Class": "dk.zlepper.itlt.Main" // so that the popup code works
+                "Specification-Title": "itlt",
+                "Specification-Vendor": "Paint_Ninja",
+                "Specification-Version": "1", // We are version 1 of ourselves
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+                "Implementation-Vendor" : "Paint_Ninja",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "MixinConfigs": "itlt.mixins.json",
+                "Main-Class": "dk.zlepper.itlt.Main" // so that the pop-up window code works
         ])
     }
 }
 
+jar {
+    manifest.from(MANIFEST)
+}
+
 shadowJar {
-    archiveClassifier.set("fat")
+    archiveClassifier.set("")
     configurations = [project.configurations.shade]
-    relocate "lib.group", "${project.group}.shadow.lib.group" // ensure repackaged packages have unique names
+
+    // Apache Commons Imaging needs to be put somewhere else to prevent a NoClassDefFoundError
+    relocate "org.apache.commons.imaging", "${project.group}.shadow.org.apache.commons.imaging"
+
+    manifest.from(MANIFEST)
 }
 
 reobf {
     shadowJar { }
 }
 
-tasks.build.dependsOn reobfShadowJar
-jar.finalizedBy("reobfShadowJar")
-//jar.finalizedBy("shrinkJar")
-
-task pgShrinkJar(type: proguard.gradle.ProGuardTask, dependsOn: reobfShadowJar) {
+task shrinkJar(type: Jar, dependsOn: reobfShadowJar) {
     ext {
-        inputJar = file("${buildDir}/libs/${archivesBaseName}-${version}-fat.jar")
-        outDir = file("${buildDir}/libs/proguard")
-        shrunkJar = "${outDir}/${jar.archiveBaseName}.jar"
-        config = "proguard.pro"
+        inputJar = file("${buildDir}/libs/${archivesBaseName}-${version}.jar")
+        shadowGroup = project.group.replace('.','/') + "/shadow"
+        apacheImagingFormats = "${shadowGroup}/org/apache/commons/imaging/formats"
+        apacheImaging = "${shadowGroup}/org/apache/commons/imaging"
     }
-    inputs.file inputJar
-    inputs.file config
-
-    outDir.mkdirs()
-
-    injars inputJar
-    outjars shrunkJar
-    libraryjars configurations.compile
-
-    // Automatically handle the Java version of this build.
-    if (System.getProperty('java.version').startsWith('1.')) {
-        // Before Java 9, the runtime classes were packaged in a single jar file.
-        libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-    } else {
-        // As of Java 9, the runtime classes are packaged in modular jmod files.
-        libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.getProperty('java.home')}/jmods/java.desktop.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.getProperty('java.home')}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.getProperty('java.home')}/jmods/jdk.unsupported.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-    }
-
-    configuration config
-}
-
-task shrinkJar(type: Jar, dependsOn: pgShrinkJar) {
     archiveClassifier.set("shrunk")
-    from zipTree(pgShrinkJar.shrunkJar)
+    from zipTree(inputJar)
+    exclude "net/sf/image4j/example/**", "net/sf/image4j/test/**"
+
+    exclude "${apacheImaging}/formats/gif/**", "${apacheImaging}/formats/psd/**", "${apacheImaging}/formats/rgbe/**"
+    exclude "${apacheImaging}/formats/xbm/**", "${apacheImaging}/formats/xpm/**", "${apacheImaging}/formats/pnm/**"
+    exclude "${apacheImaging}/formats/pcx/**", "${apacheImaging}/formats/dcx/**", "${apacheImaging}/formats/png/**"
+    exclude "${apacheImaging}/formats/bmp/**", "${apacheImaging}/formats/wbmp/**", "${apacheImaging}/formats/ico/**"
+
+    exclude "${apacheImaging}/common/itu_t4/**", "${apacheImaging}/common/mylzw/**", "${apacheImaging}/common/BasicCParser**"
+    exclude "${apacheImaging}/common/RationalNumber**", "${apacheImaging}/common/GenericImageMetadata**"
+    exclude "${apacheImaging}/common/ZlibDeflate**", "${apacheImaging}/common/PackBits**", "${apacheImaging}/icc/**"
+    exclude "${apacheImaging}/palette/**", "${apacheImaging}/color/**", "${apacheImaging}/ImageDump**"
+    exclude "${apacheImaging}/ColorTools**", "${apacheImaging}/internal/**"
+
+    exclude "META-INF/LICENSE.txt", "META-INF/NOTICE.txt"
+
+    manifest.from(MANIFEST)
 }
+
+//tasks.build.dependsOn reobfShadowJar
+//jar.finalizedBy("reobfShadowJar")
+tasks.build.dependsOn shrinkJar
+jar.finalizedBy("shrinkJar")
 
 mixin {
     add sourceSets.main, "itlt.refmap.json"

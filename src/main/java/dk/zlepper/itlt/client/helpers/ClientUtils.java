@@ -1,8 +1,5 @@
 package dk.zlepper.itlt.client.helpers;
 
-import com.github.gino0631.icns.IcnsIcons;
-import com.github.gino0631.icns.IcnsParser;
-import com.github.gino0631.icns.IcnsType;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import dk.zlepper.itlt.client.ClientConfig;
@@ -22,21 +19,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.image4j.codec.ico.ICODecoder;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.formats.icns.IcnsImageParser;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-import javax.swing.*;
-
-import static net.sf.image4j.codec.ico.ICODecoder.read;
 
 public class ClientUtils {
 
@@ -87,47 +80,45 @@ public class ClientUtils {
 
     public static void setWindowIcon(final File inputIconFile, final Minecraft mcInstance) throws IOException {
         final List<InputStream> iconsList = new ArrayList<>();
+        List<BufferedImage> bufferedImageList = new ArrayList<>(0);
 
         final String inputIconFilenameAndExt = inputIconFile.getName().toLowerCase();
         if (inputIconFilenameAndExt.endsWith(".ico")) {
             // load all of the images inside the `.ico` file as a list of `BufferedImage`s
-            final List<BufferedImage> bufferedImageList = ICODecoder.read(inputIconFile);
-
-            // convert from List<BufferedImage> to List<InputStream> and filter out invalid image types
-            for (final BufferedImage bufferedImage : bufferedImageList) {
-                final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                // only convert icons that are 8bit per channel, non-premultiplied RGBA as that's what GLFW expects.
-                // icons that aren't converted are not included in the List<InputStream>
-                if (bufferedImage.getType() == BufferedImage.TYPE_INT_ARGB) {
-                    ImageIO.write(bufferedImage, "png", outStream);
-                    iconsList.add(new ByteArrayInputStream(outStream.toByteArray()));
-                    outStream.close();
-                }
-            }
+            bufferedImageList = ICODecoder.read(inputIconFile);
         } else if (inputIconFilenameAndExt.endsWith(".icns")) {
-            // load all of the images inside the `.icns` file directly as a list of `InputStream`s
-            for (final IcnsIcons.Entry entry : IcnsIcons.load(inputIconFile.toPath()).getEntries()) {
-                itlt.LOGGER.debug("---");
-                itlt.LOGGER.debug("Entry: " + entry);
-                itlt.LOGGER.debug("Type: " + entry.getType());
-                itlt.LOGGER.debug("OSType: " + entry.getOsType());
-                //if (!entry.getType().hasMask())
-                final IcnsType entryType = entry.getType();
-                if (entryType == IcnsType.ICNS_128x128_JPEG_PNG_IMAGE || entryType == IcnsType.ICNS_128x128_2X_JPEG_PNG_IMAGE ||
-                        entryType == IcnsType.ICNS_256x256_JPEG_PNG_IMAGE || entryType == IcnsType.ICNS_256x256_2X_JPEG_PNG_IMAGE ||
-                        entryType == IcnsType.ICNS_32x32_JPEG_PNG_IMAGE || entryType == IcnsType.ICNS_32x32_2X_JPEG_PNG_IMAGE ||
-                        entryType == IcnsType.ICNS_16x16_JPEG_PNG_IMAGE || entryType == IcnsType.ICNS_16x16_2X_JPEG_PNG_IMAGE ||
-                        entryType == IcnsType.ICNS_64x64_JPEG_PNG_IMAGE ) {
-                    iconsList.add(entry.newInputStream());
-                } else if (!entry.getType().hasMask()) {
-                    // todo: convert to a PNG before adding
-                    //itlt.LOGGER.debug("imageIO type: " + ImageIO.read(entry.newInputStream()).getType());
-                }
+            // try to load all of the images inside the `.icns` file as a list of `BufferedImage`s
+            try {
+                bufferedImageList = new IcnsImageParser().getAllBufferedImages(inputIconFile);
+            } catch (final ImageReadException e) {
+                e.printStackTrace();
+                return;
             }
         } else if (inputIconFilenameAndExt.endsWith(".png")) {
             // load the `.png` file directly as an `InputStream`
             iconsList.add(new FileInputStream(inputIconFile));
         }
+
+        if (inputIconFilenameAndExt.endsWith(".ico") || inputIconFilenameAndExt.endsWith(".icns")) {
+            // convert from List<BufferedImage> to List<InputStream> and filter out invalid image types
+            for (final BufferedImage bufferedImage : bufferedImageList) {
+                itlt.LOGGER.debug("---");
+                itlt.LOGGER.debug("Type: " + bufferedImage.getType());
+                itlt.LOGGER.debug("Width: " + bufferedImage.getWidth());
+                itlt.LOGGER.debug("Height: " + bufferedImage.getHeight());
+
+                // only convert icons that are 8bit per channel, non-premultiplied RGBA as that's what GLFW expects.
+                // icons that aren't converted are not included in the List<InputStream>
+                if (bufferedImage.getType() == BufferedImage.TYPE_INT_ARGB) {
+                    iconsList.add(convertToInputStream(bufferedImage));
+                    itlt.LOGGER.debug("Added embedded image");
+                } else {
+                    itlt.LOGGER.debug("Skipped embedded image");
+                }
+            }
+        }
+
+        itlt.LOGGER.debug("Final iconsList size: " + iconsList.size());
 
         final MemoryStack memoryStack = MemoryStack.stackPush();
         final GLFWImage.Buffer buffer = GLFWImage.mallocStack(iconsList.size(), memoryStack);
@@ -163,63 +154,11 @@ public class ClientUtils {
         }
     }
 
-    /*
-    public static void setWindowIcon(final File inputIconFile, final Minecraft mcInstance) throws IOException {
-        final BufferedImage inputIcon = ImageIO.read(inputIconFile);
-
-        // make the 16x16 icon
-        final BufferedImage resizedSmall = Scalr.resize(inputIcon, 16, 16);
-
-        final int inputWidth = inputIcon.getWidth();
-        final int inputHeight = inputIcon.getHeight();
-
-        /* this ensures that icons are the right size, resizing to the middle of a boundary if necessary
-         * here's some examples...
-         * - a 28x31 icon would be resized to 32x32 as the longest side (31px in this case) is between 24 and 48
-         * - a 64x64 icon would be used directly as it's already a valid size and aspect ratio
-         * - a 48x32 icon would be resized to 48x48 as its longest side (48px) is between 32 and 64
-         * - a 140x100 icon would be resized to 128x128 as one of its sides is over 128px
-         * - a tiny 12x12 icon would be resized to 16x16 as both sides are under 16px
-         * note that the resizing should maintain the existing aspect ratios - a weird 16:9 icon will still look like
-         * 16:9 but in a square file and be visually small as a result
-         */
-    /*
-        final BufferedImage resizedLarge;
-        if ((inputWidth == 128 && inputHeight == 128) || (inputWidth == 96 && inputHeight == 96) ||
-            (inputWidth == 64 && inputHeight == 64)   || (inputWidth == 48 && inputHeight == 48) ||
-            (inputWidth == 32 && inputHeight == 32)   || (inputWidth == 24 && inputHeight == 24) ||
-            (inputWidth == 16 && inputHeight == 16)) {
-            // if the icon is already a valid size and aspect ratio, use it directly without resizing
-            resizedLarge = inputIcon;
-        } else if (inputWidth > 128 || inputHeight > 128)
-            // one of the sides are too big, resize to 128px²
-            resizedLarge = Scalr.resize(inputIcon, 128, 128);
-        else if ((inputWidth > 64 && inputWidth < 128) || (inputHeight > 64 && inputHeight < 128))
-            // if a side is between 64 and 128px, resize to 96px²
-            resizedLarge = Scalr.resize(inputIcon, 96, 96);
-        else if ((inputWidth > 48 && inputWidth < 96) || (inputHeight > 48 && inputHeight < 96))
-            // if a side is between 48 and 96px, resize to 64px²
-            resizedLarge = Scalr.resize(inputIcon, 64, 64);
-        else if ((inputWidth > 32 && inputWidth < 64) || (inputHeight > 32 && inputHeight < 64))
-            // etc...
-            resizedLarge = Scalr.resize(inputIcon, 48, 48);
-        else if ((inputWidth > 24 && inputWidth < 48) || (inputHeight > 24 && inputHeight < 48))
-            resizedLarge = Scalr.resize(inputIcon, 32, 32);
-        else if ((inputWidth > 16 && inputWidth < 32) || (inputHeight > 16 && inputHeight < 32))
-            resizedLarge = Scalr.resize(inputIcon, 24, 24);
-        else
-            // if both sides are <=16px, resize to 16px²
-            resizedLarge = Scalr.resize(inputIcon, 16, 16);
-
-        inputIcon.flush();
-
-        mcInstance.getMainWindow().setWindowIcon(convertToInputStream(resizedSmall), convertToInputStream(resizedLarge));
-    }
-    */
-
     public static ByteArrayInputStream convertToInputStream(final BufferedImage bufferedImage) throws IOException {
         // convert BufferedImage to ByteArrayOutputStream without a double copy behind the scenes, only for our
-        // specific use-case. https://stackoverflow.com/a/12253091/3944931 (warning: unsafe - not suitable for all use-cases!)
+        // specific use-case. This is faster and more efficient, but can be problematic when performing other operations
+        // on the same instance of a ByteArrayOutputStream or BufferedImage.
+        // https://stackoverflow.com/a/12253091/3944931 (warning: unsafe - not suitable for all use-cases!)
         final ByteArrayOutputStream output = new ByteArrayOutputStream() {
             @Override
             public synchronized byte[] toByteArray() {

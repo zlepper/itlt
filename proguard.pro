@@ -1,3 +1,0 @@
--dontoptimize
--dontobfuscate
--keepclasseswithmembers class *

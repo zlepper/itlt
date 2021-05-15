@@ -202,12 +202,13 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   Redo the anti-cheat stuff
     -   It works, but there's lots of signs of me trying to get it all to work and trying new concepts in-place rather than in isolation. The whole thing could do with a cleanup really
     -   Measure if there's actually a performance benefit for using BLAKE3-JNI instead of the pure Java implementation or if the overhead of JNI and the benefits of JVM's JIT narrows the gap. If there isn't much perf benefit then removing it from being shadowed would be good.
--   HIGH PRIORITY: Cleanup the icon resizing stuff
-    -   Look into using `client.helpers.IconLoader` instead of shadowing in the Scalr library
 -   logo.png referenced in mods.toml but not shown in mods menu yet
 -   Write up website guides and make them the warning system defaults rather than pointing to the placeholder "https://ozli.ga"
 -   Verify guide URLs in the config and actually make sure they start with "https://"
 -   Update mods.toml description and maybe add updateChecker support, too
+
+-   Fix crash on launch when running the jar directly due to the use of JNA's `Platform.isWindows()` library method
+-   `FMLNetworkConstants.IGNORESERVERONLY` thingy so it doesn't show servers without the mod as incompatible, should be a simple copy & paste from the v1 branch
 
 ### New features to consider adding later
 

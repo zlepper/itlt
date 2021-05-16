@@ -1,7 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = "https://maven.minecraftforge.net" }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
@@ -11,14 +10,11 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "1.11.x-1.0.2"
+version = "1.11.x-1.0.3"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
-sourceCompatibility = targetCompatibility = "1.6" // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = "1.6"
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = "1.7" // Need this here so eclipse task generates correctly.
 
 minecraft {
     version = "1.11-13.19.1.2199"

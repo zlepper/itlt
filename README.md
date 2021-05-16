@@ -21,14 +21,14 @@ https://www.curseforge.com/minecraft/mc-mods/its-the-little-things
 | master (you're here)                                                      | 1.16.x            | v1          | ForgeGradle 3, Gradle 4.9                                                |
 | [1.15](https://github.com/zlepper/itlt/tree/1.15)                         | 1.15.2            | v1          | ForgeGradle 3, Gradle 4.9                                                |
 | [1.14](https://github.com/zlepper/itlt/tree/1.14)                         | 1.14.x            | v1          | ForgeGradle 3, Gradle 4.10.3                                             |
-| [1.12](https://github.com/zlepper/itlt/tree/1.12)                         | 1.12.2            | v1          | ForgeGradle 3, Gradle 4.9                                                |
-| [1.11](https://github.com/zlepper/itlt/tree/1.11)                         | 1.11.x            | v1          | ForgeGradle 2.2, Gradle 2.14                                             |
-| [1.10](https://github.com/zlepper/itlt/tree/1.10)                         | 1.10.x            | v1          | ForgeGradle 2.2, Gradle 2.7                                              |
-| [1.9.4](https://github.com/zlepper/itlt/tree/1.9.4)                       | 1.9.4             | v1          | ForgeGradle 2.2, Gradle 2.7                                              |
-| [1.9](https://github.com/zlepper/itlt/tree/1.9)                           | 1.9.0             | v1          | ForgeGradle 2.1, Gradle 2.7                                              |
-| [1.8.9](https://github.com/zlepper/itlt/tree/1.8.9)                       | 1.8.9             | v1          | ForgeGradle 2.1, Gradle 2.7                                              |
-| [1.8](https://github.com/zlepper/itlt/tree/1.8)                           | 1.8.0             | v1          | ForgeGradle 2.0.2, Gradle 2.7                                            |
-| [1.7](https://github.com/zlepper/itlt/tree/1.7)                           | 1.7.10            | v1          | ForgeGradle 1.2, Gradle 2.6                                              |
+| [1.12](https://github.com/zlepper/itlt/tree/1.12)                         | 1.12.2            | v1          | ForgeGradle 4.1, Gradle 6.9                                                |
+| [1.11](https://github.com/zlepper/itlt/tree/1.11)                         | 1.11.x            | v1          | ForgeGradle 2.2.1, Gradle 4.10.3                                         |
+| [1.10](https://github.com/zlepper/itlt/tree/1.10)                         | 1.10.x            | v1          | ForgeGradle 2.2.1, Gradle 4.10.3                                         |
+| [1.9.4](https://github.com/zlepper/itlt/tree/1.9.4)                       | 1.9.4             | v1          | ForgeGradle 2.2.1, Gradle 4.10.3                                         |
+| [1.9](https://github.com/zlepper/itlt/tree/1.9)                           | 1.9.0             | v1          | ForgeGradle 2.1.1, Gradle 4.10.3                                         |
+| [1.8.9](https://github.com/zlepper/itlt/tree/1.8.9)                       | 1.8.9             | v1          | ForgeGradle 2.1.1, Gradle 4.10.3                                         |
+| [1.8](https://github.com/zlepper/itlt/tree/1.8)                           | 1.8.0             | v1          | ForgeGradle 2.0-SNAPSHOT-aa67375, Gradle 4.7                             |
+| [1.7](https://github.com/zlepper/itlt/tree/1.7)                           | 1.7.10            | v1          | ForgeGradle 1.2.1, Gradle 4.4.1                                          |
 | [1.6](https://github.com/zlepper/itlt/tree/1.6)                           | 1.6.x             | v1          | ForgeGradle 1.0, Gradle 3.0                                              |
 | [1.5](https://github.com/zlepper/itlt/tree/1.5)                           | 1.5.x             | v1          | Forge Src 7.8.1.738(?) + MCP 7.51 scripts + Manual labour, Python 2.7.3  |
 | [1.4.6/1.4.7](https://github.com/zlepper/itlt/tree/1.4.6/1.4.7)           | 1.4.6 and 1.4.7   | v1          | Forge Src 6.6.2.534(?) + MCP 7.26a scripts + Manual labour, Python 2.7.3 |

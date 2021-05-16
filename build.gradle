@@ -21,8 +21,7 @@ version = "1.7.10-1.0.3"
 group= "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = "1.7"
 
 minecraft {
     version = "1.7.10-10.13.4.1558-1.7.10"

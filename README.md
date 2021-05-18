@@ -4,7 +4,7 @@
 
 ## About itlt
 
-It's the little things, the little finishing touches to your modpack. :)
+It's the little things that make all the difference, the finishing touches to your modpack. :)
 
 ### 📂 Download
 

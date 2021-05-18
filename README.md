@@ -1,6 +1,6 @@
 ![It's the little things logo](docs/logo/inverted-transparent/logo-long-inverted-transparent.png)
 
-# [![](http://cf.way2muchnoise.eu/full_its-the-little-things_downloads.svg)](http://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](https://cf.way2muchnoise.eu/versions/Available%20for%20MC_its-the-little-things_all.svg)](http://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
+# [![](http://cf.way2muchnoise.eu/full_its-the-little-things_downloads.svg)](http://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](http://cf.way2muchnoise.eu/versions/Available%20for%20MC_its-the-little-things_all.svg)](http://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
 
 ## About itlt
 

@@ -1,3 +1,5 @@
+![itlt](docs/logo/inverted-transparent/logo-rectangle-inverted-transparent.png)
+
 # Technical documentation
 
 ## Terminology
@@ -32,6 +34,9 @@
     -   [Things I still need to document here](#things-i-still-need-to-document-here)
     -   [Things left to-do with the existing code](#things-left-to-do-with-the-existing-code)
     -   [New features to consider adding later](#new-features-to-consider-adding-later)
+-   [Troubleshooting](#troubleshooting)
+    -   [Compiled file doesn't work on Java 8 or unable to build](#compiled-file-doesnt-work-on-java-8-or-unable-to-build)
+    -   [Unable to start Gradle](#unable-to-start-gradle)
 
 ## Introduction
 
@@ -199,9 +204,6 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ### Things left to-do with the existing code
 
--   Redo the anti-cheat stuff
-    -   It works, but there's lots of signs of me trying to get it all to work and trying new concepts in-place rather than in isolation. The whole thing could do with a cleanup really
-    -   Measure if there's actually a performance benefit for using BLAKE3-JNI instead of the pure Java implementation or if the overhead of JNI and the benefits of JVM's JIT narrows the gap. If there isn't much perf benefit then removing it from being shadowed would be good.
 -   logo.png referenced in mods.toml but not shown in mods menu yet
 -   Write up website guides and make them the warning system defaults rather than pointing to the placeholder "https://ozli.ga"
 -   Verify guide URLs in the config and actually make sure they start with "https://"
@@ -224,6 +226,25 @@ See the warnings feature brief for details on which to use and when. If you're n
     - When joining a server that also has itlt and has this feature configured, instead of joining into a world on a hub server, show another screen similar to the server list but with a list of servers offered by said hub server
     - The idea is that you can bypass a server's hub world and quickly join any of the servers through a multiplayer server list-like menu rather than running around a hub world
     - Server hub replies with a json of IPs and Names on join and kicks player. Client renders and shows a separate multiplayer server list containing only the entries from the server hub's json with a button to go back to the main server list
--   Support Java build numbers (e.g. Java 8u51, Java 8u200, etc...)
+-   Support Java 8 build number detection and requirements/warnings/etc (e.g. Java 8u51, Java 8u200, etc...)
 -   Support Vanilla's window title changing depending on what you're doing (e.g. "Minecraft 1.16.5 (Multiplayer)" when you click Multiplayer). Currently it's static and stays the same as when you first start the game.
 -   Anti-piracy feature (detect and block known pirated launchers by default)
+-   Redo the anti-cheat stuff
+    -   It works, but there's lots of signs of me trying to get it all to work and trying new concepts in-place rather than in isolation. The whole thing could do with a cleanup really
+    -   Measure if there's actually a performance benefit for using BLAKE3-JNI instead of the pure Java implementation or if the overhead of JNI and the benefits of JVM's JIT narrows the gap. If there isn't much perf benefit then removing it from being shadowed would be good.
+
+## Troubleshooting
+
+### Compiled file doesn't work on Java 8 or unable to build
+
+Make sure you set the project SDK to 11 and the language level to 8. It's important that you set both correctly, otherwise you may end up accidentally building a jar that only runs on Java 11+!
+
+In IntelliJ, you can do this by going to `File -> Project Structure`. It should look like this:
+![Screenshot showing what to change in the project structure window](docs/project-structure.png)
+
+### Unable to start Gradle
+
+Run Gradle with Java 8 to 15 inclusive. Using Java 16 isn't supported yet but is being worked on with ForgeGradle 5. I'll update the buildscript to ForgeGradle 5 and Gradle 7 once available.
+
+In IntelliJ, you can do this by going to `File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` and set the Gradle JVM to "Project SDK", which should be version 11 from the previous troubleshooting step. It should look like this:
+![Screenshot showing what to change in the project gradle settings window](docs/gradlew-settings.png)

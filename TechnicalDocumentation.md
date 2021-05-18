@@ -209,7 +209,6 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   Verify guide URLs in the config and actually make sure they start with "https://"
 -   Update mods.toml description and maybe add updateChecker support, too
 
--   Fix crash on launch when running the jar directly due to the use of JNA's `Platform.isWindows()` library method
 
 ### New features to consider adding later
 

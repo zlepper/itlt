@@ -1,7 +1,5 @@
 package dk.zlepper.itlt.client.helpers;
 
-import com.sun.jna.Platform;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;

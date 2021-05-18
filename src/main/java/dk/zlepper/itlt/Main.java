@@ -1,7 +1,7 @@
 package dk.zlepper.itlt;
 
-import com.sun.jna.Platform;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
+import dk.zlepper.itlt.client.helpers.Platform;
 import dk.zlepper.itlt.client.helpers.WarningPreferences;
 
 import javax.annotation.Nullable;

@@ -1,43 +1,46 @@
-![It's the little things logo](docs/logo/inverted-transparent/logo-long-inverted-transparent.png)
+[![It's the little things logo](docs/logo/inverted-transparent/logo-long-inverted-transparent.png)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things)
 
-# [![](http://cf.way2muchnoise.eu/full_its-the-little-things_downloads.svg)](http://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](https://cf.way2muchnoise.eu/versions/Available%20for%20MC_its-the-little-things_all.svg)](http://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
+[![](http://cf.way2muchnoise.eu/full_its-the-little-things_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](http://cf.way2muchnoise.eu/versions/Available%20for%20MC_its-the-little-things_all.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
 
 ## About itlt
 
 It's the little things, the little finishing touches to your modpack. :)
 
-### Download
+### 📂 Download
 
 Available for download at CurseForge: https://www.curseforge.com/minecraft/mc-mods/its-the-little-things
 
 ## Players and modpack authors
 
-### Help
+### ❓ Help
 
 If you need help using or troubleshooting itlt, you can open a support ticket by [clicking here](https://github.com/zlepper/itlt/issues/new?labels=help&template=3_user-help.md)
 
-### Problems and bugs
+### 🐛 Problems and bugs
 
 If you're having a problem with itlt crashing or being buggy, please [file a new bug report](https://github.com/zlepper/itlt/issues/new?labels=bug&template=1_bug_report.md) and I'll look into it.
 
-### Suggestions
+### 💡 Suggestions
 
 If you have an idea or suggestion for itlt, I'd love to hear it!
 
 Check out [this issues page](https://github.com/zlepper/itlt/issues?q=is%3Aissue+is%3Aopen+label%3Asuggestion) to see if it's already been suggested and leave a thumbs up on things you would like to see implemented. To make a new suggestion, [click here](https://github.com/zlepper/itlt/issues/new?labels=suggestion&template=2_suggestion.md).
 
-## Contributors and developers
+## 🛠 Contributors and developers
 
 Please refer to the [Technical Documentation](TechnicalDocumentation.md) - it provides a technical overview, troubleshooting, to-do lists and various details about how stuff works and how to add or change stuff.
 
-### Help
+### ❓ Help
 
 If you need a hand working with itlt, ping me (@Paint_Ninja) in **#squirrels** on [Forgecord](https://discord.gg/UvedJ9m). Remember to bare their rules in mind. Alternatively, [open a dev support ticket](https://github.com/PaintNinja/issue-template-test/issues/new?labels=dev+help&template=4_dev_help.md) and I'll get back to you when I can.
 
-### Notes
+### 📝 Notes
 
 -   All branches are actively maintained, but don't worry! For contributing, you only need to submit a PR to one branch (of your choice) and I'll handle porting to the rest after merging your PR.
 -   If you want to add support for a Minecraft version that doesn't already have a branch, open a dev support ticket and I'll make the branch for you so you can make your PR.
+-   There are two versions of this mod
+    -   v2 which is the latest version that has being rewritten from the ground up. All work on new features is being done in v2.
+    -   v1 is the original mod which has been backported to legacy Minecraft versions and gets maintained with minor bugfixes and changes.
 
 ### Branches
 

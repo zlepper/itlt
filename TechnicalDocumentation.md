@@ -210,7 +210,6 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   Update mods.toml description and maybe add updateChecker support, too
 
 -   Fix crash on launch when running the jar directly due to the use of JNA's `Platform.isWindows()` library method
--   `FMLNetworkConstants.IGNORESERVERONLY` thingy so it doesn't show servers without the mod as incompatible, should be a simple copy & paste from the v1 branch
 
 ### New features to consider adding later
 

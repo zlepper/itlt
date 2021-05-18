@@ -10,7 +10,7 @@ It's the little things, the little finishing touches to your modpack. :)
 
 Available for download at CurseForge: https://www.curseforge.com/minecraft/mc-mods/its-the-little-things
 
-## Players and modpack authors
+## 🎮 Players and modpack authors
 
 ### ❓ Help
 
@@ -49,7 +49,7 @@ If you need a hand working with itlt, ping me (@Paint_Ninja) in **#squirrels** o
 | Branch                                                          | Minecraft version | Mod version | ForgeGradle version              | Gradle version |
 | --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------- | -------------- |
 | 1.16-2.0-rewrite (you're here)                                  | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| [master](https://github.com/zlepper/itlt/tree/1.16-2.0-rewrite) | 1.16.x            | v1          | ForgeGradle 3                    | Gradle 4.9     |
+| [master](https://github.com/zlepper/itlt/tree/master)           | 1.16.x            | v1          | ForgeGradle 3                    | Gradle 4.9     |
 | [1.15](https://github.com/zlepper/itlt/tree/1.15)               | 1.15.2            | v1          | ForgeGradle 3                    | Gradle 4.9     |
 | [1.14](https://github.com/zlepper/itlt/tree/1.14)               | 1.14.x            | v1          | ForgeGradle 3                    | Gradle 4.10.3  |
 | [1.12](https://github.com/zlepper/itlt/tree/1.12)               | 1.12.2            | v1          | ForgeGradle 4.1                  | Gradle 6.9     |

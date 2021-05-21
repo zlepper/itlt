@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>It's The Little Things</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <style>:root { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }</style>
+    <style media="(prefers-color-scheme: dark)">:root { background: black; color: white; }</style>
+</head>
+<body>
+    <script type="module">
+        "use strict";
+
+        function sanitise(text) {
+            return text.replaceAll("script", '');
+        }
+
+        function getUrlVars() {
+            let vars = {};
+            window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+                vars[key] = value;
+            });
+            return vars;
+        }
+
+        function getUrlParam(parameter) {
+            return sanitise(decodeURI(getUrlVars()[parameter]).replaceAll('"', '')) ?? '';
+        }
+
+        const guides = {
+            "technic": "https://github.com/zlepper/itlt/wiki/Technic-Launcher-guide",
+            "undefined": "https://github.com/zlepper/itlt/wiki/Launcher-guides"
+        }
+
+        const detectedLauncher = getUrlParam("launcher");
+        const redirectUrl = guides[detectedLauncher.toLowerCase()];
+
+        document.querySelector("#launcher").innerText = detectedLauncher;
+        document.querySelector("#redirectUrl").innerText = redirectUrl;
+
+        if (getUrlParam("debug")) {
+            document.querySelector("p").innerText = "Debug mode enabled";
+            document.querySelector("details").setAttribute("open", "true");
+        } else {
+            window.setTimeout(() => {
+                window.location = redirectUrl;
+            }, 500);
+        }
+    </script>
+    <p>Redirecting... If nothing happens, click <a href="https://github.com/zlepper/itlt/wiki/Launcher-guides">here</a>.</p>
+    <hr>
+    <p><i>It's The Little Things</i></p>
+    <details open>
+        <summary>Debug log</summary>
+        <code>
+            Launcher name: <span id="launcher"></span><br>
+            Redirect URL: <span id="redirectUrl"></span>
+        </code>
+    </details>
+</body>
+</html>

@@ -194,7 +194,7 @@ public class ClientUtils {
             rightButtonText = msgTranslationKeyTemplate + ".dontAskAgainButtonText";
         }
 
-        final String guideURL;
+        String guideURL;
         switch (messageContent.msgSubject) {
             case Memory:
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) guideURL = ClientConfig.customMemoryAllocGuideURL.get();
@@ -216,6 +216,7 @@ public class ClientUtils {
                 guideURL = "N/A";
                 break;
         }
+        guideURL = guideURL.replaceAll("%launcher", ClientModEvents.detectedLauncher.toString());
 
         // translate the keys manually as they aren't able to be translated by the game until after the main menu's shown
 

@@ -194,29 +194,34 @@ public class ClientUtils {
             rightButtonText = msgTranslationKeyTemplate + ".dontAskAgainButtonText";
         }
 
+        final String defaultGuideURL = "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject";
         String guideURL;
         switch (messageContent.msgSubject) {
             case Memory:
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) guideURL = ClientConfig.customMemoryAllocGuideURL.get();
-                else guideURL = "https://ozli.ga";
+                else guideURL = defaultGuideURL;
                 break;
             case Java:
                 if (messageContent.msgDesire == Message.Desire.SixtyFourBit) {
                     if (ClientConfig.enableCustom64bitJavaGuide.get()) guideURL = ClientConfig.custom64bitJavaGuideURL.get();
-                    else guideURL = "https://ozli.ga";
+                    else guideURL = defaultGuideURL;
                 } else if (messageContent.msgDesire == Message.Desire.Newer) {
                     if (ClientConfig.enableCustomJavaUpgradeGuide.get()) guideURL = ClientConfig.customJavaUpgradeGuideURL.get();
-                    else guideURL = "https://ozli.ga";
+                    else guideURL = defaultGuideURL;
                 } else {
                     if (ClientConfig.enableCustomJavaDowngradeGuide.get()) guideURL = ClientConfig.customJavaDowngradeGuideURL.get();
-                    else guideURL = "https://ozli.ga";
+                    else guideURL = defaultGuideURL;
                 }
                 break;
             default:
                 guideURL = "N/A";
                 break;
         }
-        guideURL = guideURL.replaceAll("%launcher", ClientModEvents.detectedLauncher.toString());
+        guideURL = guideURL.replaceAll("%launcher", ClientModEvents.detectedLauncher.getName())
+                .replaceAll("%reason", messageContent.toString())
+                .replaceAll("%type", messageContent.msgType.toString())
+                .replaceAll("%desire", messageContent.msgDesire.toString())
+                .replaceAll("%subject", messageContent.msgSubject.toString());
 
         // translate the keys manually as they aren't able to be translated by the game until after the main menu's shown
 
@@ -247,7 +252,7 @@ public class ClientUtils {
 
             // insert some values where they're needed
             if (messageContent.msgSubject == Message.Subject.Memory) {
-                messageBody = messageBody.replaceFirst("%sb", ClientConfig.getSimplifiedDoubleStr(ClientModEvents.currentMem));
+                messageBody = messageBody.replaceFirst("%sb", ClientConfig.getSimplifiedFloatStr(ClientModEvents.currentMem));
             } else if (messageContent.msgSubject == Message.Subject.Java) {
                 messageBody = messageBody.replaceFirst("%sb", String.valueOf(getJavaVersion()));
             }
@@ -255,19 +260,19 @@ public class ClientUtils {
             switch (messageContent) {
                 case NeedsMoreMemory:
                     messageBody = messageBody.replaceFirst("%s",
-                            ClientConfig.getSimplifiedDoubleStr(ClientConfig.reqMinMemoryAmountInGB.get()));
+                            ClientConfig.getSimplifiedFloatStr(ClientConfig.reqMinMemoryAmountInGB.get().floatValue()));
                     break;
                 case WantsMoreMemory:
                     messageBody = messageBody.replaceFirst("%s",
-                            ClientConfig.getSimplifiedDoubleStr(ClientConfig.warnMinMemoryAmountInGB.get()));
+                            ClientConfig.getSimplifiedFloatStr(ClientConfig.warnMinMemoryAmountInGB.get().floatValue()));
                     break;
                 case NeedsLessMemory:
                     messageBody = messageBody.replaceFirst("%s",
-                            ClientConfig.getSimplifiedDoubleStr(ClientConfig.reqMaxMemoryAmountInGB.get()));
+                            ClientConfig.getSimplifiedFloatStr(ClientConfig.reqMaxMemoryAmountInGB.get().floatValue()));
                     break;
                 case WantsLessMemory:
                     messageBody = messageBody.replaceFirst("%s",
-                            ClientConfig.getSimplifiedDoubleStr(ClientConfig.warnMaxMemoryAmountInGB.get()));
+                            ClientConfig.getSimplifiedFloatStr(ClientConfig.warnMaxMemoryAmountInGB.get().floatValue()));
                     break;
                 case NeedsNewerJava:
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());

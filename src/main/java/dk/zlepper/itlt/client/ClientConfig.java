@@ -78,10 +78,10 @@ public final class ClientConfig {
             warnMaxJavaVersion;
 
     /** Simplify floats to ints when they represent the same value (e.g. show "1" instead of "1.0") **/
-    public static String getSimplifiedDoubleStr(final double doubleNum) {
-        if (doubleNum == (int) doubleNum)
-            return String.valueOf((int) doubleNum);
-        else return String.valueOf(doubleNum);
+    public static String getSimplifiedFloatStr(final float floatNum) {
+        if (floatNum == (int) floatNum && floatNum != 0)
+            return String.valueOf((int) floatNum);
+        else return String.valueOf(floatNum);
     }
 
     /** Returns the path as a File if it already exists or has been successfully created. Returns null otherwise **/
@@ -182,14 +182,16 @@ public final class ClientConfig {
                                     " they ask for instructions on how to get 64bit Java.",
                                     " ",
                                     " This is mainly useful for when you're using an unsupported version of this mod and",
-                                    " the default guide's outdated or 404s.")
+                                    " the default guide's outdated or you're using your own custom launcher.")
                             .define("enableCustom64bitJavaGuide", false);
                     custom64bitJavaGuideURL = clientConfigBuilder
                             .comment(" ",
                                     " The URL of the guide you want users to visit when they want 64bit Java.",
                                     " Note: enableCustom64bitJavaGuide must be enabled for this to take effect.",
-                                    " Note: The URL must start with \"https://\" for security reasons.")
-                            .define("custom64bitJavaGuideURL", "https://ozli.ga");
+                                    " Note: The URL must start with \"https://\" for security reasons.",
+                                    " Note: itlt supports the following *optional* string insertions, useful for being",
+                                    " able to show an exact guide: %launcher, %reason, %type, %desire, %subject.")
+                            .define("custom64bitJavaGuideURL", "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
                 } clientConfigBuilder.pop();
 
                 // Java.Arch.Requirement
@@ -234,14 +236,16 @@ public final class ClientConfig {
                                         " they ask for instructions on how to upgrade Java.",
                                         " ",
                                         " This is mainly useful for when you're using an unsupported version of this mod",
-                                        " and the default guide is outdated.")
+                                        " and the default guide is outdated or you're using your own custom launcher.")
                                 .define("enableCustomJavaUpgradeGuide", false);
                         customJavaUpgradeGuideURL = clientConfigBuilder
                                 .comment(" ",
                                         " The URL of the guide you want users to visit when they want to upgrade Java.",
                                         " Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect.",
-                                        " Note: The URL must start with \"https://\" for security reasons.")
-                                .define("customJavaUpgradeGuideURL", "https://ozli.ga");
+                                        " Note: The URL must start with \"https://\" for security reasons.",
+                                        " Note: itlt supports the following *optional* string insertions, useful for being",
+                                        " able to show an exact guide: %launcher, %reason, %type, %desire, %subject.")
+                                .define("customJavaUpgradeGuideURL", "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Min.Requirement
@@ -313,14 +317,16 @@ public final class ClientConfig {
                                         " Java if it works with your mods.",
                                         " ",
                                         " This is mainly useful for when you're using an unsupported version of this mod",
-                                        " and the default guide is outdated.")
+                                        " and the default guide is outdated or you're using your own custom launcher.")
                                 .define("enableCustomJavaDowngradeGuide", false);
                         customJavaDowngradeGuideURL = clientConfigBuilder
                                 .comment(" ",
                                         " The URL of the guide you want users to visit when they want 64bit Java.",
                                         " Note: enableCustomJavaDowngradeGuide must be enabled for this to take effect.",
-                                        " Note: The URL must start with \"https://\" for security reasons.")
-                                .define("customJavaDowngradeGuideURL", "https://ozli.ga");
+                                        " Note: The URL must start with \"https://\" for security reasons.",
+                                        " Note: itlt supports the following *optional* string insertions, useful for being",
+                                        " able to show an exact guide: %launcher, %reason, %type, %desire, %subject.")
+                                .define("customJavaDowngradeGuideURL", "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Max.Requirement
@@ -393,7 +399,7 @@ public final class ClientConfig {
                                     " they ask for instructions on how to change their memory allocation settings.",
                                     " ",
                                     " This is mainly useful for when you're using an unsupported version of this mod and",
-                                    " the default guide is outdated.")
+                                    " the default guide is outdated or you're using your own custom launcher.")
                             .define("enableCustomMemoryGuide", false);
                     customMemoryAllocGuideURL = clientConfigBuilder
                             .comment(" ",
@@ -402,8 +408,10 @@ public final class ClientConfig {
                                     " ",
                                     " Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect",
                                     " ",
-                                    " Note: The URL must start with \"https://\" for security reasons.")
-                            .define("customMemoryAllocGuideURL", "https://ozli.ga");
+                                    " Note: The URL must start with \"https://\" for security reasons.",
+                                    " Note: itlt supports the following *optional* string insertions, useful for being",
+                                    " able to show an exact guide: %launcher, %reason, %type, %desire, %subject.")
+                            .define("customMemoryAllocGuideURL", "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
                 } clientConfigBuilder.pop();
 
                 // Java.Memory.Min

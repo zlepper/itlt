@@ -6,6 +6,10 @@ import java.io.IOException;
 
 public interface DetectedLauncher {
 
+    default String getName() {
+        return this.getClass().getSimpleName();
+    }
+
     @Nullable
     String getModpackDisplayName() throws IOException;
 

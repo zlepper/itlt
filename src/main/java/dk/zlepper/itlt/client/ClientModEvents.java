@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -42,7 +41,7 @@ public class ClientModEvents {
     // rounded to the nearest tenth (e.g. 1.0, 1.1, 1.2...)
     private static float getCurrentMem() {
         final long currentMem = Runtime.getRuntime().maxMemory() + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getMax();
-        return (Math.round(currentMem / 1073741824.0F) * 10) / 10F;
+        return Float.parseFloat(String.format("%.1f", currentMem / 1073741824F));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST) // run this as soon as possible to avoid wasting time if a requirement isn't met
@@ -52,7 +51,7 @@ public class ClientModEvents {
         final int javaVerInt = ClientUtils.getJavaVersion();
         itlt.LOGGER.debug("javaVerInt: " + javaVerInt);
 
-        itlt.LOGGER.info("detectedLauncher: " + detectedLauncher);
+        itlt.LOGGER.info("detectedLauncher: " + detectedLauncher.getName());
 
         // Minimum Java version requirement and warning
         itlt.LOGGER.debug("requiredMinJavaVerion: " + ClientConfig.requiredMinJavaVersion.get());
@@ -62,7 +61,7 @@ public class ClientModEvents {
         } else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get()) {
             if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
                 if (!detectedLauncher.supportsChangingJavaVersion()) {
-                    itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
+                    itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.getName()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
                     itlt.LOGGER.info("If you are seeing this and your launcher does allow it, update itlt.");
                     itlt.LOGGER.info("If already up-to-date, let us know by filing an issue on itlt's Github issues");
@@ -81,7 +80,7 @@ public class ClientModEvents {
         } else if (ClientConfig.enableMaxJavaVerWarning.get() && javaVerInt > ClientConfig.warnMaxJavaVersion.get()) {
             if (ClientConfig.selectivelyIgnoreMaxJavaVerWarning.get()) {
                 if (!detectedLauncher.supportsChangingJavaVersion()) {
-                    itlt.LOGGER.info("Skipping maxJavaVerWarning as you appear to be using the " + detectedLauncher.toString()
+                    itlt.LOGGER.info("Skipping maxJavaVerWarning as you appear to be using the " + detectedLauncher.getName()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
                     itlt.LOGGER.info("If you are seeing this and your launcher does allow it, update itlt.");
                     itlt.LOGGER.info("If already up-to-date, let us know by filing an issue on itlt's Github issues");

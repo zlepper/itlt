@@ -30,17 +30,16 @@
         }
 
         const guides = {
-            "technic": "https://github.com/zlepper/itlt/wiki/Technic-Launcher-guide",
-            "undefined": "https://github.com/zlepper/itlt/wiki/Launcher-guides"
+            "technic": "https://github.com/zlepper/itlt/wiki/Technic-Launcher-guide"
         }
 
         const detectedLauncher = getUrlParam("launcher");
-        const redirectUrl = guides[detectedLauncher.toLowerCase()];
+        const redirectUrl = guides[detectedLauncher.toLowerCase()] ?? "https://github.com/zlepper/itlt/wiki/Launcher-guides";
 
         document.querySelector("#launcher").innerText = detectedLauncher;
         document.querySelector("#redirectUrl").innerText = redirectUrl;
 
-        if (getUrlParam("debug")) {
+        if (getUrlParam("debug") === "true") {
             document.querySelector("p").innerText = "Debug mode enabled";
             document.querySelector("details").setAttribute("open", "true");
         } else {

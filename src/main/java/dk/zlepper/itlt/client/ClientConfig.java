@@ -187,6 +187,7 @@ public final class ClientConfig {
                     custom64bitJavaGuideURL = clientConfigBuilder
                             .comment(" ",
                                     " The URL of the guide you want users to visit when they want 64bit Java.",
+                                    " ",
                                     " Note: enableCustom64bitJavaGuide must be enabled for this to take effect.",
                                     " Note: The URL must start with \"https://\" for security reasons.",
                                     " Note: itlt supports the following *optional* string insertions, useful for being",
@@ -241,6 +242,7 @@ public final class ClientConfig {
                         customJavaUpgradeGuideURL = clientConfigBuilder
                                 .comment(" ",
                                         " The URL of the guide you want users to visit when they want to upgrade Java.",
+                                        " ",
                                         " Note: enableCustomJavaUpgradeGuide must be enabled for this to take effect.",
                                         " Note: The URL must start with \"https://\" for security reasons.",
                                         " Note: itlt supports the following *optional* string insertions, useful for being",
@@ -322,6 +324,7 @@ public final class ClientConfig {
                         customJavaDowngradeGuideURL = clientConfigBuilder
                                 .comment(" ",
                                         " The URL of the guide you want users to visit when they want 64bit Java.",
+                                        " ",
                                         " Note: enableCustomJavaDowngradeGuide must be enabled for this to take effect.",
                                         " Note: The URL must start with \"https://\" for security reasons.",
                                         " Note: itlt supports the following *optional* string insertions, useful for being",

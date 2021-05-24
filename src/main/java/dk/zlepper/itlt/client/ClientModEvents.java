@@ -161,8 +161,15 @@ public class ClientModEvents {
         if (ClientConfig.enableCustomIcon.get()) {
             File customIcon = null;
 
+            // first try the auto-detected modpack icon if available
+            if (ClientConfig.enableUsingAutodetectedIcon.get()) {
+                final File autoDetectedIcon = detectedLauncher.getModpackIcon();
+                if (autoDetectedIcon != null && autoDetectedIcon.exists() && !autoDetectedIcon.isDirectory())
+                    customIcon = autoDetectedIcon;
+            }
+
             // check if an icon file exists in the itltDir and use it if it does, prioritising
-            // ico over icns and icns over png
+            // ico over icns and icns over png. Prioritise the provided icon over the auto-detected one
             if (itltDir != null) {
                 final File icoIcon = Paths.get(itltDir.getAbsolutePath(), "icon.ico").toFile();
                 final File icnsIcon = Paths.get(itltDir.getAbsolutePath(), "icon.icns").toFile();
@@ -173,13 +180,6 @@ public class ClientModEvents {
                 else if (pngIcon.exists() && !pngIcon.isDirectory()) customIcon = pngIcon;
             }
 
-            // prioritise the auto-detected modpack icon if available
-            if (ClientConfig.enableUsingAutodetectedIcon.get()) {
-                final File autoDetectedIcon = detectedLauncher.getModpackIcon();
-                if (autoDetectedIcon != null && autoDetectedIcon.exists() && !autoDetectedIcon.isDirectory())
-                    customIcon = autoDetectedIcon;
-            }
-
             if (customIcon != null) {
                 try {
                     ClientUtils.setWindowIcon(customIcon, mcInstance);
@@ -188,7 +188,7 @@ public class ClientModEvents {
                     e.printStackTrace();
                 }
             } else {
-                itlt.LOGGER.warn("enableCustomIcon is true but icon.png is missing or invalid.");
+                itlt.LOGGER.warn("enableCustomIcon is true but icon.ico/icns/png is missing or invalid.");
             }
         }
 

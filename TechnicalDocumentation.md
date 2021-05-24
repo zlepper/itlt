@@ -204,9 +204,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ### Things left to-do with the existing code
 
--   Write up website guides and make them the warning system defaults rather than pointing to the placeholder "https://ozli.ga"
--   Verify guide URLs in the config and actually make sure they start with "https://"
--   Add Forge updateChecker support (mods.toml's updateJSONURL)
+-   Nada, v2 is ready for primetime!
 
 ### New features to consider adding later
 
@@ -228,6 +226,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   Redo the anti-cheat stuff
     -   It works, but there's lots of signs of me trying to get it all to work and trying new concepts in-place rather than in isolation. The whole thing could do with a cleanup really
     -   Measure if there's actually a performance benefit for using BLAKE3-JNI instead of the pure Java implementation or if the overhead of JNI and the benefits of JVM's JIT narrows the gap. If there isn't much perf benefit then removing it from being shadowed would be good.
+-   Verify guide URLs in the config and actually make sure they start with "https://"
 
 ## Troubleshooting
 

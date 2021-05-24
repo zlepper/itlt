@@ -191,7 +191,7 @@ public final class ClientConfig {
                                     " Note: The URL must start with \"https://\" for security reasons.",
                                     " Note: itlt supports the following *optional* string insertions, useful for being",
                                     " able to show an exact guide: %launcher, %reason, %type, %desire, %subject.")
-                            .define("custom64bitJavaGuideURL", "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
+                            .define("custom64bitJavaGuideURL", "https://zlepper.github.io/itlt/guide?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
                 } clientConfigBuilder.pop();
 
                 // Java.Arch.Requirement
@@ -245,7 +245,7 @@ public final class ClientConfig {
                                         " Note: The URL must start with \"https://\" for security reasons.",
                                         " Note: itlt supports the following *optional* string insertions, useful for being",
                                         " able to show an exact guide: %launcher, %reason, %type, %desire, %subject.")
-                                .define("customJavaUpgradeGuideURL", "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
+                                .define("customJavaUpgradeGuideURL", "https://zlepper.github.io/itlt/guide?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Min.Requirement
@@ -326,7 +326,7 @@ public final class ClientConfig {
                                         " Note: The URL must start with \"https://\" for security reasons.",
                                         " Note: itlt supports the following *optional* string insertions, useful for being",
                                         " able to show an exact guide: %launcher, %reason, %type, %desire, %subject.")
-                                .define("customJavaDowngradeGuideURL", "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
+                                .define("customJavaDowngradeGuideURL", "https://zlepper.github.io/itlt/guide?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Max.Requirement
@@ -411,7 +411,7 @@ public final class ClientConfig {
                                     " Note: The URL must start with \"https://\" for security reasons.",
                                     " Note: itlt supports the following *optional* string insertions, useful for being",
                                     " able to show an exact guide: %launcher, %reason, %type, %desire, %subject.")
-                            .define("customMemoryAllocGuideURL", "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
+                            .define("customMemoryAllocGuideURL", "https://zlepper.github.io/itlt/guide?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject&debug=false");
                 } clientConfigBuilder.pop();
 
                 // Java.Memory.Min
@@ -590,31 +590,15 @@ public final class ClientConfig {
                                 " ",
                                 " Note: The icon needs to be placed in config" + File.separator + "itlt" + File.separator + "icon.(ico/icns/png).",
                                 " ",
-                                " Note: For best results, ideally use an ICO with as many embedded size variations as possible.",
-                                " Do *NOT* make an ICO with a bunch of resized variations, I instead mean ideally use an",
-                                " ICO that has all of the sizes individually made. See the itlt wiki for an example of this.",
-                                " ",
-                                " Note: Recommended ideal embedded size variations include: 256x256, 192x192, 160x160,",
-                                " 128x128, 96x96, 80x80, 72x72, 64x64, 48x48, 40x40, 32x32, 24x24, 20x20, 16x16.",
-                                " Or if you want to save some time: 128x, 64x, 48x, 32x and 16x.",
-                                " ",
-                                " Warning: *Don't* simply resize existing embedded sizes to make more variations as that just",
-                                " wastes space and may result in a blurry icon. If you haven't got a certain size, simply don't",
-                                " include it or make one specifically for that size. itlt will use the closest size available if",
-                                " there's no perfect fit.",
-                                " ",
-                                " Note: If you want to keep things simple, use a square icon.png and call it a day. Max",
-                                " size of 128 x 128px. If it doesn't work, make sure it's saved as an \"RGBA (32bit Bit Depth)\".",
+                                " Note: See the itlt wiki for more info.",
                                 " ",
                                 " Note: This will override the enableEnhancedVanillaIcon when a valid custom icon is found.")
-                        .define("enableCustomIcon", false);
+                        .define("enableCustomIcon", true);
                 enableUsingAutodetectedIcon = clientConfigBuilder
                         .comment(" ",
-                                " Enable this if you want itlt to automatically use your modpack's icon instead of the",
-                                " icon.ico/icon.icns/icon.png when launching from a supported launcher.",
-                                " ",
-                                " Note: This will override the config" + File.separator + "itlt" + File.separator + "icon.(ico/icns/png) when",
-                                " launching from a supported launcher.",
+                                " Enable this if you want itlt to automatically detect your modpack's icon when launching",
+                                " from a supported launcher. If unable to auto-detect, it will fallback to a provided",
+                                " icon.ico/icon.icns/icon.png file if available.",
                                 " ",
                                 " Note: enableCustomIcon must be enabled for this to take effect.")
                         .define("enableUsingAutodetectedIcon", true); // Currently supported launchers: Technic, MultiMC.

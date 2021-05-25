@@ -57,13 +57,13 @@ With Hi-DPI and multi-size ICO and ICNS support, your modpack's icon can look cr
 
 To see this in action, check out [this single ICO file](https://github.com/zlepper/itlt/gh-pages/docs/guides/itlt/icon.ico) automatically display different sizes depending on the resolution scale:
 
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/100%.png)
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/125%.png)
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/150%.png)
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/200%.png)
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/300%.png)
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%.png)
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/500%.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/100%25.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/125%25.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/150%25.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/200%25.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/300%25.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%25.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/500%25.png)
 
 #### __Enhanced Vanilla Icon__
 
@@ -71,11 +71,11 @@ This feature uses the new icon handling system for the Vanilla icon on Windows a
 
 Vanilla:
 
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%-vanilla.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%25-vanilla.png)
 
 itlt:
 
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%-enhanced-vanilla.png)
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%25-enhanced-vanilla.png)
 
 ### New custom window title system
 

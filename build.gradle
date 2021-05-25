@@ -1,12 +1,7 @@
 import org.gradle.api.java.archives.internal.DefaultManifest
 
 buildscript {
-    repositories {
-        maven { url = "https://maven.minecraftforge.net" }
-        maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
-    }
     dependencies {
-        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.1.+", changing: true
         classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
     }
 }
@@ -16,8 +11,8 @@ plugins {
     id "java" // java plugin is needed for the shadow plugin to work
     id "eclipse"
     id "maven-publish"
+    id "net.minecraftforge.gradle" version "4.1.+"
 }
-apply plugin: "net.minecraftforge.gradle"
 apply plugin: "org.spongepowered.mixin"
 
 version = "1.16.x-2.0.0"

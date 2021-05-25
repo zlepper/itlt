@@ -24,9 +24,7 @@ logoFile="logo.png" #optional
 # A text field displayed in the mod UI
 authors="Zlepper, Paint_Ninja" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description='''
-It's the little things that make all the difference, the finishing touches to your modpack. :)
-'''
+description='''It's the little things that make all the difference, the finishing touches to your modpack. :)'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.itlt]] #optional
     # the modid of the dependency

@@ -110,7 +110,7 @@ All config options are categorised and have detailed comments to group similar s
 -   Pop-up windows now attempt to use a more system-native design, with custom code for handling showing native Windows iconography rather than Swing's bundled Windows 7 icons
 -   Pop-up windows are ran in a separate process so that they can persist after a game crash and to avoid causing crash-on-launch issues on older Mac OSX
 -   If you run the itlt jar directly, you'll now get this message both in the console output and as a GUI dialogue box:
-    -   ![](https://zlepper.github.io/docs/changelogs/v2.0.0/install-dialogue.png)
+    -   ![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/install-dialogue.png)
 
 ## Other changes
 

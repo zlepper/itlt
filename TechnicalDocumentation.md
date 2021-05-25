@@ -1,4 +1,4 @@
-![itlt](docs/logo/inverted-transparent/logo-rectangle-inverted-transparent.png)
+![itlt](https://zlepper.github.io/itlt/docs/logo/inverted-transparent/logo-rectangle-inverted-transparent.png)
 
 # Technical documentation
 
@@ -235,11 +235,11 @@ See the warnings feature brief for details on which to use and when. If you're n
 Make sure you set the project SDK to 11 and the language level to 8. It's important that you set both correctly, otherwise you may end up accidentally building a jar that only runs on Java 11+!
 
 In IntelliJ, you can do this by going to `File -> Project Structure`. It should look like this:
-![Screenshot showing what to change in the project structure window](docs/project-structure.png)
+![Screenshot showing what to change in the project structure window](https://zlepper.github.io/itlt/docs/project-structure.png)
 
 ### Unable to start Gradle
 
 Run Gradle with Java 8 to 15 inclusive. Using Java 16 isn't supported yet but is being worked on with ForgeGradle 5. I'll update the buildscript to ForgeGradle 5 and Gradle 7 once available.
 
 In IntelliJ, you can do this by going to `File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` and set the Gradle JVM to "Project SDK", which should be version 11 from the previous troubleshooting step. It should look like this:
-![Screenshot showing what to change in the project gradle settings window](docs/gradlew-settings.png)
+![Screenshot showing what to change in the project gradle settings window](https://zlepper.github.io/itlt/docs/gradlew-settings.png)

@@ -207,7 +207,7 @@ public class ClientUtils {
             rightButtonText = msgTranslationKeyTemplate + ".dontAskAgainButtonText";
         }
 
-        final String defaultGuideURL = "https://zlepper.github.io/itlt?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject";
+        final String defaultGuideURL = "https://zlepper.github.io/itlt/guide?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject";
         String guideURL;
         switch (messageContent.msgSubject) {
             case Memory:
@@ -311,14 +311,14 @@ public class ClientUtils {
         messageGuideError = messageGuideError.replaceFirst("%s", guideURL);
 
         itlt.LOGGER.info("messageContent: " + messageContent.toString());
-        itlt.LOGGER.info("messageType: " + messageContent.msgType.toString());
+        itlt.LOGGER.debug("messageType: " + messageContent.msgType.toString());
         itlt.LOGGER.info("messageTitle: " + messageTitle);
         itlt.LOGGER.info("messageBody: " + messageBody);
         itlt.LOGGER.info("guideURL: " + guideURL);
-        itlt.LOGGER.info("messageGuideError: " + messageGuideError);
-        itlt.LOGGER.info("left: " + leftButtonText);
-        itlt.LOGGER.info("middle: " + middleButtonText);
-        itlt.LOGGER.info("right: " + rightButtonText);
+        itlt.LOGGER.debug("messageGuideError: " + messageGuideError);
+        itlt.LOGGER.debug("left: " + leftButtonText);
+        itlt.LOGGER.debug("middle: " + middleButtonText);
+        itlt.LOGGER.debug("right: " + rightButtonText);
 
         try {
             final ProcessBuilder builder = new ProcessBuilder(

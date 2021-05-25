@@ -1,4 +1,4 @@
-[![It's the little things logo](docs/logo/inverted-transparent/logo-long-inverted-transparent.png)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things)
+[![It's the little things logo](https://zlepper.github.io/itlt/docs/logo/logo-long-githubdark.png)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things)
 
 [![](http://cf.way2muchnoise.eu/full_its-the-little-things_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](http://cf.way2muchnoise.eu/versions/Available%20for%20MC_its-the-little-things_all.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
 
@@ -14,7 +14,7 @@ Available for download at CurseForge: https://www.curseforge.com/minecraft/mc-mo
 
 ### ❓ Help
 
-If you need help using or troubleshooting itlt, you can open a support ticket by [clicking here](https://github.com/zlepper/itlt/issues/new?labels=help&template=3_user-help.md)
+If you need help using or troubleshooting itlt, you can open a support ticket by [clicking here](https://github.com/zlepper/itlt/issues/new?labels=help&template=3_user-help.md). The wiki may also be helpful: https://github.com/zlepper/itlt/wiki
 
 ### 🐛 Problems and bugs
 
@@ -46,21 +46,23 @@ If you need a hand working with itlt, ping me (@Paint_Ninja) in **#squirrels** o
 
 #### Current
 
-| Branch                                                          | Minecraft version | Mod version | ForgeGradle version              | Gradle version |
-| --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------- | -------------- |
-| 1.16-2.0-rewrite (you're here)                                  | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| [master](https://github.com/zlepper/itlt/tree/master)           | 1.16.x            | v1          | ForgeGradle 3                    | Gradle 4.9     |
-| [1.15](https://github.com/zlepper/itlt/tree/1.15)               | 1.15.2            | v1          | ForgeGradle 3                    | Gradle 4.9     |
-| [1.14](https://github.com/zlepper/itlt/tree/1.14)               | 1.14.x            | v1          | ForgeGradle 3                    | Gradle 4.10.3  |
-| [1.12](https://github.com/zlepper/itlt/tree/1.12)               | 1.12.2            | v1          | ForgeGradle 4.1                  | Gradle 6.9     |
-| [1.11](https://github.com/zlepper/itlt/tree/1.11)               | 1.11.x            | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
-| [1.10](https://github.com/zlepper/itlt/tree/1.10)               | 1.10.x            | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
-| [1.9.4](https://github.com/zlepper/itlt/tree/1.9.4)             | 1.9.4             | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
-| [1.9](https://github.com/zlepper/itlt/tree/1.9)                 | 1.9.0             | v1          | ForgeGradle 2.1.1                | Gradle 4.10.3  |
-| [1.8.9](https://github.com/zlepper/itlt/tree/1.8.9)             | 1.8.9             | v1          | ForgeGradle 2.1.1                | Gradle 4.10.3  |
-| [1.8](https://github.com/zlepper/itlt/tree/1.8)                 | 1.8.0             | v1          | ForgeGradle 2.0-SNAPSHOT-aa67375 | Gradle 4.7     |
-| [1.7](https://github.com/zlepper/itlt/tree/1.7)                 | 1.7.10            | v1          | ForgeGradle 1.2.1                | Gradle 4.4.1   |
-| [1.6](https://github.com/zlepper/itlt/tree/1.6)                 | 1.6.x             | v1          | ForgeGradle 1.0                  | Gradle 3.0     |
+Work for the latest supported Minecraft version is done on the "master" branch, however mod update checking always uses named branches to ensure reliability during a switchover to a newer MC version. When 1.17 comes out, master is merged onto 1.16 and 1.17 work goes on master. Until then, the 1.16 branch serves as a placeholder for update checking.
+
+| Branch                                              | Minecraft version | Mod version | ForgeGradle version              | Gradle version |
+| --------------------------------------------------- | ----------------- | ----------- | -------------------------------- | -------------- |
+| master (you're here)                                | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| 1.16                                                | Placeholder       | **v2**      | None                             | None           |
+| [1.15](https://github.com/zlepper/itlt/tree/1.15)   | 1.15.2            | v1          | ForgeGradle 3                    | Gradle 4.9     |
+| [1.14](https://github.com/zlepper/itlt/tree/1.14)   | 1.14.x            | v1          | ForgeGradle 3                    | Gradle 4.10.3  |
+| [1.12](https://github.com/zlepper/itlt/tree/1.12)   | 1.12.2            | v1          | ForgeGradle 4.1                  | Gradle 6.9     |
+| [1.11](https://github.com/zlepper/itlt/tree/1.11)   | 1.11.x            | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
+| [1.10](https://github.com/zlepper/itlt/tree/1.10)   | 1.10.x            | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
+| [1.9.4](https://github.com/zlepper/itlt/tree/1.9.4) | 1.9.4             | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
+| [1.9](https://github.com/zlepper/itlt/tree/1.9)     | 1.9.0             | v1          | ForgeGradle 2.1.1                | Gradle 4.10.3  |
+| [1.8.9](https://github.com/zlepper/itlt/tree/1.8.9) | 1.8.9             | v1          | ForgeGradle 2.1.1                | Gradle 4.10.3  |
+| [1.8](https://github.com/zlepper/itlt/tree/1.8)     | 1.8.0             | v1          | ForgeGradle 2.0-SNAPSHOT-aa67375 | Gradle 4.7     |
+| [1.7](https://github.com/zlepper/itlt/tree/1.7)     | 1.7.10            | v1          | ForgeGradle 1.2.1                | Gradle 4.4.1   |
+| [1.6](https://github.com/zlepper/itlt/tree/1.6)     | 1.6.x             | v1          | ForgeGradle 1.0                  | Gradle 3.0     |
 
 #### Legacy
 

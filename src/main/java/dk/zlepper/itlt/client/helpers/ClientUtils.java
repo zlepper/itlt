@@ -106,12 +106,25 @@ public class ClientUtils {
                 itlt.LOGGER.debug("Type: " + bufferedImage.getType());
                 itlt.LOGGER.debug("Width: " + bufferedImage.getWidth());
                 itlt.LOGGER.debug("Height: " + bufferedImage.getHeight());
+                itlt.LOGGER.debug("Transparency: " + bufferedImage.getTransparency());
 
                 // only convert icons that are 8bit per channel, non-premultiplied RGBA as that's what GLFW expects.
                 // icons that aren't converted are not included in the List<InputStream>
                 if (bufferedImage.getType() == BufferedImage.TYPE_INT_ARGB) {
-                    iconsList.add(convertToInputStream(bufferedImage));
-                    itlt.LOGGER.debug("Added embedded image");
+
+                    // handle special case for ICNS where icon sizes above 48px aren't being properly decoded yet
+                    if (inputIconFilenameAndExt.endsWith(".icns")) {
+                        if (bufferedImage.getWidth() <= 48) {
+                            iconsList.add(convertToInputStream(bufferedImage));
+                            itlt.LOGGER.debug("Added embedded image");
+                        } else {
+                            itlt.LOGGER.debug("Skipped embedded image");
+                        }
+                    } else {
+                        iconsList.add(convertToInputStream(bufferedImage));
+                        itlt.LOGGER.debug("Added embedded image");
+                    }
+
                 } else {
                     itlt.LOGGER.debug("Skipped embedded image");
                 }
@@ -145,7 +158,7 @@ public class ClientUtils {
         }
 
         if (errorCounter == iconsList.size()) {
-            // if there was an error loading all of the icons inside the .ico, throw an error and don't try setting the
+            // if there was an error loading all of the icons inside the .ico/.icns, throw an error and don't try setting the
             // window icon as an empty buffer.
             throw new IOException("Unable to load icon(s)");
         } else {

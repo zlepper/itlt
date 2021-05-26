@@ -44,11 +44,6 @@ public final class ClientConfig {
             enableMaxJavaVerRequirement,
             enableMaxJavaVerWarning,
             selectivelyIgnoreMaxJavaVerWarning,
-            enableCustomWindowTitle,
-            enableUsingAutodetectedDisplayName,
-            enableEnhancedVanillaIcon,
-            enableCustomIcon,
-            enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
             enableExplicitGC,
             doExplicitGCOnPause,
@@ -56,12 +51,10 @@ public final class ClientConfig {
             doExplicitGCOnMenu;
 
     public static ForgeConfigSpec.ConfigValue<String>
-            customWindowTitleText,
             custom64bitJavaGuideURL,
             customJavaUpgradeGuideURL,
             customJavaDowngradeGuideURL,
             customMemoryAllocGuideURL,
-            autoDetectedDisplayNameFallback,
             configVersion;
 
     public static ForgeConfigSpec.ConfigValue<Double>
@@ -88,7 +81,7 @@ public final class ClientConfig {
     @Nullable
     public static File makeItltFolderIfNeeded() {
         final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
-        if (!itltDir.exists() && (enableCustomIcon.get() || enableEnhancedVanillaIcon.get() || areAnyWarningsEnabled()) && !itltDir.mkdir()) {
+        if (!itltDir.exists() && areAnyWarningsEnabled() && !itltDir.mkdir()) {
             itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
             return null;
         }
@@ -159,8 +152,8 @@ public final class ClientConfig {
                             .comment(" ",
                                     " Whether or not to run explicit GC when navigating one of the following opaque",
                                     " background screens: Singleplayer world selection, Multiplayer server selection,",
-                                    " Resource Pack selection, Language selection, Chat options, controls options,",
-                                    " accessibility options, Realms main screen and stats menu.",
+                                    " Resource Pack selection, Language selection, Chat options, controls options",
+                                    " and stats menu.",
                                     " ",
                                     " Mainly useful to disable for speedruns that start the timer when the main menu is shown.",
                                     " ",
@@ -314,7 +307,7 @@ public final class ClientConfig {
                                         " they ask for instructions on how to downgrade Java.",
                                         " ",
                                         " Note: I recommend stating in your guide why you want your users to use an older",
-                                        " version of Java than what Forge supports (Java 10 works in Forge 1.14.4 at the",
+                                        " version of Java than what Forge supports (Java 10 works in Forge 1.13.2 at the",
                                         " time of writing). You should ideally be using the latest supported version of",
                                         " Java if it works with your mods.",
                                         " ",
@@ -524,90 +517,6 @@ public final class ClientConfig {
             } clientConfigBuilder.pop(); // end of Java.Memory
 
         } clientConfigBuilder.pop(); // end of Java section
-
-        // Display section
-        clientConfigBuilder.push("Display"); {//.comment("Here you can change the aesthetics of your modpack.");
-
-            // Display.WindowTitle
-            clientConfigBuilder.push("WindowTitle"); {
-                enableCustomWindowTitle = clientConfigBuilder
-                        .comment(" ",
-                                " Enable this if you want to change the name of the Minecraft window.")
-                        .define("enableCustomWindowTitle", true);
-                customWindowTitleText = clientConfigBuilder
-                        .comment(" ",
-                                " The name you want your Minecraft window to be. Put \"%mc\" to include the original",
-                                " window title's contents to help identify the Minecraft version for example.",
-                                " ",
-                                " Warning: Mojang have asked people to not change their branding entirely and made it",
-                                " harder for modders to change it at all as of MC 1.15 and newer. They clearly don't like",
-                                " people taking full credit for their work and I understand that.",
-                                " Please make sure you keep the \"%mc\" in your customWindowTitleText as a sign of respect.",
-                                " Keeping it also helps others troubleshoot your pack by knowing what Minecraft version",
-                                " it's based on - especially useful if your modpack has multiple major releases that",
-                                " span across different Minecraft versions.",
-                                " ",
-                                " Note: Put \"%autoName\" for your modpack's display name to be automatically detected",
-                                " and used when launching from a supported launcher.",
-                                " ",
-                                " Examples:",
-                                " - \"ModpackName - %mc\" = \"ModpackName - Minecraft* 1.14.4\"",
-                                " - \"%mc - ModpackName\" = \"Minecraft* 1.14.4 - ModpackName\"",
-                                " - \"ModpackName (%mc)\" = \"ModpackName (Minecraft* 1.14.4)\"",
-                                " - \"%autoName (%mc)\" = \"ModpackName (Minecraft* 1.14.4)\"",
-                                " - \"ModpackName v2 based on %mc\" = \"ModpackName v2 based on Minecraft* 1.14.4\"",
-                                " ",
-                                " Note: enableCustomWindowTitle must be enabled for this to take effect.")
-                        .define("customWindowTitleText", "%autoName - %mc");
-                enableUsingAutodetectedDisplayName = clientConfigBuilder
-                        .comment(" ",
-                                " Whether or not to automatically replace \"%autoName\" in customWindowTitleText with",
-                                " your modpack's display name when launching from a supported launcher.",
-                                " ",
-                                " Note: enableCustomWindowTitle must be enabled for this to take effect.")
-                        .define("enableUsingAutodetectedDisplayName", true);
-                autoDetectedDisplayNameFallback = clientConfigBuilder
-                        .comment(" ",
-                                " The text to use in place of %autoDetect if we're unable to automatically detect your",
-                                " modpack's display name.",
-                                " ",
-                                " Note: This value will always be used for %autoName if enableUsingAutodetectedDisplayName",
-                                " is disabled, regardless of whether or not the pack is launched from a supported launcher.")
-                        .define("autoDetectedDisplayNameFallback", "ModpackName");
-            } clientConfigBuilder.pop();
-
-            // Display.Icon
-            clientConfigBuilder.push("Icon"); {
-                enableEnhancedVanillaIcon = clientConfigBuilder
-                        .comment(" ",
-                                " Enable this if you want itlt to use its HiDPI-aware (aka Retina support) icon setting",
-                                " feature with the Vanilla game icon, obtained directly from the game's resources.",
-                                " ",
-                                " Turning this on should give you a more crisp and detailed icon on higher resolution displays,",
-                                " rather than the comparatively blurry 32px PNG that is normally used.")
-                        .define("enableEnhancedVanillaIcon", true);
-                enableCustomIcon = clientConfigBuilder
-                        .comment(" ",
-                                " Enable this if you want to change the window and taskbar icon of the Minecraft window.",
-                                " ICO, ICNS and PNG icons provided to this mod are supported on all operating systems.",
-                                " ",
-                                " Note: The icon needs to be placed in config" + File.separator + "itlt" + File.separator + "icon.(ico/icns/png).",
-                                " ",
-                                " Note: See the itlt wiki for more info.",
-                                " ",
-                                " Note: This will override the enableEnhancedVanillaIcon when a valid custom icon is found.")
-                        .define("enableCustomIcon", true);
-                enableUsingAutodetectedIcon = clientConfigBuilder
-                        .comment(" ",
-                                " Enable this if you want itlt to automatically detect your modpack's icon when launching",
-                                " from a supported launcher. If unable to auto-detect, it will fallback to a provided",
-                                " icon.ico/icon.icns/icon.png file if available.",
-                                " ",
-                                " Note: enableCustomIcon must be enabled for this to take effect.")
-                        .define("enableUsingAutodetectedIcon", true); // Currently supported launchers: Technic, MultiMC.
-            } clientConfigBuilder.pop();
-
-        } clientConfigBuilder.pop(); // end of Display section
 
         // Server list section
         clientConfigBuilder.push("ServerList"); {

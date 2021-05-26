@@ -1,8 +1,8 @@
 package dk.zlepper.itlt.client;
 
 import dk.zlepper.itlt.itlt;
-import net.minecraft.client.gui.AccessibilityScreen;
-import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.achievement.GuiStats;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -15,7 +15,7 @@ public class ClientForgeEvents {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onGuiOpen(final GuiOpenEvent event) {
         if (ClientConfig.enableExplicitGC.get()) {
-            final Screen screen = event.getGui();
+            final GuiScreen screen = event.getGui();
             if (screen == null) return;
             itlt.LOGGER.debug("Screen: " + screen);
 
@@ -23,14 +23,13 @@ public class ClientForgeEvents {
             // pause screen or opening an opaque bg screen such as the Resource Pack or Controls screens.
             // Doing this can help reduce memory usage in certain situations and also slightly reduces the chances
             // of a large GC happening in the middle of gameplay.
-            if ((ClientConfig.doExplicitGCOnPause.get() && screen.isPauseScreen())
-                    || (ClientConfig.doExplicitGCOnSleep.get() && screen instanceof SleepInMultiplayerScreen)
+            if ((ClientConfig.doExplicitGCOnPause.get() && screen instanceof GuiIngameMenu)
+                    || (ClientConfig.doExplicitGCOnSleep.get() && screen instanceof GuiSleepMP)
                     || (ClientConfig.doExplicitGCOnMenu.get() && (
-                            screen instanceof WorldSelectionScreen || screen instanceof MultiplayerScreen
-                                    || screen instanceof ServerListScreen || screen instanceof ResourcePacksScreen
-                                    || screen instanceof LanguageScreen || screen instanceof ChatOptionsScreen
-                                    || screen instanceof ControlsScreen || screen instanceof AccessibilityScreen
-                                    || screen instanceof StatsScreen))) {
+                            screen instanceof GuiWorldSelection || screen instanceof GuiMultiplayer
+                                    || screen instanceof GuiScreenServerList || screen instanceof GuiScreenResourcePacks
+                                    || screen instanceof GuiLanguage || screen instanceof ScreenChatOptions
+                                    || screen instanceof GuiControls || screen instanceof GuiStats))) {
                 Runtime.getRuntime().gc();
             }
         }

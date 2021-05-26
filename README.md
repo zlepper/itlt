@@ -53,7 +53,8 @@ Work for the latest supported Minecraft version is done on the "master" branch, 
 | [master](https://github.com/zlepper/itlt)           | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | 1.16                                                | Placeholder       | **v2**      | None                             | None           |
 | [1.15](https://github.com/zlepper/itlt/tree/1.15)   | 1.15.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| 1.14 (you're here)                                  | 1.14.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| [1.14](https://github.com/zlepper/itlt/tree/1.14)   | 1.14.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| 1.13 (you're here)                                  | 1.13.2            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.12](https://github.com/zlepper/itlt/tree/1.12)   | 1.12.2            | v1          | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.11](https://github.com/zlepper/itlt/tree/1.11)   | 1.11.x            | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
 | [1.10](https://github.com/zlepper/itlt/tree/1.10)   | 1.10.x            | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |

@@ -11,9 +11,6 @@ import net.minecraft.client.Minecraft;
 
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SharedConstants;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,11 +18,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -114,7 +109,6 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void clientInit(final FMLClientSetupEvent event) {
         final Minecraft mcInstance = event.getMinecraftSupplier().get();
-        final String mcVersion = SharedConstants.getVersion().getName();
 
         // Java arch requirement and warning
         final boolean isJava64bit = mcInstance.isJava64bit();
@@ -122,76 +116,6 @@ public class ClientModEvents {
         if (!isJava64bit) {
             if (ClientConfig.enable64bitRequirement.get()) ClientUtils.startUIProcess(Message.Content.NeedsJava64bit);
             else if (ClientConfig.enable64bitWarning.get()) ClientUtils.startUIProcess(Message.Content.WantsJava64bit);
-        }
-
-        // Custom window title text
-        if (ClientConfig.enableCustomWindowTitle.get()) {
-            String customWindowTitle = ClientConfig.customWindowTitleText.get();
-
-            String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
-            if (ClientConfig.enableUsingAutodetectedDisplayName.get() && customWindowTitle.contains("%autoName")) {
-                try {
-                    final String tmp = detectedLauncher.getModpackDisplayName();
-                    if (tmp != null) autoDetectedDisplayName = tmp;
-                } catch (final IOException e) {
-                    itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
-                    e.printStackTrace();
-                }
-            }
-            customWindowTitle = customWindowTitle.replaceFirst("%autoName", autoDetectedDisplayName);
-
-            // replace %mc with the Vanilla window title
-            customWindowTitle = customWindowTitle.replaceFirst("%mc", "Minecraft* " + mcVersion);
-
-            itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
-
-            if (!customWindowTitle.isEmpty()) GLFW.glfwSetWindowTitle(mcInstance.mainWindow.getHandle(), customWindowTitle);
-        }
-
-        // Enhanced window icon
-        if (ClientConfig.enableEnhancedVanillaIcon.get()) {
-            try {
-                final InputStream enhancedIcon = mcInstance.getPackFinder().getVanillaPack()
-                        .getResourceStream(ResourcePackType.CLIENT_RESOURCES, new ResourceLocation("icons/minecraft.icns"));
-                ClientUtils.setWindowIcon(enhancedIcon, mcInstance, itltDir, "icns");
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Custom window icon
-        if (ClientConfig.enableCustomIcon.get()) {
-            File customIcon = null;
-
-            // first try the auto-detected modpack icon if available
-            if (ClientConfig.enableUsingAutodetectedIcon.get()) {
-                final File autoDetectedIcon = detectedLauncher.getModpackIcon();
-                if (autoDetectedIcon != null && autoDetectedIcon.exists() && !autoDetectedIcon.isDirectory())
-                    customIcon = autoDetectedIcon;
-            }
-
-            // check if an icon file exists in the itltDir and use it if it does, prioritising
-            // ico over icns and icns over png. Prioritise the provided icon over the auto-detected one
-            if (itltDir != null) {
-                final File icoIcon = Paths.get(itltDir.getAbsolutePath(), "icon.ico").toFile();
-                final File icnsIcon = Paths.get(itltDir.getAbsolutePath(), "icon.icns").toFile();
-                final File pngIcon = Paths.get(itltDir.getAbsolutePath(), "icon.png").toFile();
-
-                if (icoIcon.exists() && !icoIcon.isDirectory()) customIcon = icoIcon;
-                else if (icnsIcon.exists() && !icnsIcon.isDirectory()) customIcon = icnsIcon;
-                else if (pngIcon.exists() && !pngIcon.isDirectory()) customIcon = pngIcon;
-            }
-
-            if (customIcon != null) {
-                try {
-                    ClientUtils.setWindowIcon(customIcon, mcInstance);
-                } catch (final IOException e) {
-                    itlt.LOGGER.error("Unable to set the window icon.");
-                    e.printStackTrace();
-                }
-            } else {
-                itlt.LOGGER.warn("enableCustomIcon is true but icon.ico/icns/png is missing or invalid.");
-            }
         }
 
         // Custom server list entries

@@ -126,22 +126,13 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 #### What?
 
--   Modpack authors can add to the existing game's branding to help distinguish it from other modpacks on the same Minecraft version
-    -   Window title can either be customised with a static string or to include placeholders such as "%autoName" to auto-detect based on how it's named in the launcher the game was started from. Or no custom window title at all if prefered (this'll keep the Vanilla one).
-    -   Same with the custom icon - can either be:
-        - Static icon based on a PNG file
-        - Dynamic icon auto-detected by a supported launcher
-        - Vanilla icon (no custom icon)
+-   This feature is unavailable for Minecraft 1.13.2.
+-   This section partially remains as it contains details regarding launcher detection, which is also used for the warnings and requirements system which is available for MC 1.13.2
 
 #### Where?
 
--   Handled in `client.ClientModEvents#clientInit` (`FMLClientSetupEvent`)
 -   Has calls to:
-    -   `ClientConfig` to grab config values related to branding customisation
     -   `LauncherUtils#getDetectedLauncher()` to get the launcher used to start the game
-    -   `DetectedLauncher#getModpackDisplayName()` to get the modpack's user-friendly display name
-    -   `DetectedLauncher#getModpackIcon()` to get the modpack's icon
-    -   `ClientUtils#setWindowIcon()` to set the custom window icon
 -   Uses classes that implement the following interfaces:
     -   `DetectedLauncher` (implemented by `CurseClient`, `Technic`, `MultiMC`, etc...)
 
@@ -154,12 +145,6 @@ See the warnings feature brief for details on which to use and when. If you're n
     -   Once it has determined the launcher, it returns a new instance of the relevant launcher class that implements `client.launchers.DetectedLauncher`
         - Launcher classes that don't support a feature yet (such as getting the modpack's icon) should `return null` on the appropriate methods and itlt should handle it gracefully
         - The use of instancing and implementing an interface with a bunch of classes helps reduce the amount of logic code in this case as we don't need to check what launcher we're running on before running launcher-specific modpack display name detection code.
--   What does `Technic#getModpackDisplayName()` do?
-    -   It parses the Technic Launcher's `cache.json` file for our packSlug and grabs the value associated to the `displayName` key
--   What does `MultiMC#getModpackDisplayName()` do?
-    -   It parses the MultiMC `instance.cfg` file in the root `.minecraft` folder we're running from and grabs the value associated to the `name` key
--   What does `CurseClient#getModpackDisplayName()` do?
-    -   It parses the `.minecraftinstance.json` and grabs the value associated to the `name` key
 -   What's the inheritance model and how does it work in this case?
     -   `LauncherUtils#getDetectedLauncher()` returns a new instance of a class that implements DetectedLauncher.
     -   Said class `@Override`s relevant methods
@@ -176,14 +161,6 @@ See the warnings feature brief for details on which to use and when. If you're n
     1. Determine how the launcher stores the friendly display name for the currently running modpack
     2. Implement `getModpackDisplayName()` in the existing launcher class you're interested in, found in `client.launchers` (e.g. `client.launchers.MultiMC`).
         - If you return null, itlt should fallback to `ClientConfig.autoDetectedDisplayNameFallback.get()`
--   Support custom window title auto-detection on a new launcher?
-    -   First add detection for the new launcher, then follow the instructions for doing it on an existing launcher
--   Support custom icon auto-detection on an existing launcher?
-    1. Determine how the launcher stores the icon for the currently running modpack
-    2. Implement `getModpackIcon()` in the existing launcher class you're interested in, found in `client.launchers` (e.g. `client.launchers.Technic`).
-        - If you return null, itlt should fallback to the file at `config\itlt\icon.png`. If that's also missing, it'll log a warning and carry on with the Vanilla icon
--   Support custom icon auto-detection on a new launcher?
-    -   First add detection for the new launcher, then follow the instructions for doing it on an existing launcher
 
 ## To-do lists
 
@@ -236,7 +213,7 @@ Make sure you set both the project SDK to 8 and language level to 8.
 
 In IntelliJ, you can do this by going to `File -> Project Structure`.
 
-You need to use Java 8u232 or lower as newer builds of Java 8 removed a part of a library that MC 1.14.x depends on.
+You need to use Java 8u232 or lower as newer builds of Java 8 removed a part of a library that MC 1.13.x depends on.
 
 ### Unable to start Gradle
 

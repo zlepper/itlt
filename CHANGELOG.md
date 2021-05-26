@@ -6,6 +6,11 @@
 
 With v2 of itlt, everything has been written from the ground-up with a goal on being the best at the specific little things it does.
 
+## MC 1.13.2-specific
+
+-   itlt v2 is now available for MC 1.13.2!
+-   Branding customisation features such as custom window title and icon are unavailable, please use MC 1.14.x or newer if you want those features
+
 ## Breaking changes
 
 Everything's changed so this release is not compatible with existing v1 configs. The default behaviour of auto-detecting the modpack's icon and title is still in place.
@@ -49,42 +54,6 @@ Here's a list of supported warnings (shown as "Wants") and requirements (shown a
 -   NeedsOlderJava
 -   WantsOlderJava
 
-### Overhauled custom icon handling
-
-The new icon handling system supports ICO, ICNS and PNG files as well as launcher integration for automatically detecting and using your modpack's icon from its platform listing.
-
-With Hi-DPI and multi-size ICO and ICNS support, your modpack's icon can look crisp at any screen resolution and size. When an exact size isn't available, the closest one is resized and used automatically.
-
-To see this in action, check out [this single ICO file](https://github.com/zlepper/itlt/blob/gh-pages/docs/guides/itlt/icon.ico) automatically display different sizes depending on the resolution scale:
-
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/100%25.png)
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/125%25.png)
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/150%25.png)
-
-More scales: [200%](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/200%25.png), [300%](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/300%25.png), [400%](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%25.png), [500%](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/500%25.png)
-
-#### __Enhanced Vanilla Icon__
-
-This feature uses the new icon handling system for the Vanilla icon on Windows and Linux, boosting its maximum resolution from 32px² to 48px²
-
-Vanilla:
-
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%25-vanilla.png)
-
-itlt:
-
-![](https://zlepper.github.io/itlt/docs/changelogs/v2.0.0/400%25-enhanced-vanilla.png)
-
-### New custom window title system
-
-Mojang have politely asked people to not completely replace existing branding, effectively taking credit for their work.
-
-With v2, itlt respects this with new defaults and string interpolation techniques. This brings a few benefits:
-
--   Easier for others to troubleshoot your modpack by knowing what Minecraft version it's based on
--   The ability to vaguely tell what the player's doing by the window title (e.g. `ModpackName - Minecraft* 1.16.5 (Multiplayer)`)
--   Ability to use launcher integration and static titles simultaneously, allowing for you to name your pack "myPack" in the launcher and have the title show up as "myPack v2" for example when launching v2 of your pack, "myPack v3" when launching v3, etc...
-
 ### Multiple entries in custom server list
 
 You can now pre-install more than one server entry to the Multiplayer menu without overwriting or removing player-added ones when updating the modpack. You can now also force the use of a server-provided resourcepack for specific preloaded server entries.
@@ -105,7 +74,6 @@ All config options are categorised and have detailed comments to group similar s
 
 ### Miscellaneous improvements
 
--   The itlt entry in the mods menu now features the itlt logo.
 -   Pop-up windows now attempt to use a more system-native design, with custom code for handling showing native Windows iconography rather than Swing's bundled Windows 7 icons
 -   Pop-up windows are ran in a separate process so that they can persist after a game crash and to avoid causing crash-on-launch issues on older Mac OSX
 -   If you run the itlt jar directly, you'll now get this message both in the console output and as a GUI dialogue box:

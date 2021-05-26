@@ -8,16 +8,16 @@ plugins {
     id "net.minecraftforge.gradle" version "4.1.+"
 }
 
-version = "1.14.x-2.0.0"
+version = "1.13.x-2.0.0"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
-// MC 1.14.x needs Java 8u232 or older for the dev env to successfully setup
+// MC 1.13.x needs Java 8u232 or older for the dev env to successfully setup
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = "1.8"
 
 println "Java: ${System.getProperty "java.version"}, JVM: ${System.getProperty "java.vm.version"} (${System.getProperty "java.vendor"}), Arch: ${System.getProperty "os.arch"}"
 minecraft {
-    mappings channel: "snapshot", version: "20190624-1.14.2"
+    mappings channel: "snapshot", version: "20190530-1.13.2"
 
     accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
 
@@ -71,7 +71,7 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.14.4-28.2.23"
+    minecraft "net.minecraftforge:forge:1.13.2-25.0.219"
 
     // itlt uses the "image4j" library to read .ico files
     implementation "com.github.imcdonagh:image4j:0.7.2"

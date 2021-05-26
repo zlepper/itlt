@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 @Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptableRemoteVersions = "*")
-public class Itlt {
+public final class Itlt {
     @Mod.Instance("itlt")
     public static Itlt instance;
 
@@ -44,18 +44,20 @@ public class Itlt {
         logger = event.getModLog();
 
         if (proxy instanceof ClientProxy) {
+            final Minecraft mcInstance = Minecraft.getMinecraft();
+
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
             config.load();
-            Property javaBitDetectionProp = config.get("BitDetection", "ShouldYellAt32BitUsers", false);
+            Property javaBitDetectionProp = config.get("BitDetection", "ShouldYellAt32BitUsers", true);
             javaBitDetectionProp.setComment("Set to true to make itlt yell at people attempting to use 32x java for the modpack.");
-            String yelling = javaBitDetectionProp.getBoolean() ? "We are yelling at people" : "We are NOT yelling at people";
+            final String yelling = javaBitDetectionProp.getBoolean() ? "We are yelling at people" : "We are NOT yelling at people";
             logger.info(yelling);
 
             Property javaBitIssueMessageProp = config.get("BitDetection", "ErrorMessage", "You are using a 32 bit version of java. This is not recommended with this modpack.");
             javaBitIssueMessageProp.setComment("If ShouldYellAt32BitUsers is set to true, this is the message that will be displayed to the user.");
 
             if (javaBitDetectionProp.getBoolean(false)) {
-                if (!Minecraft.getMinecraft().isJava64bit()) {
+                if (!mcInstance.isJava64bit()) {
                     ShouterThread st = new ShouterThread(javaBitIssueMessageProp.getString());
                     st.start();
                 }
@@ -72,10 +74,10 @@ public class Itlt {
             Property customIconProp = config.get("Display", "loadCustomIcon", true);
             customIconProp.setComment("Set to true to load a custom icon from config" + File.separator + "itlt" + File.separator + "icon.png");
             if (customIconProp.getBoolean()) {
-                File di = Paths.get(event.getModConfigurationDirectory().getAbsolutePath(), "itlt").toFile();
+                final File di = Paths.get(event.getModConfigurationDirectory().getAbsolutePath(), "itlt").toFile();
                 logger.info(di);
                 if (di.exists()) {
-                    File icon = Paths.get(di.getAbsolutePath(), "icon.png").toFile();
+                    final File icon = Paths.get(di.getAbsolutePath(), "icon.png").toFile();
                     logger.info(icon.exists() ? "Custom modpack icon found" : "Custom modpack icon NOT found.");
                     if (icon.exists() && !icon.isDirectory()) {
                         Display.setIcon(IconLoader.load(icon));
@@ -91,9 +93,9 @@ public class Itlt {
             Property useTechnicIconProp = config.get("Display", "useTechnicIcon", true);
             useTechnicIconProp.setComment("Set to true to attempt to use the icon assigned to the modpack by the technic launcher. \nThis will take priority over loadCustomIcon");
             if (useTechnicIconProp.getBoolean()) {
-                Path assets = getAssetDir();
+                final Path assets = getAssetDir();
 
-                File icon = Paths.get(assets.toAbsolutePath().toString(), "icon.png").toFile();
+                final File icon = Paths.get(assets.toAbsolutePath().toString(), "icon.png").toFile();
                 logger.info(icon.exists() ? "Technic icon found" : "Technic icon NOT found. ");
                 if (icon.exists() && !icon.isDirectory()) {
                     Display.setIcon(IconLoader.load(icon));
@@ -103,9 +105,9 @@ public class Itlt {
             Property useTechnicDisplayNameProp = config.get("Display", "useTechnicDisplayName", true);
             useTechnicDisplayNameProp.setComment("Set to true to attempt to get the display name of the pack of the info json file \nThis will take priority over windowDisplayTitle");
             if (useTechnicDisplayNameProp.getBoolean()) {
-                Path assets = getAssetDir();
+                final Path assets = getAssetDir();
 
-                File cacheFile = Paths.get(assets.toAbsolutePath().toString(), "cache.json").toFile();
+                final File cacheFile = Paths.get(assets.toAbsolutePath().toString(), "cache.json").toFile();
                 logger.info(cacheFile.exists() ? "Cache file found" : "Cache file not found.");
                 if (cacheFile.exists() && !cacheFile.isDirectory()) {
                     String json = null;
@@ -116,7 +118,7 @@ public class Itlt {
                         logger.error(e.toString());
                     }
                     if (json != null) {
-                        Map cacheContents = new Gson().fromJson(json, Map.class);
+                        final Map cacheContents = new Gson().fromJson(json, Map.class);
                         logger.info(cacheContents.size());
                         if (cacheContents.containsKey("displayName")) {
                             logger.info(cacheContents.get("displayName").toString());
@@ -137,7 +139,7 @@ public class Itlt {
 
             if (addCustomServerProp.getBoolean()) {
                 ServerList serverList = new ServerList(Minecraft.getMinecraft());
-                int c = serverList.countServers();
+                final int c = serverList.countServers();
                 boolean foundServer = false;
                 for (int i = 0; i < c; i++) {
                     ServerData data = serverList.getServerData(i);
@@ -163,15 +165,15 @@ public class Itlt {
 
     private Path getAssetDir() {
         // Get the current Working directory
-        Path currentRelativePath = Paths.get("").toAbsolutePath();
-        String slugname = currentRelativePath.getFileName().toString();
+        final Path currentRelativePath = Paths.get("").toAbsolutePath();
+        final String slugname = currentRelativePath.getFileName().toString();
 
-        Path directParent = currentRelativePath.getParent();
+        final Path directParent = currentRelativePath.getParent();
         if (directParent == null) {
             return currentRelativePath;
         }
         // Should be the .technic directory
-        Path technic = directParent.getParent();
+        final Path technic = directParent.getParent();
         if (technic == null) {
             return currentRelativePath;
         }

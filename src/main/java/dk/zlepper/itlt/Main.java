@@ -79,7 +79,7 @@ public final class Main {
         try {
             System.out.println("messageContent: " + args[8]);
         } catch (final ArrayIndexOutOfBoundsException e) {
-            final String helpMsg = "To install this mod, place me in the mods folder of a Minecraft Forge 1.16.x setup.";
+            final String helpMsg = "To install this mod, place me in the mods folder of a Minecraft Forge 1.15.x setup.";
             JOptionPane.showMessageDialog(getParentComponent(), helpMsg, "It's the little things mod",
                     JOptionPane.INFORMATION_MESSAGE, infoIcon);
             System.out.println(helpMsg);

@@ -16,6 +16,7 @@ public final class ShouterThread extends Thread {
     @Override
     public void run() {
         if(Itlt.proxy instanceof ClientProxy) {
+            System.setProperty("java.awt.headless", "false");
             JOptionPane.showMessageDialog(null, message, "Java version issue", JOptionPane.WARNING_MESSAGE);
         } else {
             Itlt.logger.warn(message);

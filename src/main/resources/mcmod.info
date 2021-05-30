@@ -3,8 +3,8 @@
     "modid": "itlt",
     "name": "It's the little things",
     "description": "A mod that does those \"little things\".",
-    "version": "1.0.3",
-    "mcversion": "${mcversion}",
+    "version": "1.0.4",
+    "mcversion": "1.12",
     "url": "https://www.curseforge.com/minecraft/mc-mods/its-the-little-things",
     "updateUrl": "",
     "authorList": [

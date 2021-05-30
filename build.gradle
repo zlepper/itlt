@@ -19,7 +19,7 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "1.9-1.0.1"
+version = "1.9.x-1.0.1"
 group= "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 

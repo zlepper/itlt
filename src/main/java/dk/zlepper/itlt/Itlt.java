@@ -27,7 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME)
+@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptedMinecraftVersions = "[1.9,1.9.4]")
 public class Itlt {
     @Mod.Instance("itlt")
     public static Itlt instance;

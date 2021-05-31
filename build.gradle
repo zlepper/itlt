@@ -2,35 +2,24 @@ import net.minecraftforge.gradle.userdev.UserDevPlugin
 import net.minecraftforge.gradle.common.util.MinecraftRepo
 import net.minecraftforge.gradle.common.util.Utils
 
-buildscript {
-    repositories {
-        maven { url = "https://su5ed.jfrog.io/artifactory/maven/" }
-        maven { url = "https://files.minecraftforge.net/maven" }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.1.legacy-SNAPSHOT", changing: true
-    }
-}
-
 plugins {
     id "eclipse"
     id "maven-publish"
+    id "net.minecraftforge.gradle" version "4.1.legacy-SNAPSHOT"
 }
-apply plugin: "net.minecraftforge.gradle"
 
 MinecraftRepo.MCP_URL = "https://su5ed.jfrog.io/artifactory/maven/"
 
 version = "1.4.6&7-1.0.0"
 group = "ga.ozli.minecraftmods"
 
-def forgeGroup = "net.minecraftforge"
-def forgeName = "forge"
-def forgeVersion = "1.4.7-6.6.3.541"
+final forgeGroup = "net.minecraftforge"
+final forgeName = "forge"
+final forgeVersion = "1.4.7-6.6.3.541"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+java.sourceCompatibility = java.targetCompatibility = JavaVersion.VERSION_1_7
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+println "Java: ${System.getProperty "java.version"}, JVM: ${System.getProperty "java.vm.version"} (${System.getProperty "java.vendor"}), Arch: ${System.getProperty "os.arch"}"
 minecraft {
     mappings channel: "stable", version: "7.26-1.4.7"
     
@@ -82,7 +71,7 @@ processResources {
             "mc_version": "1.4.7"
     ])
     
-    filesMatching("legacyfixmod.info") {
+    filesMatching("itlt.info") {
         // replace version and mcversion
         expand "version": project.version, "mc_version": "1.4.7"
     }

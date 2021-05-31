@@ -1,0 +1,109 @@
+import net.minecraftforge.gradle.userdev.UserDevPlugin
+import net.minecraftforge.gradle.common.util.MinecraftRepo
+import net.minecraftforge.gradle.common.util.Utils
+
+buildscript {
+    repositories {
+        maven { url = "https://su5ed.jfrog.io/artifactory/maven/" }
+        maven { url = "https://files.minecraftforge.net/maven" }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "4.1.legacy-SNAPSHOT", changing: true
+    }
+}
+
+plugins {
+    id "eclipse"
+    id "maven-publish"
+}
+apply plugin: "net.minecraftforge.gradle"
+
+MinecraftRepo.MCP_URL = "https://su5ed.jfrog.io/artifactory/maven/"
+
+version = "1.4.6&7-1.0.0"
+group = "ga.ozli.minecraftmods"
+
+def forgeGroup = "net.minecraftforge"
+def forgeName = "forge"
+def forgeVersion = "1.4.7-6.6.3.541"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+minecraft {
+    mappings channel: "stable", version: "7.26-1.4.7"
+    
+    runs {
+        client {
+            workingDirectory project.file("run")
+            //property 'forge.logging.markers', 'REGISTRIES'
+            property "forge.logging.console.level", "info"
+
+            mods {
+                itlt {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = "forge"
+        url = "https://su5ed.jfrog.io/artifactory/maven/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft(group: forgeGroup, name: forgeName, version: forgeVersion)
+}
+
+// Example for how to get properties into the manifest for reading by the runtime..
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "itlt",
+            "Specification-Vendor": "Paint_Ninja",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": project.name,
+            "Implementation-Version": project.version,
+            "Implementation-Vendor" :"Paint_Ninja",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+processResources {
+    inputs.properties([
+            "version": project.version,
+            "mc_version": "1.4.7"
+    ])
+    
+    filesMatching("legacyfixmod.info") {
+        // replace version and mcversion
+        expand "version": project.version, "mc_version": "1.4.7"
+    }
+}
+
+tasks.whenTaskAdded {
+    // Add the obfuscated forge jar to the classpath when deobfuscating dependencies. This is required for live inheritance to work
+    if (it.name.startsWith("_RenameObf2Mcp_")) {
+        it.setClasspath(files(Utils.getCache(project, "minecraft_user_repo", forgeGroup.replace('.', '/'), forgeName, forgeVersion, "$forgeName-$forgeVersion-obf.jar"), getConfigurations().getByName(UserDevPlugin.OBF)))
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
+    }
+}

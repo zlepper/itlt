@@ -5,11 +5,11 @@ import dk.zlepper.itlt.proxies.ClientProxy;
 
 import javax.swing.*;
 
-public class ShouterThread extends Thread {
+public final class ShouterThread extends Thread {
 
     private String message;
 
-    public ShouterThread(String message) {
+    public ShouterThread(final String message) {
         this.message = message;
     }
 

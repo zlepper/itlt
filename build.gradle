@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.7.10-1.0.3"
+version = "1.7.x-1.0.3"
 group= "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
@@ -43,6 +43,15 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
 }
+
+//jar {
+//    manifest {
+//        attributes([
+//                "FMLAT": "itlt_at.cfg", // Access Transformer for MC 1.7.10
+//                "FMLCorePlugin": "dk.zlepper.itlt.launch.itltCorePlugin" // for MC 1.7.2
+//        ])
+//    }
+//}
 
 processResources
 {

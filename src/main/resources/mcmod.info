@@ -5,10 +5,11 @@
     "description": "A mod that does those \"little things\".",
     "version": "${version}",
     "mcversion": "${mcversion}",
-    "url": "",
+    "url": "https://curseforge.com/minecraft/mc-mods/its-the-little-things/files/all?filter-status=1&filter-game-version=1738749986%3A5",
     "updateUrl": "",
     "authorList": [
-      "Zlepper"
+      "Zlepper",
+      "Paint_Ninja"
     ],
     "credits": "",
     "logoFile": "",

@@ -5,6 +5,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import dk.zlepper.itlt.about.mod;
 import dk.zlepper.itlt.helpers.IconLoader;
 import dk.zlepper.itlt.proxies.ClientProxy;
@@ -21,14 +22,15 @@ import org.lwjgl.opengl.Display;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptableRemoteVersions = "*")
-public class Itlt {
+@Mod(modid = mod.ID, version = mod.VERSION, name = mod.NAME, acceptableRemoteVersions = "*", acceptedMinecraftVersions = "[1.7.2,1.7.10]")
+public final class Itlt {
     @Mod.Instance("itlt")
     public static Itlt instance;
 
@@ -44,19 +46,32 @@ public class Itlt {
         logger = event.getModLog();
 
         if (proxy instanceof ClientProxy) {
+            final Minecraft mcInstance = Minecraft.getMinecraft();
+
+            String launchedVersion;
+            try {
+                final Field launchedVersionField = ReflectionHelper.findField(mcInstance.getClass(), "launchedVersion", "field_110447_Z");
+                launchedVersionField.setAccessible(true);
+                launchedVersion = (String) launchedVersionField.get(mcInstance);
+            } catch (final Exception e) {
+                launchedVersion = "1.7.?";
+            }
+
+            logger.info("version: " + launchedVersion);
+
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
             config.load();
-            Property javaBitDetectionProp = config.get("BitDetection", "ShouldYellAt32BitUsers", false);
+            Property javaBitDetectionProp = config.get("BitDetection", "ShouldYellAt32BitUsers", true);
             javaBitDetectionProp.comment = "Set to true to make itlt yell at people attempting to use 32x java for the modpack.";
-            String yelling = javaBitDetectionProp.getBoolean() ? "We are yelling at people" : "We are NOT yelling at people";
+            final String yelling = javaBitDetectionProp.getBoolean() ? "We are yelling at people" : "We are NOT yelling at people";
             logger.info(yelling);
 
             Property javaBitIssueMessageProp = config.get("BitDetection", "ErrorMessage", "You are using a 32 bit version of java. This is not recommended with this modpack.");
             javaBitIssueMessageProp.comment = "If ShouldYellAt32BitUsers is set to true, this is the message that will be displayed to the user.";
 
             if (javaBitDetectionProp.getBoolean(false)) {
-                if (!Minecraft.getMinecraft().isJava64bit()) {
-                    ShouterThread st = new ShouterThread(javaBitIssueMessageProp.getString());
+                if (!mcInstance.isJava64bit()) {
+                    final ShouterThread st = new ShouterThread(javaBitIssueMessageProp.getString());
                     st.start();
                 }
             }
@@ -65,24 +80,24 @@ public class Itlt {
             shouldMaximizeDisplayProp.comment = "Set to true to make minecraft attempt to maximize itself on startup (This is kinda unstable right now, so don't trust it too much)";
             makeScreenBigger = shouldMaximizeDisplayProp.getBoolean();
 
-            Property windowDisplayTitleProp = config.get("Display", "windowDisplayTitle", "Minecraft 1.7.10");
+            Property windowDisplayTitleProp = config.get("Display", "windowDisplayTitle", "Minecraft " + launchedVersion);
             windowDisplayTitleProp.comment = "Change this value to change the name of the MineCraft window";
             windowDisplayTitle = windowDisplayTitleProp.getString();
 
             Property customIconProp = config.get("Display", "loadCustomIcon", true);
             customIconProp.comment = "Set to true to load a custom icon from config" + File.pathSeparator + "itlt" + File.pathSeparator + "icon.png";
             if (customIconProp.getBoolean()) {
-                File di = Paths.get(event.getModConfigurationDirectory().getAbsolutePath(), "itlt").toFile();
+                final File di = Paths.get(event.getModConfigurationDirectory().getAbsolutePath(), "itlt").toFile();
                 logger.info(di);
                 if (di.exists()) {
-                    File icon = Paths.get(di.getAbsolutePath(), "icon.png").toFile();
+                    final File icon = Paths.get(di.getAbsolutePath(), "icon.png").toFile();
                     logger.info(icon.exists() ? "Custom modpack icon found" : "Custom modpack icon NOT found.");
                     if (icon.exists() && !icon.isDirectory()) {
                         Display.setIcon(IconLoader.load(icon));
                     }
                 } else {
                     logger.error("Directory for custom modpack icon not found!");
-                    if(di.mkdir()) {
+                    if (di.mkdir()) {
                         logger.info("Made the directory for you. ");
                     }
                 }
@@ -90,24 +105,24 @@ public class Itlt {
 
             Property useTechnicIconProp = config.get("Display", "useTechnicIcon", true);
             useTechnicIconProp.comment = "Set to true to attempt to use the icon assigned to the modpack by the technic launcher. \nThis will take priority over loadCustomIcon";
-            if(useTechnicIconProp.getBoolean()) {
-                Path assets = getAssetDir();
+            if (useTechnicIconProp.getBoolean()) {
+                final Path assets = getAssetDir();
 
-                File icon = Paths.get(assets.toAbsolutePath().toString(), "icon.png").toFile();
+                final File icon = Paths.get(assets.toAbsolutePath().toString(), "icon.png").toFile();
                 logger.info(icon.exists() ? "Technic icon found" : "Technic icon NOT found. ");
-                if(icon.exists() && !icon.isDirectory()) {
+                if (icon.exists() && !icon.isDirectory()) {
                     Display.setIcon(IconLoader.load(icon));
                 }
             }
 
             Property useTechnicDisplayNameProp = config.get("Display", "useTechnicDisplayName", true);
             useTechnicDisplayNameProp.comment = "Set to true to attempt to get the display name of the pack of the info json file \nThis will take priority over windowDisplayTitle";
-            if(useTechnicDisplayNameProp.getBoolean()) {
-                Path assets = getAssetDir();
+            if (useTechnicDisplayNameProp.getBoolean()) {
+                final Path assets = getAssetDir();
 
-                File cacheFile = Paths.get(assets.toAbsolutePath().toString(), "cache.json").toFile();
+                final File cacheFile = Paths.get(assets.toAbsolutePath().toString(), "cache.json").toFile();
                 logger.info(cacheFile.exists() ? "Cache file found" : "Cache file not found.");
-                if(cacheFile.exists() && !cacheFile.isDirectory()) {
+                if (cacheFile.exists() && !cacheFile.isDirectory()) {
                     String json = null;
                     try {
                         json = StringUtils.join(Files.readAllLines(cacheFile.toPath(), StandardCharsets.UTF_8), "");
@@ -115,10 +130,10 @@ public class Itlt {
                     } catch (IOException e) {
                         logger.error(e.toString());
                     }
-                    if(json != null) {
-                        Map cacheContents = new Gson().fromJson(json, Map.class);
+                    if (json != null) {
+                        final Map cacheContents = new Gson().fromJson(json, Map.class);
                         logger.info(cacheContents.size());
-                        if(cacheContents.containsKey("displayName")) {
+                        if (cacheContents.containsKey("displayName")) {
                             logger.info(cacheContents.get("displayName").toString());
                             windowDisplayTitle = cacheContents.get("displayName").toString();
                         }
@@ -135,9 +150,9 @@ public class Itlt {
             Property customServerIpProp = config.get("Server", "ServerIP", "127.0.0.1:25555");
             customServerIpProp.comment = "The ip of the dedicated server to add.";
 
-            if(addCustomServerProp.getBoolean()) {
-                ServerList serverList = new ServerList(Minecraft.getMinecraft());
-                int c = serverList.countServers();
+            if (addCustomServerProp.getBoolean()) {
+                ServerList serverList = new ServerList(mcInstance);
+                final int c = serverList.countServers();
                 boolean foundServer = false;
                 for (int i = 0; i < c; i++) {
                     ServerData data = serverList.getServerData(i);
@@ -162,15 +177,15 @@ public class Itlt {
 
     private Path getAssetDir() {
         // Get the current Working directory
-        Path currentRelativePath = Paths.get("").toAbsolutePath();
-        String slugname = currentRelativePath.getFileName().toString();
+        final Path currentRelativePath = Paths.get("").toAbsolutePath();
+        final String slugname = currentRelativePath.getFileName().toString();
 
-        Path directParent = currentRelativePath.getParent();
+        final Path directParent = currentRelativePath.getParent();
         if (directParent == null) {
             return currentRelativePath;
         }
         // Should be the .technic directory
-        Path technic = directParent.getParent();
+        final Path technic = directParent.getParent();
         if (technic == null) {
             return currentRelativePath;
         }

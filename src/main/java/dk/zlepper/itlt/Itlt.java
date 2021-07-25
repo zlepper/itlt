@@ -1,6 +1,7 @@
 package dk.zlepper.itlt;
 
 import com.google.gson.Gson;
+import dk.zlepper.itlt.helpers.IconHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import dk.zlepper.itlt.about.mod;
@@ -43,7 +44,8 @@ public final class Itlt {
 
     @Mod.EventHandler
     @SideOnly(Side.CLIENT)
-    public void preinit(FMLPreInitializationEvent event) {
+    public void preinit(FMLPreInitializationEvent event) throws IOException
+    {
         logger = event.getModLog();
 
         if (proxy instanceof ClientProxy) {
@@ -77,13 +79,24 @@ public final class Itlt {
             Property customIconProp = config.get("Display", "loadCustomIcon", true);
             customIconProp.setComment("Set to true to load a custom icon from config" + File.separator + "itlt" + File.separator + "icon.png");
             if (customIconProp.getBoolean()) {
+                File customIcon = null;
                 final File di = Paths.get(event.getModConfigurationDirectory().getAbsolutePath(), "itlt").toFile();
                 logger.info(di);
                 if (di.exists()) {
-                    final File icon = Paths.get(di.getAbsolutePath(), "icon.png").toFile();
-                    logger.info(icon.exists() ? "Custom modpack icon found" : "Custom modpack icon NOT found.");
-                    if (icon.exists() && !icon.isDirectory()) {
-                        Display.setIcon(IconLoader.load(icon));
+                    final File icoIcon = Paths.get(di.getAbsolutePath(), "icon.ico").toFile();
+                    final File icnsIcon = Paths.get(di.getAbsolutePath(), "icon.icns").toFile();
+                    final File pngIcon = Paths.get(di.getAbsolutePath(), "icon.png").toFile();
+                    logger.info(icoIcon.exists() ? "Custom modpack .ico found" : "Custom modpack .ico NOT found.");
+                    logger.info(icnsIcon.exists() ? "Custom modpack .icns found" : "Custom modpack .icns NOT found.");
+                    logger.info(pngIcon.exists() ? "Custom modpack .png found" : "Custom modpack .png NOT found.");
+
+                    if (icoIcon.exists() && !icoIcon.isDirectory()) customIcon = icoIcon;
+                    else if (icnsIcon.exists() && !icnsIcon.isDirectory()) customIcon = icnsIcon;
+                    else if (pngIcon.exists() && !pngIcon.isDirectory()) customIcon = pngIcon;
+                    if(customIcon != null) {
+                        IconHandler.setWindowIcon(customIcon);
+                    } else {
+                        logger.warn("loadCustomIcon is true but icon.ico/icns/png is missing or invalid.");
                     }
                 } else {
                     logger.error("Directory for custom modpack icon not found!");

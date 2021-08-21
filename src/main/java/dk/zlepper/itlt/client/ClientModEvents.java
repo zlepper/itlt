@@ -1,6 +1,7 @@
 package dk.zlepper.itlt.client;
 
 import com.google.gson.Gson;
+import dk.zlepper.itlt.client.helpers.Platform;
 import dk.zlepper.itlt.client.launchers.LauncherUtils;
 import dk.zlepper.itlt.client.launchers.DetectedLauncher;
 import dk.zlepper.itlt.itlt;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import static dk.zlepper.itlt.client.ClientConfig.makeItltFolderIfNeeded;
 
@@ -41,7 +43,7 @@ public class ClientModEvents {
     // rounded to the nearest tenth (e.g. 1.0, 1.1, 1.2...)
     private static float getCurrentMem() {
         final long currentMem = Runtime.getRuntime().maxMemory() + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getMax();
-        return Float.parseFloat(String.format("%.1f", currentMem / 1073741824F));
+        return Float.parseFloat(String.format((Locale) null, "%.1f", currentMem / 1073741824F));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST) // run this as soon as possible to avoid wasting time if a requirement isn't met
@@ -146,18 +148,8 @@ public class ClientModEvents {
             if (!customWindowTitle.isEmpty()) mcInstance.getMainWindow().func_230148_b_(customWindowTitle);
         }
 
-        // Enhanced window icon
-        if (ClientConfig.enableEnhancedVanillaIcon.get()) {
-            try {
-                final InputStream enhancedIcon = mcInstance.getPackFinder().getVanillaPack()
-                        .getResourceStream(ResourcePackType.CLIENT_RESOURCES, new ResourceLocation("icons/minecraft.icns"));
-                ClientUtils.setWindowIcon(enhancedIcon, mcInstance, itltDir, "icns");
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         // Custom window icon
+        boolean isCustomIconSet = false;
         if (ClientConfig.enableCustomIcon.get()) {
             File customIcon = null;
 
@@ -183,12 +175,24 @@ public class ClientModEvents {
             if (customIcon != null) {
                 try {
                     ClientUtils.setWindowIcon(customIcon, mcInstance);
+                    isCustomIconSet = true;
                 } catch (final IOException e) {
                     itlt.LOGGER.error("Unable to set the window icon.");
                     e.printStackTrace();
                 }
             } else {
                 itlt.LOGGER.warn("enableCustomIcon is true but icon.ico/icns/png is missing or invalid.");
+            }
+        }
+
+        // Enhanced window icon
+        if (ClientConfig.enableEnhancedVanillaIcon.get() && !isCustomIconSet) {
+            try {
+                final InputStream enhancedIcon = mcInstance.getPackFinder().getVanillaPack()
+                        .getResourceStream(ResourcePackType.CLIENT_RESOURCES, new ResourceLocation("icons/minecraft.icns"));
+                ClientUtils.setWindowIcon(enhancedIcon, mcInstance, itltDir, "icns");
+            } catch (final IOException e) {
+                e.printStackTrace();
             }
         }
 

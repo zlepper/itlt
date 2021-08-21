@@ -15,7 +15,7 @@ plugins {
 }
 apply plugin: "org.spongepowered.mixin"
 
-version = "1.16.x-2.0.0"
+version = "1.16.x-2.0.1"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 

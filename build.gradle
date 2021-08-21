@@ -15,7 +15,7 @@ plugins {
 }
 apply plugin: "org.spongepowered.mixin"
 
-version = "1.15.x-2.0.0"
+version = "1.15.x-2.0.1"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
@@ -100,7 +100,7 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.15.2-31.2.50"
+    minecraft "net.minecraftforge:forge:1.15.2-31.2.55"
 
     // Mixin
     implementation "org.spongepowered:mixin:0.8.2"

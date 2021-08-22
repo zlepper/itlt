@@ -2,6 +2,24 @@
 
 # Changelog
 
+# v2.0.1
+
+This release fixes a couple of bugs that caused crash on launch issues for some users as well as minor performance improvements and other changes.
+
+## MC 1.14-specific changes
+
+-   Corrected a minor mistake regarding Java versioning in the troubleshooting section of the technical documentation
+
+## Bug fixes
+
+-   Fixed a startup crash on system locales that separate decimal points with commas (#24)
+-   The "Enhanced Vanilla Icon" logic no longer unnecessarily runs when a valid custom icon is provided
+
+## Other changes
+
+-   Icon handling has been made more robust and can now continue to use an icon when it contains corrupt/invalid embedded images, as long as at least one embedded image is okay
+-   Improved debug logging and error messages for icon handling
+
 # v2.0.0
 
 With v2 of itlt, everything has been written from the ground-up with a goal on being the best at the specific little things it does.

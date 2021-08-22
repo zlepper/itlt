@@ -99,6 +99,8 @@ public class ClientUtils {
             iconsList.add(new FileInputStream(inputIconFile));
         }
 
+        itlt.LOGGER.debug("Icon file: \"" + inputIconFilenameAndExt + "\"");
+
         if (inputIconFilenameAndExt.endsWith(".ico") || inputIconFilenameAndExt.endsWith(".icns")) {
             // convert from List<BufferedImage> to List<InputStream> and filter out invalid image types
             for (final BufferedImage bufferedImage : bufferedImageList) {
@@ -133,6 +135,17 @@ public class ClientUtils {
 
         itlt.LOGGER.debug("Final iconsList size: " + iconsList.size());
 
+        final GLFWImage.Buffer buffer = loadIconsIntoBuffer(iconsList, mcInstance);
+        GLFW.glfwSetWindowIcon(mcInstance.mainWindow.handle, buffer);
+    }
+
+    public static GLFWImage.Buffer loadIconsIntoBuffer(final List<InputStream> iconsList,
+                                                       final Minecraft mcInstance) throws IOException {
+        return loadIconsIntoBuffer(iconsList, mcInstance, 1);
+    }
+
+    public static GLFWImage.Buffer loadIconsIntoBuffer(final List<InputStream> iconsList, final Minecraft mcInstance,
+                                                       final int attempt) throws IOException {
         final MemoryStack memoryStack = MemoryStack.stackPush();
         final GLFWImage.Buffer buffer = GLFWImage.mallocStack(iconsList.size(), memoryStack);
 
@@ -144,9 +157,14 @@ public class ClientUtils {
         // may occur when trying to load each icon
         short iconCounter = 0;
         short errorCounter = 0;
+        List<InputStream> newIconsList = new ArrayList<>();
         for (final InputStream inStream : iconsList) {
-            final ByteBuffer byteBuffer = mcInstance.mainWindow.func_198111_a(inStream, intBufferX, intBufferY, intBufferChannels);
-            if (byteBuffer == null) {
+            final ByteBuffer byteBuffer;
+            try {
+                byteBuffer = mcInstance.mainWindow.func_198111_a(inStream, intBufferX, intBufferY, intBufferChannels);
+                if (byteBuffer == null) throw new IOException("byteBuffer is null");
+            } catch (final IOException e) {
+                itlt.LOGGER.debug("Unable to load image #" + iconCounter + " inside iconsList, skipping...");
                 errorCounter++;
                 continue;
             }
@@ -155,15 +173,26 @@ public class ClientUtils {
             buffer.height(intBufferY.get(0));
             buffer.pixels(byteBuffer);
             iconCounter++;
+            newIconsList.add(inStream);
         }
 
         if (errorCounter == iconsList.size()) {
             // if there was an error loading all of the icons inside the .ico/.icns, throw an error and don't try setting the
             // window icon as an empty buffer.
-            throw new IOException("Unable to load icon(s)");
+            throw new IOException("Unable to load icon(s): Failed to load all embedded images");
+        }
+
+        // GLFW expects the allocated stack capacity to match the used capacity otherwise it'll crash
+        if (errorCounter > 0) {
+            if (attempt > 2) {
+                throw new IOException("Unable to load icon(s): Too many failed attempts");
+            } else {
+                // Allocate a new stack without erroneous icons and use that instead
+                return loadIconsIntoBuffer(newIconsList, mcInstance, attempt + 1);
+            }
         } else {
             buffer.position(0);
-            GLFW.glfwSetWindowIcon(mcInstance.mainWindow.handle, buffer);
+            return buffer;
         }
     }
 

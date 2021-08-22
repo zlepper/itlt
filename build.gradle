@@ -8,7 +8,7 @@ plugins {
     id "net.minecraftforge.gradle" version "4.1.+"
 }
 
-version = "1.13.x-2.0.0"
+version = "1.13.2-2.0.1"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 

@@ -219,5 +219,5 @@ You need to use Java 8u232 or lower as newer builds of Java 8 removed a part of 
 
 Run Gradle with Java 8.
 
-In IntelliJ, you can do this by going to `File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` and set the Gradle JVM to "Project SDK", which should be version 11 from the previous troubleshooting step. It should look like this but with "Project SDK 8"
+In IntelliJ, you can do this by going to `File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` and set the Gradle JVM to "Project SDK", which should be version 8 from the previous troubleshooting step. It should look like this but with "Project SDK 8"
 ![Screenshot showing what to change in the project gradle settings window](https://zlepper.github.io/itlt/docs/gradlew-settings.png)

@@ -2,6 +2,18 @@
 
 # Changelog
 
+# v2.0.1
+
+This release fixes a bug that caused crash on launch issues for some users.
+
+## MC 1.13.2-specific changes
+
+-   Corrected a minor mistake regarding Java versioning in the troubleshooting section of the technical documentation
+
+## Bug fixes
+
+-   Fixed a startup crash on system locales that separate decimal points with commas (#24)
+
 # v2.0.0
 
 With v2 of itlt, everything has been written from the ground-up with a goal on being the best at the specific little things it does.

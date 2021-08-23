@@ -57,7 +57,16 @@ minecraft {
 }
 
 configurations {
+    library
     shade
+    implementation.extendsFrom library
+    shade.extendsFrom library
+}
+
+minecraft.runs.all {
+    lazyToken('minecraft_classpath') {
+        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+    }
 }
 
 repositories {
@@ -71,11 +80,12 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.17.1-37.0.43"
+    minecraft "net.minecraftforge:forge:1.17.1-37.0.44"
 
     // itlt uses the "image4j" library to read .ico files
     implementation "com.github.imcdonagh:image4j:0.7.2"
     shade "com.github.imcdonagh:image4j:0.7.2"
+    library "com.github.imcdonagh:image4j:0.7.2"
 
     // itlt uses the "Apache Commons Imaging" library to read .icns files
     /*implementation "org.apache.commons:commons-imaging:1.0-alpha2"
@@ -85,6 +95,7 @@ dependencies {
     // don't use, therefore allowing us to drastically reduce the shrunk jar's filesize
     implementation files("thirdPartyLibs/commons-imaging-1.0-alpha2-custom.jar")
     shade files("thirdPartyLibs/commons-imaging-1.0-alpha2-custom.jar")
+    library files("thirdPartyLibs/commons-imaging-1.0-alpha2-custom.jar")
 }
 
 ext {

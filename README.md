@@ -46,13 +46,14 @@ If you need a hand working with itlt, ping me (@Paint_Ninja) in **#squirrels** o
 
 #### Current
 
-Work for the latest supported Minecraft version is done on the "master" branch, however mod update checking always uses named branches to ensure reliability during a switchover to a newer MC version. When 1.17 comes out, master is merged onto 1.16 and 1.17 work goes on master. Until then, the 1.16 branch serves as a placeholder for update checking.
+Work for the latest supported Minecraft version is done on the "master" branch, however mod update checking always uses named branches to ensure reliability during a switchover to a newer MC version. When 1.18 comes out, master is merged onto 1.17 and 1.18 work goes on master. Until then, the 1.16 branch serves as a placeholder for update checking.
 
 | Branch                                                          | Minecraft version | Mod version | ForgeGradle version              | Gradle version |
 | --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------- | -------------- |
-| [master](https://github.com/zlepper/itlt)                       | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| 1.16                                                            | Placeholder       | **v2**      | None                             | None           |
-| 1.15 (you're here)                                              | 1.15.2            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| [master](https://github.com/zlepper/itlt)                       | 1.17.1            | **v2**      | ForgeGradle 5.1                  | Gradle 7.2     |
+| 1.17                                                            | Placeholder       | **v2**      | None                             | None           |
+| [1.16](https://github.com/zlepper/itlt/tree/1.16)               | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| 1.15 (you're here)                                              | 1.15.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.14](https://github.com/zlepper/itlt/tree/1.14)               | 1.14.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.13](https://github.com/zlepper/itlt/tree/1.13)               | 1.13.2            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.12](https://github.com/zlepper/itlt/tree/1.12)               | 1.12.2            | v1          | ForgeGradle 4.1                  | Gradle 6.9     |
@@ -77,5 +78,3 @@ I've provided `Instructions.md` and some additional files in each of these branc
 | [1.4.4/1.4.5](https://github.com/zlepper/itlt/tree/1.4.4/1.4.5) | 1.4.4 and 1.4.5   | v1          | Forge Src 6.4.2.448(?) + MCP 7.23 scripts + Manual steps | Python 2.7.3   |
 | [1.3.2](https://github.com/zlepper/itlt/tree/1.3.2)             | 1.3.2             | v1          | Forge Src 4.3.5.318(?) + MCP 7.2 scripts + Manual steps  | Python 2.7.2   |
 | [1.2.5](https://github.com/zlepper/itlt/tree/1.2.5)             | 1.2.5             | v1          | Forge Src 3.4.9.171(?) + MCP 6.2 scripts + Manual steps  | Python 2.7.2   |
-
-Update branch list, use shorter download counter

@@ -43,7 +43,7 @@ public final class Main {
         } catch (final IllegalAccessException | InaccessibleObjectException e) {
             // Don't show the illegal access stacktrace on Java 16+
             if (ClientUtils.getJavaVersion() > 15)
-                System.err.println("Warn: Please run with JVM's \"permit illegal access\" flag for the best experience on Windows.");
+                System.err.println("Warn: Please run with the \"--illegal-access=permit\" flag for the best experience on Windows.");
             else e.printStackTrace();
             return null;
         } catch (final InvocationTargetException | NoSuchMethodException | ClassNotFoundException | ClassCastException e) {
@@ -68,8 +68,10 @@ public final class Main {
             // Manually detect Windows and use modern icons for it
             if (Platform.isWindows()) {
                 infoIcon = getWindowsSystemIcon("imageres", 81, 32);
-                warningIcon = getWindowsSystemIcon("imageres", 84, 32);
-                errorIcon = getWindowsSystemIcon("imageres", 98, 32);
+                if (infoIcon != null) {
+                    warningIcon = getWindowsSystemIcon("imageres", 84, 32);
+                    errorIcon = getWindowsSystemIcon("imageres", 98, 32);
+                }
             }
         } catch (final ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException
                 | InstantiationException ignored) {

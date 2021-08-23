@@ -18,6 +18,7 @@ import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -239,11 +240,11 @@ public class ClientUtils {
         final String defaultGuideURL = "https://zlepper.github.io/itlt/guide?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject";
         String guideURL;
         switch (messageContent.msgSubject) {
-            case Memory:
+            case Memory -> {
                 if (ClientConfig.enableCustomMemoryAllocGuide.get()) guideURL = ClientConfig.customMemoryAllocGuideURL.get();
                 else guideURL = defaultGuideURL;
-                break;
-            case Java:
+            }
+            case Java -> {
                 if (messageContent.msgDesire == Message.Desire.SixtyFourBit) {
                     if (ClientConfig.enableCustom64bitJavaGuide.get()) guideURL = ClientConfig.custom64bitJavaGuideURL.get();
                     else guideURL = defaultGuideURL;
@@ -254,10 +255,8 @@ public class ClientUtils {
                     if (ClientConfig.enableCustomJavaDowngradeGuide.get()) guideURL = ClientConfig.customJavaDowngradeGuideURL.get();
                     else guideURL = defaultGuideURL;
                 }
-                break;
-            default:
-                guideURL = "N/A";
-                break;
+            }
+            default -> guideURL = "N/A";
         }
         guideURL = guideURL.replaceAll("%launcher", ClientModEvents.detectedLauncher.getName())
                 .replaceAll("%reason", messageContent.toString())
@@ -300,40 +299,30 @@ public class ClientUtils {
             }
 
             switch (messageContent) {
-                case NeedsMoreMemory:
-                    messageBody = messageBody.replaceFirst("%s",
-                            ClientConfig.getSimplifiedFloatStr(ClientConfig.reqMinMemoryAmountInGB.get().floatValue()));
-                    break;
-                case WantsMoreMemory:
-                    messageBody = messageBody.replaceFirst("%s",
-                            ClientConfig.getSimplifiedFloatStr(ClientConfig.warnMinMemoryAmountInGB.get().floatValue()));
-                    break;
-                case NeedsLessMemory:
-                    messageBody = messageBody.replaceFirst("%s",
-                            ClientConfig.getSimplifiedFloatStr(ClientConfig.reqMaxMemoryAmountInGB.get().floatValue()));
-                    break;
-                case WantsLessMemory:
-                    messageBody = messageBody.replaceFirst("%s",
-                            ClientConfig.getSimplifiedFloatStr(ClientConfig.warnMaxMemoryAmountInGB.get().floatValue()));
-                    break;
-                case NeedsNewerJava:
+                case NeedsMoreMemory -> messageBody = messageBody.replaceFirst("%s",
+                        ClientConfig.getSimplifiedFloatStr(ClientConfig.reqMinMemoryAmountInGB.get().floatValue()));
+                case WantsMoreMemory -> messageBody = messageBody.replaceFirst("%s",
+                        ClientConfig.getSimplifiedFloatStr(ClientConfig.warnMinMemoryAmountInGB.get().floatValue()));
+                case NeedsLessMemory -> messageBody = messageBody.replaceFirst("%s",
+                        ClientConfig.getSimplifiedFloatStr(ClientConfig.reqMaxMemoryAmountInGB.get().floatValue()));
+                case WantsLessMemory -> messageBody = messageBody.replaceFirst("%s",
+                        ClientConfig.getSimplifiedFloatStr(ClientConfig.warnMaxMemoryAmountInGB.get().floatValue()));
+                case NeedsNewerJava -> {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());
                     messageBody = messageBody.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());
-                    break;
-                case WantsNewerJava:
+                }
+                case WantsNewerJava -> {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString());
                     messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString());
-                    break;
-                case NeedsOlderJava:
+                }
+                case NeedsOlderJava -> {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
                     messageBody = messageBody.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
-                    break;
-                case WantsOlderJava:
+                }
+                case WantsOlderJava -> {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
                     messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
-                    break;
-                default:
-                    break;
+                }
             }
         }
 
@@ -350,9 +339,10 @@ public class ClientUtils {
         itlt.LOGGER.debug("right: " + rightButtonText);
 
         try {
-            final ProcessBuilder builder = new ProcessBuilder(
+            final var builder = new ProcessBuilder(
                     System.getProperty("java.home") + File.separator + "bin" + File.separator + "java",
                     "-Dapple.awt.application.appearance=system", // macOS dark theme support in Java 14+ (JDK-8235363)
+                    "-XX:+IgnoreUnrecognizedVMOptions", "--add-opens=java.desktop/sun.awt.shell=ALL-UNNAMED", // allow access to Win32ShellFolder2 on Java 16
                     "-jar", modFile.toString(), messageContent.msgType.toString().toLowerCase(), messageTitle, messageBody,
                     leftButtonText, middleButtonText, rightButtonText, messageGuideError, guideURL, messageContent.toString());
             builder.inheritIO();
@@ -371,20 +361,5 @@ public class ClientUtils {
                 System.exit(1);
             }
         }
-    }
-
-    /**
-     * Use Java 11's more efficient Files.readString() if available with a fallback to `new String(Files.readAllBytes(path))`
-     */
-    @SuppressWarnings("Since15") // technically Since11 but IntelliJ doesn't recognise that
-    public static String readString(final Path path) throws IOException {
-        // If you're a dev getting a build error here, build with JDK 11+ and set the language level to 8. In IntelliJ
-        // you can do this by going to File -> Project Structure and setting the SDK to 11 and the language level to 8.
-
-        // If you're still having trouble, make sure Gradle is using the Project SDK at Gradle -> Spanner -> Gradle Settings
-        // As long as the lang level is still 8 it'll run fine on Java 8 - you just need 11+ javac to build
-
-        if (getJavaVersion() >= 11) return Files.readString(path);
-        else return new String(Files.readAllBytes(path));
     }
 }

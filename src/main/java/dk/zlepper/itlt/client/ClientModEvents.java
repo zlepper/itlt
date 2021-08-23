@@ -1,7 +1,6 @@
 package dk.zlepper.itlt.client;
 
 import com.google.gson.Gson;
-import dk.zlepper.itlt.client.helpers.Platform;
 import dk.zlepper.itlt.client.launchers.LauncherUtils;
 import dk.zlepper.itlt.client.launchers.DetectedLauncher;
 import dk.zlepper.itlt.itlt;
@@ -26,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -216,12 +216,12 @@ public class ClientModEvents {
 
             try {
                 // read the file
-                final String customServersJson = ClientUtils.readString(customServersJsonPath);
+                final String customServersJson = Files.readString(customServersJsonPath);
 
                 // parse it into an array of CustomServerData classes
                 final ClientUtils.CustomServerData[] featuredList = new Gson().fromJson(customServersJson, ClientUtils.CustomServerData[].class);
                 if (featuredList != null) {
-                    final ServerList serverList = new ServerList(mcInstance);
+                    final var serverList = new ServerList(mcInstance);
 
                     for (final ClientUtils.CustomServerData customServerEntry : featuredList) {
                         final ServerData serverToAdd = new ServerData(customServerEntry.name, customServerEntry.address, false);

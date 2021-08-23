@@ -46,12 +46,13 @@ If you need a hand working with itlt, ping me (@Paint_Ninja) in **#squirrels** o
 
 #### Current
 
-Work for the latest supported Minecraft version is done on the "master" branch, however mod update checking always uses named branches to ensure reliability during a switchover to a newer MC version. When 1.17 comes out, master is merged onto 1.16 and 1.17 work goes on master. Until then, the 1.16 branch serves as a placeholder for update checking.
+Work for the latest supported Minecraft version is done on the "master" branch, however mod update checking always uses named branches to ensure reliability during a switchover to a newer MC version. When 1.18 comes out, master is merged onto 1.17 and 1.18 work goes on master. Until then, the 1.16 branch serves as a placeholder for update checking.
 
 | Branch                                                          | Minecraft version | Mod version | ForgeGradle version              | Gradle version |
 | --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------- | -------------- |
-| [master](https://github.com/zlepper/itlt)                       | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| 1.16                                                            | Placeholder       | **v2**      | None                             | None           |
+| [master](https://github.com/zlepper/itlt)                       | 1.17.1            | **v2**      | ForgeGradle 5.1                  | Gradle 7.2     |
+| 1.17                                                            | Placeholder       | **v2**      | None                             | None           |
+| [1.16](https://github.com/zlepper/itlt/tree/1.16)               | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.15](https://github.com/zlepper/itlt/tree/1.15)               | 1.15.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.14](https://github.com/zlepper/itlt/tree/1.14)               | 1.14.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | 1.13 (you're here)                                              | 1.13.2            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |

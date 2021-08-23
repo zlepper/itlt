@@ -1,50 +1,23 @@
 import org.gradle.api.java.archives.internal.DefaultManifest
 
-buildscript {
-    dependencies {
-        classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
-    }
-}
-
 plugins {
-    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
     id "java" // java plugin is needed for the shadow plugin to work
     id "eclipse"
     id "maven-publish"
-    id "net.minecraftforge.gradle" version "4.1.+"
+    id "net.minecraftforge.gradle" version "5.1.+"
 }
-apply plugin: "org.spongepowered.mixin"
 
-version = "1.16.x-2.0.1"
+version = "1.17.1-2.0.1"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
-// Target Java 8 but use a Java 11 compiler
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = "1.8"
-tasks.withType(JavaCompile).configureEach {
-    javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
-    sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = "1.8"
-
-    // You can verify this is working correctly by running the build task, extracting itlt.class from
-    // the built jar and checking if the bytecode version is 52 using the command "javap -verbose ./itlt.class"
-}
-
-// Use Java 8 for run tasks (e.g. runClient)
-tasks.withType(JavaExec).configureEach {
-    javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
-
-    // You can verify this is working correctly by running the runClient task and checking the debug.log
-    // in the run folder for "[dk.zlepper.itlt.itlt/]: javaVerInt: 8"
-}
+// Target Java 16
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 println "Java: ${System.getProperty "java.version"}, JVM: ${System.getProperty "java.vm.version"} (${System.getProperty "java.vendor"}), Arch: ${System.getProperty "os.arch"}"
 minecraft {
-    mappings channel: "snapshot", version: "20200723-1.16.1"
+    mappings channel: "official", version: "1.17.1"
 
     accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
 
@@ -53,7 +26,6 @@ minecraft {
         client {
             workingDirectory runFile
             property "forge.logging.console.level", "info"
-            arg "-mixin.config=itlt.mixins.json"
             mods {
                 itlt {
                     source sourceSets.main
@@ -64,7 +36,6 @@ minecraft {
         server {
             workingDirectory runFile
             property "forge.logging.console.level", "info"
-            arg "-mixin.config=itlt.mixins.json"
             mods {
                 itlt {
                     source sourceSets.main
@@ -100,11 +71,7 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.16.5-36.1.18"
-
-    // Mixin
-    implementation "org.spongepowered:mixin:0.8.2"
-    annotationProcessor "org.spongepowered:mixin:0.8.2:processor"
+    minecraft "net.minecraftforge:forge:1.17.1-37.0.43"
 
     // itlt uses the "image4j" library to read .ico files
     implementation "com.github.imcdonagh:image4j:0.7.2"
@@ -130,7 +97,6 @@ ext {
                 "Implementation-Version": project.version,
                 "Implementation-Vendor" : "Paint_Ninja",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs": "itlt.mixins.json",
                 "Main-Class": "dk.zlepper.itlt.Main" // so that the pop-up window code works
         ])
     } as DefaultManifest
@@ -185,7 +151,3 @@ task shrinkJar(type: Jar, dependsOn: reobfShadowJar) {
 //jar.finalizedBy reobfShadowJar
 tasks.build.dependsOn shrinkJar
 jar.finalizedBy shrinkJar
-
-mixin {
-    add sourceSets.main, "itlt.refmap.json"
-}

@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -39,7 +40,7 @@ public final class Main {
             disposeIconMethod.invoke(null, hIcon);
 
             return new ImageIcon(image);
-        } catch (final IllegalAccessException e) {
+        } catch (final IllegalAccessException | InaccessibleObjectException e) {
             // Don't show the illegal access stacktrace on Java 16+
             if (ClientUtils.getJavaVersion() > 15)
                 System.err.println("Warn: Please run with JVM's \"permit illegal access\" flag for the best experience on Windows.");

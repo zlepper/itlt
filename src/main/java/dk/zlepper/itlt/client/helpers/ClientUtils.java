@@ -53,11 +53,11 @@ public class ClientUtils {
         if (list == null)
             return false;
 
-        for (int i = 0; i < list.countServers(); i++) {
-            final ServerData serverData = list.getServerData(i);
-            if (serverData.serverName != null && serverData.serverIP != null &&
-                    serverData.serverName.equalsIgnoreCase(server.serverName) &&
-                    serverData.serverIP.equalsIgnoreCase(server.serverIP)) {
+        for (int i = 0; i < list.size(); i++) {
+            final ServerData serverData = list.get(i);
+            if (serverData.name != null && serverData.ip != null &&
+                    serverData.name.equalsIgnoreCase(server.name) &&
+                    serverData.ip.equalsIgnoreCase(server.ip)) {
                 return true;
             }
         }
@@ -136,7 +136,7 @@ public class ClientUtils {
         itlt.LOGGER.debug("Final iconsList size: " + iconsList.size());
 
         final GLFWImage.Buffer buffer = loadIconsIntoBuffer(iconsList, mcInstance);
-        GLFW.glfwSetWindowIcon(mcInstance.getMainWindow().handle, buffer);
+        GLFW.glfwSetWindowIcon(mcInstance.getWindow().window, buffer);
     }
 
     public static GLFWImage.Buffer loadIconsIntoBuffer(final List<InputStream> iconsList,
@@ -161,7 +161,7 @@ public class ClientUtils {
         for (final InputStream inStream : iconsList) {
             final ByteBuffer byteBuffer;
             try {
-                byteBuffer = mcInstance.getMainWindow().loadIcon(inStream, intBufferX, intBufferY, intBufferChannels);
+                byteBuffer = mcInstance.getWindow().readIconPixels(inStream, intBufferX, intBufferY, intBufferChannels);
                 if (byteBuffer == null) throw new IOException("byteBuffer is null");
             } catch (final IOException e) {
                 itlt.LOGGER.debug("Unable to load image #" + iconCounter + " inside iconsList, skipping...");
@@ -268,7 +268,7 @@ public class ClientUtils {
         // translate the keys manually as they aren't able to be translated by the game until after the main menu's shown
 
         // determine which language json we need to read
-        final String lang = Minecraft.getInstance().gameSettings.language;
+        final String lang = Minecraft.getInstance().options.languageCode;
 
         // read the determined language json embedded inside the itlt jar, falling back to en_us if not found (to match vanilla behaviour)
         InputStream embeddedLangJsonInStream = itlt.class.getClassLoader().getResourceAsStream("assets/itlt/lang/" + lang + ".json");

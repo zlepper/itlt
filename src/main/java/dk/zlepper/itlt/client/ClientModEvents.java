@@ -12,8 +12,8 @@ import net.minecraft.client.Minecraft;
 
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -113,10 +113,10 @@ public class ClientModEvents {
 
     @SubscribeEvent
     public static void clientInit(final FMLClientSetupEvent event) {
-        final Minecraft mcInstance = event.getMinecraftSupplier().get();
+        final Minecraft mcInstance = Minecraft.getInstance();
 
         // Java arch requirement and warning
-        final boolean isJava64bit = mcInstance.isJava64bit();
+        final boolean isJava64bit = mcInstance.is64Bit();
         itlt.LOGGER.debug("isJava64bit: " + isJava64bit);
         if (!isJava64bit) {
             if (ClientConfig.enable64bitRequirement.get()) ClientUtils.startUIProcess(Message.Content.NeedsJava64bit);
@@ -139,13 +139,13 @@ public class ClientModEvents {
             }
             customWindowTitle = customWindowTitle.replaceFirst("%autoName", autoDetectedDisplayName);
 
-            // replace %mc with the Vanilla window title from getWindowTitle() (func_230149_ax_ == getWindowTitle)
-            customWindowTitle = customWindowTitle.replaceFirst("%mc", mcInstance.func_230149_ax_());
+            // replace %mc with the Vanilla window title from getWindowTitle() (createTitle == getWindowTitle)
+            customWindowTitle = customWindowTitle.replaceFirst("%mc", mcInstance.createTitle());
 
             itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
 
-            // set the new window title (func_230148_b_ == setWindowTitle)
-            if (!customWindowTitle.isEmpty()) mcInstance.getMainWindow().func_230148_b_(customWindowTitle);
+            // set the new window title (setTitle == setWindowTitle)
+            if (!customWindowTitle.isEmpty()) mcInstance.getWindow().setTitle(customWindowTitle);
         }
 
         // Custom window icon
@@ -188,8 +188,8 @@ public class ClientModEvents {
         // Enhanced window icon
         if (ClientConfig.enableEnhancedVanillaIcon.get() && !isCustomIconSet) {
             try {
-                final InputStream enhancedIcon = mcInstance.getPackFinder().getVanillaPack()
-                        .getResourceStream(ResourcePackType.CLIENT_RESOURCES, new ResourceLocation("icons/minecraft.icns"));
+                final InputStream enhancedIcon = mcInstance.getClientPackSource().getVanillaPack()
+                        .getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("icons/minecraft.icns"));
                 ClientUtils.setWindowIcon(enhancedIcon, mcInstance, itltDir, "icns");
             } catch (final IOException e) {
                 e.printStackTrace();
@@ -226,12 +226,12 @@ public class ClientModEvents {
                     for (final ClientUtils.CustomServerData customServerEntry : featuredList) {
                         final ServerData serverToAdd = new ServerData(customServerEntry.name, customServerEntry.address, false);
                         if (customServerEntry.forceResourcePack)
-                            serverToAdd.setResourceMode(ServerData.ServerResourceMode.ENABLED);
+                            serverToAdd.setResourcePackStatus(ServerData.ServerPackStatus.ENABLED);
 
                         if (!ClientUtils.alreadyInServerList(serverToAdd, serverList)) {
                             itlt.LOGGER.info("Adding custom server entry");
-                            serverList.addServerData(serverToAdd);
-                            serverList.saveServerList();
+                            serverList.add(serverToAdd);
+                            serverList.save();
                         }
                     }
                 }

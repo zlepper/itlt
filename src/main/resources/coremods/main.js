@@ -1,6 +1,7 @@
 function initializeCoreMod() {
     var opcodes = Java.type("org.objectweb.asm.Opcodes");
     var InsnNode = Java.type("org.objectweb.asm.tree.InsnNode");
+    var ASMAPI = Java.type("net.minecraftforge.coremod.api.ASMAPI")
 
     // Author: Paint_Ninja
     // Reason: Restores the ability to change the Minecraft window title
@@ -10,7 +11,7 @@ function initializeCoreMod() {
             "target": {
                 "type": "METHOD",
                 "class": "net.minecraft.client.Minecraft",
-                "methodName": "updateTitle",
+                "methodName": ASMAPI.mapMethod("m_91341_"),
                 "methodDesc": "()V"
             },
             "transformer": function(methodNode) {

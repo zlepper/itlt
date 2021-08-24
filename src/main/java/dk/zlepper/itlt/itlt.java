@@ -19,7 +19,7 @@ public final class itlt {
     public itlt() {
         MinecraftForge.EVENT_BUS.register(this);
 
-        final ModLoadingContext modLoadingContext = ModLoadingContext.get();
+        final var modLoadingContext = ModLoadingContext.get();
 
         modLoadingContext.registerExtensionPoint(IExtensionPoint.DisplayTest.class,() -> new IExtensionPoint.DisplayTest(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
         modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientConfig);

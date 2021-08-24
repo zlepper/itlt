@@ -238,26 +238,24 @@ public class ClientUtils {
         }
 
         final String defaultGuideURL = "https://zlepper.github.io/itlt/guide?launcher=%launcher&reason=%reason&type=%type&desire=%desire&subject=%subject";
-        String guideURL;
-        switch (messageContent.msgSubject) {
+        String guideURL = switch (messageContent.msgSubject) {
             case Memory -> {
-                if (ClientConfig.enableCustomMemoryAllocGuide.get()) guideURL = ClientConfig.customMemoryAllocGuideURL.get();
-                else guideURL = defaultGuideURL;
+                if (ClientConfig.enableCustomMemoryAllocGuide.get()) yield ClientConfig.customMemoryAllocGuideURL.get();
+                else yield defaultGuideURL;
             }
             case Java -> {
                 if (messageContent.msgDesire == Message.Desire.SixtyFourBit) {
-                    if (ClientConfig.enableCustom64bitJavaGuide.get()) guideURL = ClientConfig.custom64bitJavaGuideURL.get();
-                    else guideURL = defaultGuideURL;
+                    if (ClientConfig.enableCustom64bitJavaGuide.get()) yield ClientConfig.custom64bitJavaGuideURL.get();
+                    else yield defaultGuideURL;
                 } else if (messageContent.msgDesire == Message.Desire.Newer) {
-                    if (ClientConfig.enableCustomJavaUpgradeGuide.get()) guideURL = ClientConfig.customJavaUpgradeGuideURL.get();
-                    else guideURL = defaultGuideURL;
+                    if (ClientConfig.enableCustomJavaUpgradeGuide.get()) yield ClientConfig.customJavaUpgradeGuideURL.get();
+                    else yield defaultGuideURL;
                 } else {
-                    if (ClientConfig.enableCustomJavaDowngradeGuide.get()) guideURL = ClientConfig.customJavaDowngradeGuideURL.get();
-                    else guideURL = defaultGuideURL;
+                    if (ClientConfig.enableCustomJavaDowngradeGuide.get()) yield ClientConfig.customJavaDowngradeGuideURL.get();
+                    else yield defaultGuideURL;
                 }
             }
-            default -> guideURL = "N/A";
-        }
+        };
         guideURL = guideURL.replaceAll("%launcher", ClientModEvents.detectedLauncher.getName())
                 .replaceAll("%reason", messageContent.toString())
                 .replaceAll("%type", messageContent.msgType.toString())
@@ -298,32 +296,33 @@ public class ClientUtils {
                 messageBody = messageBody.replaceFirst("%sb", String.valueOf(getJavaVersion()));
             }
 
-            switch (messageContent) {
-                case NeedsMoreMemory -> messageBody = messageBody.replaceFirst("%s",
+            messageBody = switch (messageContent) {
+                case NeedsMoreMemory -> messageBody.replaceFirst("%s",
                         ClientConfig.getSimplifiedFloatStr(ClientConfig.reqMinMemoryAmountInGB.get().floatValue()));
-                case WantsMoreMemory -> messageBody = messageBody.replaceFirst("%s",
+                case WantsMoreMemory -> messageBody.replaceFirst("%s",
                         ClientConfig.getSimplifiedFloatStr(ClientConfig.warnMinMemoryAmountInGB.get().floatValue()));
-                case NeedsLessMemory -> messageBody = messageBody.replaceFirst("%s",
+                case NeedsLessMemory -> messageBody.replaceFirst("%s",
                         ClientConfig.getSimplifiedFloatStr(ClientConfig.reqMaxMemoryAmountInGB.get().floatValue()));
-                case WantsLessMemory -> messageBody = messageBody.replaceFirst("%s",
+                case WantsLessMemory -> messageBody.replaceFirst("%s",
                         ClientConfig.getSimplifiedFloatStr(ClientConfig.warnMaxMemoryAmountInGB.get().floatValue()));
                 case NeedsNewerJava -> {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());
-                    messageBody = messageBody.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());
+                    yield messageBody.replaceFirst("%s", ClientConfig.requiredMinJavaVersion.get().toString());
                 }
                 case WantsNewerJava -> {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString());
-                    messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString());
+                    yield messageBody.replaceFirst("%s", ClientConfig.warnMinJavaVersion.get().toString());
                 }
                 case NeedsOlderJava -> {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
-                    messageBody = messageBody.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
+                    yield messageBody.replaceFirst("%s", ClientConfig.requiredMaxJavaVersion.get().toString());
                 }
                 case WantsOlderJava -> {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
-                    messageBody = messageBody.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
+                    yield messageBody.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
                 }
-            }
+                case NeedsJava64bit, WantsJava64bit -> messageBody;
+            };
         }
 
         messageGuideError = messageGuideError.replaceFirst("%s", guideURL);

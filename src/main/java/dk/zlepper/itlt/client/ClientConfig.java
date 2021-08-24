@@ -377,6 +377,7 @@ public final class ClientConfig {
                                         " The minimum recommended version of Java needed to skip the warning message when",
                                         " launching the modpack.")
                                 .defineInRange("warnMaxJavaVersion", 15, 6, 127);
+                        // todo: update comment to reflect 1.17 and latest curseforge launcher
                         selectivelyIgnoreMaxJavaVerWarning = clientConfigBuilder
                                 .comment(" ",
                                         " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",

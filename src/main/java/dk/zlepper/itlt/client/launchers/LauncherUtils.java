@@ -2,9 +2,7 @@ package dk.zlepper.itlt.client.launchers;
 
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.targets.FMLClientDevLaunchHandler;
 import net.minecraftforge.fml.loading.targets.FMLClientUserdevLaunchHandler;
-import net.minecraftforge.fml.loading.targets.FMLServerDevLaunchHandler;
 import net.minecraftforge.fml.loading.targets.FMLServerUserdevLaunchHandler;
 
 import java.nio.file.Files;

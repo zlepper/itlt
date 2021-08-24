@@ -33,7 +33,7 @@ public final class Main {
 
             final Method makeIconMethod = clazz.getDeclaredMethod("makeIcon", long.class, boolean.class);
             makeIconMethod.setAccessible(true);
-            final Image image = (Image) makeIconMethod.invoke(null, hIcon, true);
+            final var image = (Image) makeIconMethod.invoke(null, hIcon, true);
 
             final Method disposeIconMethod = clazz.getDeclaredMethod("disposeIcon", long.class);
             disposeIconMethod.setAccessible(true);

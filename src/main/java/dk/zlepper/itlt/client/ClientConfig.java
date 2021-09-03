@@ -551,11 +551,11 @@ public final class ClientConfig {
                                 " and used when launching from a supported launcher.",
                                 " ",
                                 " Examples:",
-                                " - \"ModpackName - %mc\" = \"ModpackName - Minecraft* 1.16.5\"",
-                                " - \"%mc - ModpackName\" = \"Minecraft* 1.16.5 - ModpackName\"",
-                                " - \"ModpackName (%mc)\" = \"ModpackName (Minecraft* 1.16.5)\"",
-                                " - \"%autoName (%mc)\" = \"ModpackName (Minecraft* 1.16.5)\"",
-                                " - \"ModpackName v2 based on %mc\" = \"ModpackName v2 based on Minecraft* 1.16.5\"",
+                                " - \"ModpackName - %mc\" = \"ModpackName - Minecraft* 1.17.1\"",
+                                " - \"%mc - ModpackName\" = \"Minecraft* 1.17.1 - ModpackName\"",
+                                " - \"ModpackName (%mc)\" = \"ModpackName (Minecraft* 1.17.1)\"",
+                                " - \"%autoName (%mc)\" = \"ModpackName (Minecraft* 1.17.1)\"",
+                                " - \"ModpackName v2 based on %mc\" = \"ModpackName v2 based on Minecraft* 1.17.1\"",
                                 " ",
                                 " Note: enableCustomWindowTitle must be enabled for this to take effect.")
                         .define("customWindowTitleText", "%autoName - %mc");

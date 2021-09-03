@@ -80,7 +80,7 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.17.1-37.0.44"
+    minecraft "net.minecraftforge:forge:1.17.1-37.0.53"
 
     // itlt uses the "image4j" library to read .ico files
     implementation "com.github.imcdonagh:image4j:0.7.2"

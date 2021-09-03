@@ -42,8 +42,10 @@ public final class Main {
             return new ImageIcon(image);
         } catch (final IllegalAccessException | InaccessibleObjectException e) {
             // Don't show the illegal access stacktrace on Java 16+
-            if (ClientUtils.getJavaVersion() > 15)
+            if (ClientUtils.getJavaVersion() == 16)
                 System.err.println("Warn: Please run with the \"--illegal-access=permit\" flag for the best experience on Windows.");
+            else if (ClientUtils.getJavaVersion() > 16)
+                System.err.println("Warn: Please run with the \"-XX:+IgnoreUnrecognizedVMOptions --add-opens=java.desktop/sun.awt.shell=ALL-UNNAMED\" flags for the best experience on Windows.");
             else e.printStackTrace();
             return null;
         } catch (final InvocationTargetException | NoSuchMethodException | ClassNotFoundException | ClassCastException e) {
@@ -68,6 +70,8 @@ public final class Main {
             // Manually detect Windows and use modern icons for it
             if (Platform.isWindows()) {
                 infoIcon = getWindowsSystemIcon("imageres", 81, 32);
+
+                // don't attempt to get other Windows icons if getting the first one failed so that we avoid error spam
                 if (infoIcon != null) {
                     warningIcon = getWindowsSystemIcon("imageres", 84, 32);
                     errorIcon = getWindowsSystemIcon("imageres", 98, 32);
@@ -82,7 +86,7 @@ public final class Main {
         try {
             System.out.println("messageContent: " + args[8]);
         } catch (final ArrayIndexOutOfBoundsException e) {
-            final String helpMsg = "To install this mod, place me in the mods folder of a Minecraft Forge 1.16.x setup.";
+            final String helpMsg = "To install this mod, place me in the mods folder of a Minecraft Forge 1.17.x setup.";
             JOptionPane.showMessageDialog(getParentComponent(), helpMsg, "It's the little things mod",
                     JOptionPane.INFORMATION_MESSAGE, infoIcon);
             System.out.println(helpMsg);
@@ -103,7 +107,7 @@ public final class Main {
                 reducedMessageOptions = { args[3], args[4] };
 
         // check the user's preference about being asked if available
-        final WarningPreferences warningPreferences = new WarningPreferences();
+        final var warningPreferences = new WarningPreferences();
         warningPreferences.load();
 
         final int selectedOption;
@@ -158,7 +162,7 @@ public final class Main {
 
     private static void showGuide(final String guideURL, final String errorMessage) {
         try {
-            final URI guideURI = new URI(guideURL);
+            final var guideURI = new URI(guideURL);
             Desktop.getDesktop().browse(guideURI);
         } catch (final IOException | URISyntaxException e) {
             e.printStackTrace();

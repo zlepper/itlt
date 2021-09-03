@@ -230,16 +230,19 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ## Troubleshooting
 
-### Compiled file doesn't work on Java 8 or unable to build
+### Compiled file doesn't work on Java 8
 
-Make sure you set the project SDK to 11 and the language level to 8. It's important that you set both correctly, otherwise you may end up accidentally building a jar that only runs on Java 11+!
+Minecraft 1.17 requires Java 16.
 
-In IntelliJ, you can do this by going to `File -> Project Structure`. It should look like this:
-![Screenshot showing what to change in the project structure window](https://zlepper.github.io/itlt/docs/project-structure.png)
+### Compiled file doesn't work on Java 16 or unable to build
+
+Make sure you set the project SDK to 16 and the language level to 16.
+
+In IntelliJ, you can do this by going to `File -> Project Structure`.
 
 ### Unable to start Gradle
 
-Run Gradle with Java 8 to 15 inclusive. Using Java 16 isn't supported yet but is being worked on with ForgeGradle 5. I'll update the buildscript to ForgeGradle 5 and Gradle 7 once available.
+Run Gradle with Java 16.
 
-In IntelliJ, you can do this by going to `File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` and set the Gradle JVM to "Project SDK", which should be version 11 from the previous troubleshooting step. It should look like this:
+In IntelliJ, you can do this by going to `File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` and set the Gradle JVM to "Project SDK", which should be version 16 from the previous troubleshooting step. It should look like this but with "Project SDK" as 16 instead of 11:
 ![Screenshot showing what to change in the project gradle settings window](https://zlepper.github.io/itlt/docs/gradlew-settings.png)

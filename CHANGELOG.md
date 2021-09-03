@@ -4,7 +4,16 @@
 
 # v2.0.1
 
-This release fixes a couple of bugs that caused crash on launch issues for some users as well as minor performance improvements and other changes.
+This release adds support for MC 1.17.1 and fixes a couple of bugs that caused crash on launch issues for some users as well as minor performance improvements and other changes.
+
+## MC 1.17-specific changes
+
+-   itlt now supports MC 1.17.1
+-   Using a JS coremod instead of Mixin for custom window title handling
+-   Updated config defaults to reflect MC 1.17's new Java requirements
+-   ForgeGradle 5.1, Gradle 7.2, MojMap
+-   The code now takes full advantage of modern Java features when available and support for modern Java has been improved
+-   Improved support for Java 17
 
 ## Bug fixes
 

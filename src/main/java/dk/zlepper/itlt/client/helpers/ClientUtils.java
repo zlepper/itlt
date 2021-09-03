@@ -321,7 +321,7 @@ public class ClientUtils {
                     messageTitle = messageTitle.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
                     yield messageBody.replaceFirst("%s", ClientConfig.warnMaxJavaVersion.get().toString());
                 }
-                case NeedsJava64bit, WantsJava64bit -> messageBody;
+                default -> messageBody; // NeedsJava64bit, WantsJava64bit
             };
         }
 

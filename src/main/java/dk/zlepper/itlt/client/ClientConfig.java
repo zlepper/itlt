@@ -15,15 +15,26 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
+
+import static net.minecraftforge.fml.Logging.CORE;
 
 public final class ClientConfig {
-    private static final ForgeConfigSpec.Builder clientConfigBuilder = new ForgeConfigSpec.Builder();
+
     public static ForgeConfigSpec clientConfig;
 
     public static ForgeConfigSpec.BooleanValue
@@ -100,7 +111,9 @@ public final class ClientConfig {
                 enableMinJavaVerWarning.get() || enableMaxJavaVerWarning.get() || enable64bitWarning.get();
     }
 
-    static {
+    public static void init() {
+        final ForgeConfigSpec.Builder clientConfigBuilder = new ForgeConfigSpec.Builder();
+
         /* Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to
          * avoid confusion to the user.
          *
@@ -169,7 +182,7 @@ public final class ClientConfig {
 
                 } clientConfigBuilder.pop();
 
-            } clientConfigBuilder.pop();
+            } clientConfigBuilder.pop(); // end of Java.Advanced
 
             // Java.Arch
             clientConfigBuilder.push("Arch"); {
@@ -524,6 +537,7 @@ public final class ClientConfig {
             } clientConfigBuilder.pop(); // end of Java.Memory
 
         } clientConfigBuilder.pop(); // end of Java section
+        clientConfigBuilder.pop();
 
         // Display section
         clientConfigBuilder.push("Display"); {//.comment("Here you can change the aesthetics of your modpack.");
@@ -631,21 +645,22 @@ public final class ClientConfig {
                     .comment(" ",
                             " The version of itlt that created this config file. Intended to be used for migrating",
                             " config changes when you update the mod. Please don't touch this, this is for itlt itself to change.")
-                    .define("configVersion", "2.0.0");
+                    .define("configVersion", "unset");
         } clientConfigBuilder.pop();
 
         // Build the config
         clientConfig = clientConfigBuilder.build();
+
+        // Manually load the config early so that it can be used immediately
+        final var configData =
+                CommentedFileConfig.builder(FMLPaths.CONFIGDIR.get().resolve("itlt-client.toml"))
+                        .sync().autoreload().autosave().charset(StandardCharsets.UTF_8).writingMode(WritingMode.REPLACE).build();
+        configData.load();
+        clientConfig.setConfig(configData);
     }
 
-    public static void loadConfig(final ForgeConfigSpec spec, final Path path) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
-                .sync()
-                .autosave()
-                .writingMode(WritingMode.REPLACE)
-                .build();
-
-        configData.load();
-        spec.setConfig(configData);
+    private static void validate() {
+        if (enableMaxJavaVerRequirement.get() && enableMinJavaVerRequirement.get() && requiredMaxJavaVersion.get() < requiredMinJavaVersion.get())
+            itlt.LOGGER.error("Impossible Java version requirements set");
     }
 }

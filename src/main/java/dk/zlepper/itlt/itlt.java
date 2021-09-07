@@ -1,6 +1,7 @@
 package dk.zlepper.itlt;
 
 import dk.zlepper.itlt.client.ClientConfig;
+import dk.zlepper.itlt.client.helpers.Migration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -13,16 +14,23 @@ import org.apache.logging.log4j.Logger;
 
 @Mod(itlt.MOD_ID)
 public final class itlt {
-    public static final String MOD_ID = "itlt";
+    public static final String
+            MOD_ID = "itlt",
+            VERSION = "2.0.2";
     public static final Logger LOGGER = LogManager.getLogger();
+    public static ModLoadingContext modLoadingContext;
 
     public itlt() {
-        MinecraftForge.EVENT_BUS.register(this);
-
-        final var modLoadingContext = ModLoadingContext.get();
+        modLoadingContext = ModLoadingContext.get();
 
         modLoadingContext.registerExtensionPoint(IExtensionPoint.DisplayTest.class,() -> new IExtensionPoint.DisplayTest(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
-        modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientConfig);
-        ClientConfig.loadConfig(ClientConfig.clientConfig, FMLPaths.CONFIGDIR.get().resolve("itlt-client.toml"));
+
+        Migration.start();
+
+        //ClientConfig.init();
+        //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientConfig);
+        //ClientConfig.loadConfig(ClientConfig.clientConfig, );
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
 }

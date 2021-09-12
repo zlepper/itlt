@@ -662,5 +662,16 @@ public final class ClientConfig {
     private static void validate() {
         if (enableMaxJavaVerRequirement.get() && enableMinJavaVerRequirement.get() && requiredMaxJavaVersion.get() < requiredMinJavaVersion.get())
             itlt.LOGGER.error("Impossible Java version requirements set");
+
+        if (enableCustom64bitJavaGuide.get() && !custom64bitJavaGuideURL.get().toLowerCase().startsWith("https://"))
+            itlt.LOGGER.error("The custom64bitJavaGuideURL must start with \"https://\"");
+        else if (enableCustomJavaDowngradeGuide.get() && !customJavaDowngradeGuideURL.get().toLowerCase().startsWith("https://"))
+            itlt.LOGGER.error("The customJavaDowngradeGuideURL must start with \"https://\"");
+        else if (enableCustomJavaUpgradeGuide.get() && !customJavaUpgradeGuideURL.get().toLowerCase().startsWith("https://"))
+            itlt.LOGGER.error("The customJavaUpgradeGuideURL must start with \"https://\"");
+        else if (enableCustomMemoryAllocGuide.get() && !customMemoryAllocGuideURL.get().toLowerCase().startsWith("https://"))
+            itlt.LOGGER.error("The customMemoryAllocGuideURL must start with \"https://\"");
+
+
     }
 }

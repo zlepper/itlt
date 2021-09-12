@@ -106,7 +106,7 @@ public class Migration {
                 itlt.LOGGER.info("enableCustomWindowTitle: " + ClientConfig.enableCustomWindowTitle.get());
                 itlt.LOGGER.info("enableCustomServerListEntries: " + ClientConfig.enableCustomServerListEntries.get());
             }
-            default -> itlt.LOGGER.error("Migration failed: Unknown config version");
+            default -> itlt.LOGGER.error(String.format("Migration failed: Unknown config version \"%s\"", detectedConfigVer));
         }
 
         delete(v2_0_0_configPath);

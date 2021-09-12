@@ -32,6 +32,8 @@ import org.lwjgl.system.MemoryStack;
 
 import javax.imageio.ImageIO;
 
+import static dk.zlepper.itlt.client.ClientModEvents.detectedLauncher;
+
 public class ClientUtils {
 
     public static byte getJavaVersion() {
@@ -64,6 +66,35 @@ public class ClientUtils {
         }
 
         return false;
+    }
+
+    public static String getCustomWindowTitle(final Minecraft mcInstance) {
+        if (!ClientConfig.enableCustomWindowTitle.get()) return mcInstance.createTitle();
+
+        String customWindowTitle = ClientConfig.customWindowTitleText.get();
+
+        String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
+        if (ClientConfig.enableUsingAutodetectedDisplayName.get() && customWindowTitle.contains("%autoName")) {
+            try {
+                final String tmp = detectedLauncher.getModpackDisplayName();
+                if (tmp != null) autoDetectedDisplayName = tmp;
+            } catch (final IOException e) {
+                itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
+                e.printStackTrace();
+            }
+        }
+        customWindowTitle = customWindowTitle.replaceFirst("%autoName", autoDetectedDisplayName);
+
+        // replace %mc with the Vanilla window title from getWindowTitle() (createTitle == getWindowTitle)
+        customWindowTitle = customWindowTitle.replaceFirst("%mc", mcInstance.createTitle());
+
+        if (customWindowTitle.isEmpty()) return mcInstance.createTitle();
+        else return customWindowTitle;
+    }
+
+    public static void setCustomWindowTitle() {
+        itlt.LOGGER.info("######################################");
+        Minecraft.getInstance().getWindow().setTitle(getCustomWindowTitle(Minecraft.getInstance()));
     }
 
     public static void setWindowIcon(final InputStream inputIconInStream, final Minecraft mcInstance,
@@ -256,7 +287,7 @@ public class ClientUtils {
                 }
             }
         };
-        guideURL = guideURL.replaceAll("%launcher", ClientModEvents.detectedLauncher.getName())
+        guideURL = guideURL.replaceAll("%launcher", detectedLauncher.getName())
                 .replaceAll("%reason", messageContent.toString())
                 .replaceAll("%type", messageContent.msgType.toString())
                 .replaceAll("%desire", messageContent.msgDesire.toString())
@@ -341,7 +372,7 @@ public class ClientUtils {
             final var builder = new ProcessBuilder(
                     System.getProperty("java.home") + File.separator + "bin" + File.separator + "java",
                     "-Dapple.awt.application.appearance=system", // macOS dark theme support in Java 14+ (JDK-8235363)
-                    "-XX:+IgnoreUnrecognizedVMOptions", "--add-opens=java.desktop/sun.awt.shell=ALL-UNNAMED", // allow access to Win32ShellFolder2 on Java 16
+                    "-XX:+IgnoreUnrecognizedVMOptions", "--add-opens=java.desktop/sun.awt.shell=ALL-UNNAMED", // allow access to Win32ShellFolder2 on Java 16+
                     "-jar", modFile.toString(), messageContent.msgType.toString().toLowerCase(), messageTitle, messageBody,
                     leftButtonText, middleButtonText, rightButtonText, messageGuideError, guideURL, messageContent.toString());
             builder.inheritIO();

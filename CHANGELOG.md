@@ -2,6 +2,37 @@
 
 # Changelog
 
+# v2.1.0
+
+(preliminary changelog - changes mentioned here may not be implemented yet)
+
+## MC 1.17-specific changes
+
+-   Bugfix: The mod's pack.mcmeta format version is now updated to 7 to match 1.17
+
+## Bug fixes
+
+-   Fixed a bug in the config generation that caused every group to be inside the Java group.
+    -   Configs made older versions that had this bug will be automatically fixed to work on this version.
+
+## New features
+
+### Improved custom window title feature
+
+Vanilla changes the window title based on what you're doing (e.g. it mentions "Multiplayer" if you click the multiplayer button). Before v2.1.0, itlt didn't support this feature and kept the window title static after setting a custom title. v2.1.0 now supports this.
+
+### Config migration
+
+itlt now automatically migrates old configs to the version you're running, allowing you to update to a version of itlt containing otherwise breaking config changes without needing to fix your config manually.
+
+This basically means that if the config format changes in newer versions, itlt will automatically convert your previous config file to work with the latest version.
+
+This feature is currently used to migrate configs from v2.0.0/v2.0.1 to v2.1.0 but support for migrating even older versions such as v1 is being considered.
+
+### Config verification
+
+To help troubleshooting mistakes with your config, the mod now lets you know if you set requirements that are impossible to meet (e.g. requiring that the user simultaneously uses at least Java 11 but not newer than Java 8).
+
 # v2.0.1
 
 This release adds support for MC 1.17.1 and fixes a couple of bugs that caused crash on launch issues for some users as well as minor performance improvements and other changes.

@@ -1,5 +1,11 @@
 import org.gradle.api.java.archives.internal.DefaultManifest
 
+buildscript {
+    dependencies {
+        classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
+    }
+}
+
 plugins {
     id "com.github.johnrengelman.shadow" version "7.0.0"
     id "java" // java plugin is needed for the shadow plugin to work
@@ -7,6 +13,7 @@ plugins {
     id "maven-publish"
     id "net.minecraftforge.gradle" version "5.1.+"
 }
+apply plugin: "org.spongepowered.mixin"
 
 version = "1.17.1-2.0.2"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -80,7 +87,10 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.17.1-37.0.53"
+    minecraft "net.minecraftforge:forge:1.17.1-37.0.59"
+
+    // Mixin
+    annotationProcessor "org.spongepowered:mixin:0.8.4:processor"
 
     // itlt uses the "image4j" library to read .ico files
     implementation "com.github.imcdonagh:image4j:0.7.2"
@@ -108,6 +118,7 @@ ext {
                 "Implementation-Version": project.version,
                 "Implementation-Vendor" : "Paint_Ninja",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "MixinConfigs": "itlt.mixins.json",
                 "Main-Class": "dk.zlepper.itlt.Main" // so that the pop-up window code works
         ])
     } as DefaultManifest
@@ -162,3 +173,7 @@ task shrinkJar(type: Jar, dependsOn: reobfShadowJar) {
 //jar.finalizedBy reobfShadowJar
 tasks.build.dependsOn shrinkJar
 jar.finalizedBy shrinkJar
+
+mixin {
+    add sourceSets.main, "itlt.refmap.json"
+}

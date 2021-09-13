@@ -15,7 +15,7 @@ plugins {
 }
 apply plugin: "org.spongepowered.mixin"
 
-version = "1.17.1-2.0.2"
+version = "1.17.1-2.1.0-test"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
@@ -29,31 +29,10 @@ minecraft {
     accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
 
     runs {
-        final File runFile = project.file("run")
         client {
-            workingDirectory runFile
+            workingDirectory project.file("run")
             property "forge.logging.console.level", "info"
-            mods {
-                itlt {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory runFile
-            property "forge.logging.console.level", "info"
-            mods {
-                itlt {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory runFile
-            property "forge.logging.console.level", "info"
-            args "--mod", "itlt", "--all", "--output", file("src/generated/resources/")
+            arg "-mixin.config=itlt.mixins.json"
             mods {
                 itlt {
                     source sourceSets.main

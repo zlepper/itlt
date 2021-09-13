@@ -58,11 +58,8 @@ public class ClientUtils {
 
         for (int i = 0; i < list.size(); i++) {
             final ServerData serverData = list.get(i);
-            if (serverData.name != null && serverData.ip != null &&
-                    serverData.name.equalsIgnoreCase(server.name) &&
-                    serverData.ip.equalsIgnoreCase(server.ip)) {
+            if (serverData.name.equalsIgnoreCase(server.name) && serverData.ip.equalsIgnoreCase(server.ip))
                 return true;
-            }
         }
 
         return false;
@@ -250,9 +247,9 @@ public class ClientUtils {
         String messageTitle, messageBody, leftButtonText, middleButtonText, rightButtonText, messageGuideError;
 
         final String msgTranslationKeyTemplate =
-                "itlt." + messageContent.msgType.name().toLowerCase()
-                        + "." + messageContent.msgDesire.name().toLowerCase()
-                        + "." + messageContent.msgSubject.name().toLowerCase();
+                "itlt." + (messageContent.msgType.name()
+                        + "." + messageContent.msgDesire.name()
+                        + "." + messageContent.msgSubject.name()).toLowerCase();
         messageTitle = msgTranslationKeyTemplate + ".title";
         messageBody = msgTranslationKeyTemplate + ".body";
         messageGuideError = "itlt.cantOpenGuideErrorMsg";

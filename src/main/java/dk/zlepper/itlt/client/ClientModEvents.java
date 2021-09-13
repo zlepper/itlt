@@ -125,27 +125,11 @@ public class ClientModEvents {
 
         // Custom window title text
         if (ClientConfig.enableCustomWindowTitle.get()) {
-            String customWindowTitle = ClientConfig.customWindowTitleText.get();
-
-            String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
-            if (ClientConfig.enableUsingAutodetectedDisplayName.get() && customWindowTitle.contains("%autoName")) {
-                try {
-                    final String tmp = detectedLauncher.getModpackDisplayName();
-                    if (tmp != null) autoDetectedDisplayName = tmp;
-                } catch (final IOException e) {
-                    itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
-                    e.printStackTrace();
-                }
-            }
-            customWindowTitle = customWindowTitle.replaceFirst("%autoName", autoDetectedDisplayName);
-
-            // replace %mc with the Vanilla window title from getWindowTitle() (createTitle == getWindowTitle)
-            customWindowTitle = customWindowTitle.replaceFirst("%mc", mcInstance.createTitle());
+            final String customWindowTitle = ClientUtils.getCustomWindowTitle(mcInstance);
 
             itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
 
-            // set the new window title (setTitle == setWindowTitle)
-            if (!customWindowTitle.isEmpty()) mcInstance.getWindow().setTitle(customWindowTitle);
+            mcInstance.updateTitle();
         }
 
         // Custom window icon

@@ -12,14 +12,17 @@
 
 ## Bug fixes
 
--   Fixed a bug in the config generation that caused every group to be inside the Java group.
+-   Fixed a bug in config generation that caused every group to be inside the Java group.
     -   Configs made older versions that had this bug will be automatically fixed to work on this version.
+-   Fixed a startup crash on some macOS systems
 
 ## New features
 
 ### Improved custom window title feature
 
-Vanilla changes the window title based on what you're doing (e.g. it mentions "Multiplayer" if you click the multiplayer button). Before v2.1.0, itlt didn't support this feature and kept the window title static after setting a custom title. v2.1.0 now supports this.
+Vanilla changes the window title based on what you're doing (e.g. it mentions "Singleplayer" when playing a singleplayer world).
+
+Before v2.1.0, itlt didn't support this feature and kept the window title static. v2.1.0 now supports this feature.
 
 ### Config migration
 
@@ -32,6 +35,10 @@ This feature is currently used to migrate configs from v2.0.0/v2.0.1 to v2.1.0 b
 ### Config verification
 
 To help troubleshooting mistakes with your config, the mod now lets you know if you set requirements that are impossible to meet (e.g. requiring that the user simultaneously uses at least Java 11 but not newer than Java 8).
+
+## Other changes
+
+-   Minor performance improvements
 
 # v2.0.1
 

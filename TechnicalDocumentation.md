@@ -206,7 +206,6 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 -   Cleanup config handling and migration code
 -   Improve config verification code, make it do more than just log errors in the console
--   
 
 ### New features to consider adding later
 
@@ -222,7 +221,6 @@ See the warnings feature brief for details on which to use and when. If you're n
     - The idea is that you can bypass a server's hub world and quickly join any of the servers through a multiplayer server list-like menu rather than running around a hub world
     - Server hub replies with a json of IPs and Names on join and kicks player. Client renders and shows a separate multiplayer server list containing only the entries from the server hub's json with a button to go back to the main server list
 -   Support Java 8 build number detection and requirements/warnings/etc (e.g. Java 8u51, Java 8u200, etc...)
--   Support Vanilla's window title changing depending on what you're doing (e.g. "Minecraft 1.16.5 (Multiplayer)" when you click Multiplayer). Currently it's static and stays the same as when you first start the game.
 -   Anti-piracy feature (detect and block known pirated launchers by default)
 -   Redo the anti-cheat stuff
     -   It works, but there's lots of signs of me trying to get it all to work and trying new concepts in-place rather than in isolation. The whole thing could do with a cleanup really

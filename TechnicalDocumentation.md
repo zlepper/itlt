@@ -189,6 +189,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ### Things I still need to document here
 
+-   The new custom window title system
 -   Custom server list entries (found in `client.ClientModEvents#clientInit`)
 -   Explicit GC (found in `client.ClientForgeEvents#onGuiOpen`)
 -   Anti-cheat

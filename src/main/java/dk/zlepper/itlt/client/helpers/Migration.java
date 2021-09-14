@@ -4,6 +4,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.itlt;
+import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -43,12 +44,25 @@ public class Migration {
 
         final Path currentConfigPath = configDir.resolve("itlt-client.toml");
         final Path v2_0_0_configPath = configDir.resolve("itlt-client-2.0.0.toml");
+        final Path v1_0_3_configPath = configDir.resolve("itlt-client-1.0.3.toml");
 
         // no config exists yet, so make one and skip migration
         if (!currentConfigPath.toFile().exists()) {
             ClientConfig.init();
             return;
         }
+
+        // skip config version detection and assume no migration needed if there's an itlt-migration.toml that says
+        // we've already migrated the config to the same version we're running.
+        /*ConfigSpecs.migrationChecker.init();
+        final String migratedFrom = ConfigSpecs.migrationChecker.migratedFrom.get();
+        final String migratedTo = ConfigSpecs.migrationChecker.migratedTo.get();
+        if (migratedTo.equals(itlt.VERSION)) {
+            ClientConfig.init();
+            return;
+        } else if (!migratedFrom.equals("unset")) {
+            detectedConfigVer = migratedFrom;
+        }*/
 
         backup();
 
@@ -58,30 +72,48 @@ public class Migration {
             itlt.LOGGER.error("Migration failed: Unable to create a copy of the config");
             return;
         }
-
+        // Check if the config file has a [Java.Internal]configVersion value different from the config spec default of "unset".
+        // If it isn't "unset", we know the read file is a v2.0.0/v2.0.1 config file
         ConfigSpecs.v2_0_0.init(v2_0_0_configPath);
-        if (!ConfigSpecs.v2_0_0.configVersion.get().equals("unset"))
+        if (!ConfigSpecs.v2_0_0.configVersion.get().equals("unset")) {
             detectedConfigVer = ConfigSpecs.v2_0_0.configVersion.get();
-
-        ClientConfig.init();
-        if (detectedConfigVer.equals("unset") && ClientConfig.configVersion.get().equals("unset")) {
-            ClientConfig.configVersion.set(itlt.VERSION);
-            delete(v2_0_0_configPath);
-            return;
         }
+
+        if (!(detectedConfigVer.equals("2.0.0") || detectedConfigVer.equals("2.0.1"))) {
+            if (!copy(currentConfigPath, v1_0_3_configPath)) {
+                itlt.LOGGER.error("Migration failed: Unable to create a copy of the config");
+                delete(v2_0_0_configPath);
+                return;
+            }
+            // First check if the v2.0.0 config version was detected, if not then check for any settings that are different from the v1.0.3 config spec defaults.
+            // If there are, we know the read file is a v1.0.3 config file and that it has settings that need migrating.
+            ConfigSpecs.v1_0_3.init(v1_0_3_configPath);
+            if (detectedConfigVer.equals("unset") && !ConfigSpecs.v1_0_3.DISPLAY_WINDOW_DISPLAY_TITLE.get().equals("unset")) {
+                detectedConfigVer = "1.0.3";
+                delete(v2_0_0_configPath);
+            }
+        }
+
+        // First check if the two previous supported config versions are detected, if not then check if the config file
+        // has a [Internal]configVersion value different from the config spec default of "unset". This is for future use.
+        ClientConfig.init();
+        if (detectedConfigVer.equals("unset") && !ClientConfig.configVersion.get().equals("unset"))
+            detectedConfigVer = ClientConfig.configVersion.get();
 
         if (detectedConfigVer.equals(itlt.VERSION)) {
             itlt.LOGGER.info("Skipping migration as detected same config version as itlt version");
             delete(v2_0_0_configPath);
+            delete(v1_0_3_configPath);
             return;
         }
 
+        //ConfigSpecs.migrationChecker.migratedFrom.set(detectedConfigVer);
+        itlt.LOGGER.info("Attempting to migrate configs from \"v%s\" to \"v%s\"...");
+
+        boolean migrationSuccessful = false;
+
         switch (detectedConfigVer) {
             case "2.0.0", "2.0.1" -> {
-                itlt.LOGGER.info("BEFORE");
-                itlt.LOGGER.info("enableCustomWindowTitle: " + ConfigSpecs.v2_0_0.enableCustomWindowTitle.get());
-                itlt.LOGGER.info("enableCustomServerListEntries: " + ConfigSpecs.v2_0_0.enableCustomServerListEntries.get());
-
                 // Copy over the differing values to the new latest spec's equivalents
                 {
                     // v2.0.2 fixed a bug where all config options were inside the Java group.
@@ -99,17 +131,47 @@ public class Migration {
                 }
 
                 // Now that the migration is finished, update the config version and save it
-                ClientConfig.configVersion.set("2.0.2");
+                ClientConfig.configVersion.set("2.1.0");
                 ClientConfig.clientConfig.save();
 
-                itlt.LOGGER.info("AFTER");
-                itlt.LOGGER.info("enableCustomWindowTitle: " + ClientConfig.enableCustomWindowTitle.get());
-                itlt.LOGGER.info("enableCustomServerListEntries: " + ClientConfig.enableCustomServerListEntries.get());
+                migrationSuccessful = true;
+            }
+            case "1.0.3" -> {
+                // Copy over the differing values to the new latest spec's equivalents
+                {
+                    ClientConfig.enable64bitRequirement.set(false);
+                    ClientConfig.enable64bitWarning.set(ConfigSpecs.v1_0_3.BIT_DETECTION_SHOULD_YELL_AT_32_BIT_USERS.get());
+
+                    // DISPLAY_WINDOW_DISPLAY_TITLE is not migrated as the default is meant to be the same as the Vanilla
+                    // title from the MC version it came from, but it sometimes picked up the launcher name instead
+                    ClientConfig.enableCustomIcon.set(ConfigSpecs.v1_0_3.DISPLAY_LOAD_CUSTOM_ICON.get());
+                    ClientConfig.enableUsingAutodetectedIcon.set(ConfigSpecs.v1_0_3.DISPLAY_USE_TECHNIC_ICON.get());
+                    ClientConfig.enableUsingAutodetectedDisplayName.set(ConfigSpecs.v1_0_3.DISPLAY_USE_TECHNIC_DISPLAY_NAME.get());
+
+                    if (ConfigSpecs.v1_0_3.SERVER_ADD_DEDICATED_SERVER.get()) {
+                        ClientConfig.enableCustomServerListEntries.set(true);
+                        // todo: create servers.json in itlt folder with SERVER_SERVER_NAME and SERVER_SERVER_IP
+                        itlt.LOGGER.info("Unable to migrate SERVER_SERVER_NAME option to v2.1.0");
+                        itlt.LOGGER.info("Unable to migrate SERVER_SERVER_IP option to v2.1.0");
+                    }
+                }
+
+                // Now that the migration is finished, update the config version and save it
+                ClientConfig.configVersion.set("2.1.0");
+                ClientConfig.clientConfig.save();
+
+                migrationSuccessful = true;
             }
             default -> itlt.LOGGER.error(String.format("Migration failed: Unknown config version \"%s\"", detectedConfigVer));
         }
 
+        if (migrationSuccessful) {
+            itlt.LOGGER.info("Config migration successful");
+            //ConfigSpecs.migrationChecker.migratedTo.set(itlt.VERSION);
+        }
+
         delete(v2_0_0_configPath);
+        delete(v1_0_3_configPath);
     }
 
     static void backup() {
@@ -147,6 +209,27 @@ public class Migration {
     }
 
     static class ConfigSpecs {
+
+        /*static class migrationChecker {
+            static ForgeConfigSpec clientConfig;
+
+            static ForgeConfigSpec.ConfigValue<String> migratedFrom, migratedTo;
+
+            static void init() {
+                final ForgeConfigSpec.Builder clientConfigBuilder = new ForgeConfigSpec.Builder();
+
+                migratedFrom = clientConfigBuilder.define("migratedFrom", "unset");
+                migratedTo = clientConfigBuilder.define("migratedTo", "unset");
+
+                clientConfig = clientConfigBuilder.build();
+
+                final var configData =
+                        CommentedFileConfig.builder(FMLPaths.CONFIGDIR.get().resolve(configDir.resolve("itlt-migration.toml")))
+                                .sync().charset(StandardCharsets.UTF_8).writingMode(WritingMode.REPLACE).build();
+                configData.load();
+                clientConfig.setConfig(configData);
+            }
+        }*/
 
         static class v2_0_0 {
             static ForgeConfigSpec clientConfig;
@@ -294,6 +377,54 @@ public class Migration {
                 clientConfigBuilder.push("Internal"); {
                     configVersion = clientConfigBuilder.define("configVersion", "unset");
                 } clientConfigBuilder.pop();
+
+                // Build the config
+                clientConfig = clientConfigBuilder.build();
+
+                // Manually load the config file into the clientConfig variable
+                final var configData =
+                        CommentedFileConfig.builder(FMLPaths.CONFIGDIR.get().resolve(configFilePath))
+                                .sync().charset(StandardCharsets.UTF_8).writingMode(WritingMode.REPLACE).build();
+                configData.load();
+                clientConfig.setConfig(configData);
+            }
+        }
+
+        static class v1_0_3 {
+            static ForgeConfigSpec clientConfig;
+
+            static ForgeConfigSpec.BooleanValue BIT_DETECTION_SHOULD_YELL_AT_32_BIT_USERS;
+            static ForgeConfigSpec.ConfigValue<String> BIT_DETECTION_MESSAGE;
+
+            static ForgeConfigSpec.ConfigValue<String> DISPLAY_WINDOW_DISPLAY_TITLE;
+            static ForgeConfigSpec.BooleanValue DISPLAY_LOAD_CUSTOM_ICON;
+            static ForgeConfigSpec.BooleanValue DISPLAY_USE_TECHNIC_ICON;
+            static ForgeConfigSpec.BooleanValue DISPLAY_USE_TECHNIC_DISPLAY_NAME;
+
+            static ForgeConfigSpec.BooleanValue SERVER_ADD_DEDICATED_SERVER;
+            static ForgeConfigSpec.ConfigValue<String> SERVER_SERVER_NAME;
+            static ForgeConfigSpec.ConfigValue<String> SERVER_SERVER_IP;
+
+            static void init(final Path configFilePath) {
+                final ForgeConfigSpec.Builder clientConfigBuilder = new ForgeConfigSpec.Builder();
+
+                clientConfigBuilder.push("BitDetection");
+                    BIT_DETECTION_SHOULD_YELL_AT_32_BIT_USERS = clientConfigBuilder.define("ShouldYellAt32BitUsers", true);
+                    BIT_DETECTION_MESSAGE = clientConfigBuilder.define("Message", "You are using a 32 bit version of java. This is not recommended with this modpack.");
+                clientConfigBuilder.pop();
+
+                clientConfigBuilder.push("Display");
+                    DISPLAY_WINDOW_DISPLAY_TITLE = clientConfigBuilder.define("windowDisplayTitle", "unset");
+                    DISPLAY_LOAD_CUSTOM_ICON = clientConfigBuilder.define("loadCustomIcon", true);
+                    DISPLAY_USE_TECHNIC_ICON = clientConfigBuilder.define("useTechnicIcon", true);
+                    DISPLAY_USE_TECHNIC_DISPLAY_NAME = clientConfigBuilder.define("useTechnicDisplayName", true);
+                clientConfigBuilder.pop();
+
+                clientConfigBuilder.push("Server");
+                    SERVER_ADD_DEDICATED_SERVER = clientConfigBuilder.define("AddDedicatedServer", false);
+                    SERVER_SERVER_NAME = clientConfigBuilder.define("ServerName", "localhost");
+                    SERVER_SERVER_IP = clientConfigBuilder.define("ServerIP", "127.0.0.1:25555");
+                clientConfigBuilder.pop();
 
                 // Build the config
                 clientConfig = clientConfigBuilder.build();

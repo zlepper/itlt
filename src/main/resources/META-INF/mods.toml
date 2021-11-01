@@ -10,7 +10,7 @@ license="MIT"
 # The modid of the mod
 modId="itlt" #mandatory
 # The version number of the mod - there's a few well known ${} variables usable here or just hardcode it
-version="2.1.0-test" #mandatory
+version="2.1.0" #mandatory
 # A display name for the mod
 displayName="It's The Little Things" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
@@ -32,7 +32,7 @@ description='''It's the little things that make all the difference, the finishin
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[37.0.59,)" #mandatory
+    versionRange="[37.0.104,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER

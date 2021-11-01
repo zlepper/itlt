@@ -11,16 +11,22 @@ package dk.zlepper.itlt.client;
 //       a want or need. When this happens, show a tailored error message for this specific scenario or change the
 //       behaviour so that the max warn/need gets disabled when the min is higher (with updated config comments to note this)
 
+import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
+import dk.zlepper.itlt.client.helpers.ConfigUtils;
+import dk.zlepper.itlt.client.helpers.Migration;
+import dk.zlepper.itlt.client.helpers.MigrationOld;
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public final class ClientConfig {
 
@@ -101,6 +107,36 @@ public final class ClientConfig {
     }
 
     public static void init() {
+
+        @Nullable
+        CommentedConfig oldConfig = null;
+
+        boolean shouldMigrate = false;
+
+        File configFile = ConfigUtils.configDir.resolve("itlt-client.toml").toFile();
+
+        if (configFile.exists()) {
+            try {
+                oldConfig = ConfigUtils.readToml(ConfigUtils.configDir.resolve("itlt-client.toml").toFile());
+            } catch (final IOException e) {
+                itlt.LOGGER.error(e);
+                e.printStackTrace();
+            }
+        } else {
+            itlt.LOGGER.info("Couldn't find a config file, making one...");
+        }
+
+        String detectedConfigVersion = "Unknown";
+
+        if (oldConfig != null) {
+            detectedConfigVersion = ConfigUtils.getConfigVersion(oldConfig);
+            itlt.LOGGER.info("detectedConfigVersion: " + detectedConfigVersion);
+            if (!detectedConfigVersion.equals(itlt.VERSION)) {
+                shouldMigrate = true;
+                ConfigUtils.backup();
+            }
+        }
+
         final ForgeConfigSpec.Builder clientConfigBuilder = new ForgeConfigSpec.Builder();
 
         /* Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to
@@ -634,7 +670,7 @@ public final class ClientConfig {
                     .comment(" ",
                             " The version of itlt that created this config file. Intended to be used for migrating",
                             " config changes when you update the mod. Please don't touch this, this is for itlt itself to change.")
-                    .define("configVersion", "unset");
+                    .define("configVersion", "2.1.0");
         } clientConfigBuilder.pop();
 
         // Build the config
@@ -642,10 +678,12 @@ public final class ClientConfig {
 
         // Manually load the config early so that it can be used immediately
         final var configData =
-                CommentedFileConfig.builder(FMLPaths.CONFIGDIR.get().resolve("itlt-client.toml"))
+                CommentedFileConfig.builder(ConfigUtils.configDir.resolve("itlt-client.toml"))
                         .sync().autoreload().autosave().charset(StandardCharsets.UTF_8).writingMode(WritingMode.REPLACE).build();
         configData.load();
         clientConfig.setConfig(configData);
+
+        if (shouldMigrate) Migration.migrate(detectedConfigVersion, itlt.VERSION, oldConfig);
     }
 
     private static void validate() {

@@ -11,7 +11,6 @@ package dk.zlepper.itlt.client;
 //       a want or need. When this happens, show a tailored error message for this specific scenario or change the
 //       behaviour so that the max warn/need gets disabled when the min is higher (with updated config comments to note this)
 
-import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -110,13 +109,16 @@ public final class ClientConfig {
         @Nullable
         UnmodifiableCommentedConfig oldConfig = null;
 
+        final File configFile = ConfigUtils.configDir.resolve("itlt-client.toml").toFile();
+        final File oldConfigFile = ConfigUtils.configDir.resolve("itlt-client.toml.bak").toFile();
+        String detectedConfigVersion = "Unknown";
         boolean shouldMigrate = false;
 
-        File configFile = ConfigUtils.configDir.resolve("itlt-client.toml").toFile();
-
+        // If a config file already exists, we make a backup and read that instead to avoid corrupting it
         if (configFile.exists()) {
+            ConfigUtils.backup();
             try {
-                oldConfig = ConfigUtils.readToml(ConfigUtils.configDir.resolve("itlt-client.toml").toFile());
+                oldConfig = ConfigUtils.readToml(oldConfigFile);
             } catch (final IOException e) {
                 itlt.LOGGER.error(e);
                 e.printStackTrace();
@@ -125,14 +127,19 @@ public final class ClientConfig {
             itlt.LOGGER.info("Couldn't find a config file, making one...");
         }
 
-        String detectedConfigVersion = "Unknown";
-
-        if (oldConfig != null) {
+        if (oldConfig != null) { // oldConfig will be null if no config file exists yet
             detectedConfigVersion = ConfigUtils.getConfigVersion(oldConfig);
-            itlt.LOGGER.info("detectedConfigVersion: " + detectedConfigVersion);
-            if (!detectedConfigVersion.equals(itlt.VERSION)) {
+            itlt.LOGGER.debug("detectedConfigVersion: " + detectedConfigVersion);
+            if (detectedConfigVersion.equals(itlt.VERSION)) {
+                // Delete the backup (itlt-client.toml.bak) if no migration is necessary
+                ConfigUtils.delete(oldConfigFile.toPath());
+            } else {
+                /* Delete the current config (itlt-client.toml) so that the code below makes the new config file, then
+                 * once that's done we check shouldMigrate and run Migration.migrate() if true, which handles copying
+                 * over the settings from the old format (itlt-client.toml.bak) to the new format (itlt-client.toml)
+                 */
+                ConfigUtils.delete(configFile.toPath());
                 shouldMigrate = true;
-                ConfigUtils.backup();
             }
         }
 
@@ -682,6 +689,7 @@ public final class ClientConfig {
         configData.load();
         clientConfig.setConfig(configData);
 
+        // copy over the old config format's settings to the new format if necessary, determined near the start of ClientConfig.init()
         if (shouldMigrate) Migration.migrate(detectedConfigVersion, itlt.VERSION, oldConfig);
     }
 
@@ -697,7 +705,6 @@ public final class ClientConfig {
             itlt.LOGGER.error("The customJavaUpgradeGuideURL must start with \"https://\"");
         else if (enableCustomMemoryAllocGuide.get() && !customMemoryAllocGuideURL.get().toLowerCase().startsWith("https://"))
             itlt.LOGGER.error("The customMemoryAllocGuideURL must start with \"https://\"");
-
 
     }
 }

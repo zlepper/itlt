@@ -8,7 +8,8 @@
 
 ## MC 1.17-specific changes
 
--   Bugfix: The mod's pack.mcmeta format version is now updated to 7 to match 1.17
+-   Bugfix: The mod's pack.mcmeta format version is now updated to 7 to match MC 1.17
+-   Use Mixin again instead of a JS coremod for custom window title handling
 
 ## Bug fixes
 
@@ -26,15 +27,15 @@ Before v2.1.0, itlt didn't support this feature and kept the window title static
 
 ### Config migration
 
-itlt now automatically migrates old configs to the version you're running, allowing you to update to a version of itlt containing otherwise breaking config changes without needing to fix your config manually.
+itlt now automatically migrates old configs to the version you're running and makes a backup, allowing you to update to a version of itlt containing otherwise breaking config changes without needing to fix your config manually. The backup is deleted on second launch.
 
-This basically means that if the config format changes in newer versions, itlt will automatically convert your previous config file to work with the latest version.
+This basically means that if the config format changes in newer versions, itlt will automatically convert your previous config file to work with the latest version, preserving your existing preferences where possible.
 
-This feature is currently used to migrate configs from v2.0.0/v2.0.1 to v2.1.0 but support for migrating even older versions such as v1 is being considered.
+This feature currently supports migrating from v2.0.0/v2.0.1 to v2.1.0. Support for migrating configs from older versions is currently unimplemented.
 
 ### Config verification
 
-To help troubleshooting mistakes with your config, the mod now lets you know if you set requirements that are impossible to meet (e.g. requiring that the user simultaneously uses at least Java 11 but not newer than Java 8).
+To help troubleshooting mistakes with your config, the mod now logs an error if you set requirements that are impossible to meet (e.g. requiring that the user simultaneously uses at least Java 11 but not newer than Java 8).
 
 ## Other changes
 

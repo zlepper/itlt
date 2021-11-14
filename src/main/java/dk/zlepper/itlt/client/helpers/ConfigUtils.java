@@ -1,6 +1,5 @@
 package dk.zlepper.itlt.client.helpers;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
 import com.electronwill.nightconfig.toml.TomlParser;
 import com.electronwill.nightconfig.toml.TomlWriter;
@@ -19,7 +18,7 @@ public class ConfigUtils {
     public static final Path configDir = FMLPaths.CONFIGDIR.get();
 
     public static UnmodifiableCommentedConfig readToml(final File tomlFile) throws IOException {
-        return new TomlParser().parse(new FileReader(tomlFile.getPath(), StandardCharsets.UTF_8));
+        return new TomlParser().parse(new FileReader(tomlFile.getPath(), StandardCharsets.UTF_8)).unmodifiable();
     }
 
     public static void writeToml(final UnmodifiableCommentedConfig config, final File tomlFile) throws IOException {
@@ -77,6 +76,16 @@ public class ConfigUtils {
                 itlt.LOGGER.warn("Failed to make a backup of itlt-client.toml");
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void delete(final Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (final IOException e) {
+            try {
+                path.toFile().deleteOnExit();
+            } catch (final Exception ignored) {}
         }
     }
 }

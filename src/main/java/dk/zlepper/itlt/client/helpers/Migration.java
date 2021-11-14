@@ -1,6 +1,5 @@
 package dk.zlepper.itlt.client.helpers;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.itlt;

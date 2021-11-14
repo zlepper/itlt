@@ -1,8 +1,6 @@
 package dk.zlepper.itlt;
 
 import dk.zlepper.itlt.client.ClientConfig;
-import dk.zlepper.itlt.client.helpers.ConfigUtils;
-import dk.zlepper.itlt.client.helpers.MigrationOld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;

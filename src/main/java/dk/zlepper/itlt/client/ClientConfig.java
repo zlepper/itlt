@@ -12,11 +12,11 @@ package dk.zlepper.itlt.client;
 //       behaviour so that the max warn/need gets disabled when the min is higher (with updated config comments to note this)
 
 import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import dk.zlepper.itlt.client.helpers.ConfigUtils;
 import dk.zlepper.itlt.client.helpers.Migration;
-import dk.zlepper.itlt.client.helpers.MigrationOld;
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 public final class ClientConfig {
 
@@ -109,7 +108,7 @@ public final class ClientConfig {
     public static void init() {
 
         @Nullable
-        CommentedConfig oldConfig = null;
+        UnmodifiableCommentedConfig oldConfig = null;
 
         boolean shouldMigrate = false;
 

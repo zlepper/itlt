@@ -1,30 +1,16 @@
 package dk.zlepper.itlt.client.helpers;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.itlt;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public class Migration {
 
-    /*public enum Config {
-        v2_1_0, v2_0_0;
-
-        public Map<String, Object> map;
-        Config(final Map<String, Object> map) {
-            this.map = map;
-        }
-
-        Config() {}
-    }*/
-
     // Copy over the differing values to the new latest spec's equivalents
-    public static void migrate(final String from, final String to, final CommentedConfig oldConfig) {
+    public static void migrate(String from, final String to, final UnmodifiableCommentedConfig oldConfig) {
         switch (from) {
             case "2.0.1", "2.0.0" -> {
                 // v2.1.0 fixed a bug where all config options were inside the Java group.
@@ -45,9 +31,27 @@ public class Migration {
                 ClientConfig.configVersion.set("2.1.0");
             }
             case "1.0.3" -> {
-                // todo
+                from += " (auto-detected)";
+
+                // [Display] useTechnicIcon -> [Display.Icon] enableUsingAutodetectedIcon
+                // [Display] loadCustomIcon -> [Display.Icon] enableCustomIcon
+                ClientConfig.enableUsingAutodetectedIcon.set(oldConfig.get(List.of("Display", "useTechnicIcon")));
+                ClientConfig.enableCustomIcon.set(oldConfig.get(List.of("Display", "loadCustomIcon")));
+
+                // [Display] useTechnicDisplayName -> [Display.WindowTitle] enableUsingAutodetectedDisplayName
+                ClientConfig.enableUsingAutodetectedDisplayName.set(oldConfig.get(List.of("Display", "useTechnicDisplayName")));
+
+                // [Server] AddDedicatedServer -> [ServerList] enableCustomServerListEntries
+                final boolean addDedicatedServer = oldConfig.get(List.of("Server", "AddDedicatedServer"));
+                if (addDedicatedServer) {
+                    ClientConfig.enableCustomServerListEntries.set(true);
+                    itlt.LOGGER.warn(String.format("Unable to migrate SERVER_SERVER_NAME option from v%s to v%s", from, to));
+                    itlt.LOGGER.warn(String.format("Unable to migrate SERVER_SERVER_IP option from v%s to v%s", from, to));
+                }
+
+                ClientConfig.configVersion.set("2.1.0");
             }
-            default -> itlt.LOGGER.error(String.format("Migration failed: Unknown config version \"%s\"", from));
+            default -> itlt.LOGGER.error(String.format("Migration failed: Unknown config version \"v%s\"", from));
         }
     }
 }

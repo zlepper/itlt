@@ -691,11 +691,13 @@ public final class ClientConfig {
 
         // copy over the old config format's settings to the new format if necessary, determined near the start of ClientConfig.init()
         if (shouldMigrate) Migration.migrate(detectedConfigVersion, itlt.VERSION, oldConfig);
+
+        validate();
     }
 
     private static void validate() {
         if (enableMaxJavaVerRequirement.get() && enableMinJavaVerRequirement.get() && requiredMaxJavaVersion.get() < requiredMinJavaVersion.get())
-            itlt.LOGGER.error("Impossible Java version requirements set");
+            itlt.LOGGER.error("Impossible Java version requirements set: requiredMinJavaVersion cannot be higher than requiredMaxJavaVersion.");
 
         if (enableCustom64bitJavaGuide.get() && !custom64bitJavaGuideURL.get().toLowerCase().startsWith("https://"))
             itlt.LOGGER.error("The custom64bitJavaGuideURL must start with \"https://\"");

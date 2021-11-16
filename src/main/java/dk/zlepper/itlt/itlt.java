@@ -23,11 +23,8 @@ public final class itlt {
 
         modLoadingContext.registerExtensionPoint(IExtensionPoint.DisplayTest.class,() -> new IExtensionPoint.DisplayTest(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
 
-        //MigrationOld.start();
-
         ClientConfig.init();
         modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientConfig);
-        //ClientConfig.loadConfig(ClientConfig.clientConfig, );
 
         MinecraftForge.EVENT_BUS.register(this);
     }

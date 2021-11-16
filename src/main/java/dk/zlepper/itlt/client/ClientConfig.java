@@ -57,7 +57,8 @@ public final class ClientConfig {
             enableExplicitGC,
             doExplicitGCOnPause,
             doExplicitGCOnSleep,
-            doExplicitGCOnMenu;
+            doExplicitGCOnMenu,
+            enableWelcomeScreen;
 
     public static ForgeConfigSpec.ConfigValue<String>
             customWindowTitleText,
@@ -652,6 +653,22 @@ public final class ClientConfig {
                         .define("enableUsingAutodetectedIcon", true); // Currently supported launchers: Technic, MultiMC.
             } clientConfigBuilder.pop();
 
+            // Display.WelcomeScreen
+            clientConfigBuilder.push("WelcomeScreen"); {
+                enableWelcomeScreen = clientConfigBuilder
+                        .comment(" ",
+                                " Enable this if you want to show a welcome screen to your users the first time they",
+                                " start your modpack. You can customise the text shown using a text file.",
+                                " ",
+                                " Note: The text file needs to be placed in config" + File.separator + "itlt" + File.separator + "welcome.txt",
+                                " ",
+                                " Warning: This feature is experimental and may change in future v2.x releases. Check the",
+                                " changelog before updating if you use this. The changelog will make any breaking changes",
+                                " to this feature clear. If there's no mention of this feature in the changelog, rest assured",
+                                " you can update without needing to make any changes to your welcome.txt.")
+                        .define("enableWelcomeScreen", false);
+            } clientConfigBuilder.pop();
+
         } clientConfigBuilder.pop(); // end of Display section
 
         // Server list section
@@ -665,8 +682,7 @@ public final class ClientConfig {
                             " Warning: This feature is experimental and may change in future v2.x releases. Check the",
                             " changelog before updating if you use this. The changelog will make any breaking changes",
                             " to this feature clear. If there's no mention of this feature in the changelog, rest assured",
-                            " you can update without needing to make any changes to your servers.json.",
-                            " ")
+                            " you can update without needing to make any changes to your servers.json.")
                     .define("enableCustomServerListEntries", false);
         } clientConfigBuilder.pop(); // end of Server list section
 

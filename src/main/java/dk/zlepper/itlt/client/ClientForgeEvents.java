@@ -1,34 +1,32 @@
 package dk.zlepper.itlt.client;
 
 import com.mojang.realmsclient.RealmsMainScreen;
+import dk.zlepper.itlt.client.screens.FirstLaunchScreen;
 import dk.zlepper.itlt.itlt;
-import net.minecraft.client.gui.screens.AccessibilityOptionsScreen;
 import net.minecraft.client.gui.screens.*;
+import net.minecraft.client.gui.screens.achievement.StatsScreen;
+import net.minecraft.client.gui.screens.controls.ControlsScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import net.minecraft.client.gui.screens.ChatOptionsScreen;
-import net.minecraft.client.gui.screens.DirectJoinServerScreen;
-import net.minecraft.client.gui.screens.InBedChatScreen;
-import net.minecraft.client.gui.screens.LanguageSelectScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.achievement.StatsScreen;
-import net.minecraft.client.gui.screens.controls.ControlsScreen;
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
-import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
-import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
-
 @Mod.EventBusSubscriber(modid = itlt.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientForgeEvents {
 
+    static boolean showFirstLaunchScreen = true;
+
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onGuiOpen(final GuiOpenEvent event) {
+        final Screen screen = event.getGui();
+        if (screen == null) return;
+
         if (ClientConfig.enableExplicitGC.get()) {
-            final Screen screen = event.getGui();
-            if (screen == null) return;
             itlt.LOGGER.debug("Screen: " + screen);
 
             // Tell the GC to run whenever the user does certain non-latency-critical actions such as being on the
@@ -45,6 +43,13 @@ public class ClientForgeEvents {
                                     || screen instanceof RealmsMainScreen || screen instanceof StatsScreen))) {
                 Runtime.getRuntime().gc();
             }
+        }
+
+        //if (screen instanceof TitleScreen && showFirstLaunchScreen) {
+        if (screen instanceof SelectWorldScreen) {
+            //showFirstLaunchScreen = false; // todo: save to config file
+            //event.setGui(new FirstLaunchScreen(new TitleScreen(true), new TranslatableComponent("resourcePack.title")));
+            event.setGui(new FirstLaunchScreen(new TitleScreen(), new TranslatableComponent("itlt.welcomeScreen.title", ClientConfig.autoDetectedDisplayNameFallback.get())));
         }
     }
 }

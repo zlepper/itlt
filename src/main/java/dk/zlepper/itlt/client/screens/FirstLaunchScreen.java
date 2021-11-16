@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,7 +85,7 @@ public class FirstLaunchScreen extends Screen {
     }*/
 
     public class ScrollableTextPanel extends ScrollPanel {
-        private List<Pair<Float, FormattedCharSequence>> lines = Collections.emptyList();
+        private List<Pair<Boolean, FormattedCharSequence>> lines = Collections.emptyList();
         public int padding = 6;
 
         ScrollableTextPanel(final Minecraft mcInstance, final int width, final int height, final int top, final int left) {
@@ -97,18 +98,19 @@ public class FirstLaunchScreen extends Screen {
 
         @Override
         protected int getContentHeight() {
-            return lines.size() * font.lineHeight;
+            return (lines.size() * font.lineHeight) + font.lineHeight;
         }
 
         @Override
         protected void drawPanel(PoseStack poseStack, int entryRight, int relativeY, Tesselator tesselator, int mouseX, int mouseY) {
-            for (final Pair<Float, FormattedCharSequence> line : lines) {
+            for (final Pair<Boolean, FormattedCharSequence> line : lines) {
                 if (line != null) {
                     RenderSystem.enableBlend();
-                    if (!line.getLeft().equals(1.0F)) {
+                    if (line.getLeft()) {
                         poseStack.pushPose();
-                        poseStack.scale(line.getLeft(), line.getLeft(), 1.0F);
-                        FirstLaunchScreen.this.font.drawShadow(poseStack, line.getRight(), (left + padding) / line.getLeft(), relativeY / line.getLeft(), 0xFFFFFF);
+                        poseStack.scale(1.5F, 1.5F, 1.0F);
+                        poseStack.translate(0.0F, 1.5F, 0.0F);
+                        FirstLaunchScreen.this.font.drawShadow(poseStack, line.getRight(), (left + padding) / 1.5F, relativeY / 1.5F, 0xFFFFFF);
                         poseStack.popPose();
                     } else {
                         FirstLaunchScreen.this.font.drawShadow(poseStack, line.getRight(), left + padding, relativeY, 0xFFFFFF);
@@ -131,8 +133,8 @@ public class FirstLaunchScreen extends Screen {
         // todo: change line size to 0.5F, have every paragraph (normal text) print itself plus one blank line, change
         // h1 from 2.0F to 1.5F and print itself plus 2 blank lines. This'll fix the inconsistent gap issue of headings
         // compared to paragraphs without making the headings too big
-        public List<Pair<Float,FormattedCharSequence>> wordWrapAndFormat(final List<String> lines) {
-            final List<Pair<Float,FormattedCharSequence>> resized = new ArrayList<>(lines.size());
+        public List<Pair<Boolean,FormattedCharSequence>> wordWrapAndFormat(final List<String> lines) {
+            final List<Pair<Boolean,FormattedCharSequence>> resized = new ArrayList<>(lines.size());
             int lineCounter = 0;
             for (String line : lines) {
                 if (line == null) {
@@ -147,12 +149,12 @@ public class FirstLaunchScreen extends Screen {
                 line = line.replaceAll("(?i)&([a-f]|[0-9]|l|m|n|o|r)", "\u00a7$1");
                 line = line.replace("\\\u00a7", "&"); // allow formatting escaping with backslash (e.g. "\&a")
 
-                final float textSize;
+                final boolean isHeading;
                 if (line.startsWith("&h")) {
-                    textSize = 2.0F;
-                    line = line.substring(3);
+                    isHeading = true;
+                    line = line.substring(2);
                 } else {
-                    textSize = 1.0F;
+                    isHeading = false;
                 }
 
                 // this makes links clickable, underlined and blue
@@ -161,19 +163,24 @@ public class FirstLaunchScreen extends Screen {
                 int maxTextLength = this.width - padding * 2;
                 if (maxTextLength >= 0) {
                     Language.getInstance().getVisualOrder(font.getSplitter().splitLines(lineWithFormattedLinks, maxTextLength, Style.EMPTY)).forEach(formattedCharSequence -> {
-                        resized.add(Pair.of(textSize, formattedCharSequence));
+                        resized.add(Pair.of(isHeading, formattedCharSequence));
                     });
                 }
 
-                if (textSize > 1.0F) {
-                    resized.add(lineCounter - 1, Pair.of(1.0F, new TextComponent(" ").getVisualOrderText()));
-                    resized.add(Pair.of(1.0F, new TextComponent(" ").getVisualOrderText()));
+                lineCounter += resized.size() - lineCounter;
+
+                // add a blank line after headings to avoid overlapping with any text that may be directly below it
+                if (isHeading) {
+                    //resized.add(lineCounter - 1, Pair.of(false, new TextComponent(" ").getVisualOrderText()));
+                    resized.add(Pair.of(false, new TextComponent(" ").getVisualOrderText()));
                 }
                 lineCounter++;
             }
 
-            // add a single line at the end of the panel for aesthetical and functional reasons (hard to click links on last line)
-            resized.add(Pair.of(1.0F, new TextComponent(" ").getVisualOrderText()));
+            // if the last line isn't a heading, add a single line at the end of the panel for
+            // aesthetical (looks nicer) and functional reasons (hard to click links on last line otherwise)
+            if (!resized.get(resized.size() - 1).getLeft())
+                resized.add(Pair.of(false, new TextComponent(" ").getVisualOrderText()));
 
             return resized;
         }

@@ -1,8 +1,12 @@
 import org.gradle.api.java.archives.internal.DefaultManifest
 
 buildscript {
+    repositories {
+        maven { url = "https://maven.parchmentmc.org" }
+    }
     dependencies {
         classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
+        classpath "org.parchmentmc:librarian:1.+"
     }
 }
 
@@ -14,6 +18,7 @@ plugins {
     id "net.minecraftforge.gradle" version "5.1.+"
 }
 apply plugin: "org.spongepowered.mixin"
+apply plugin: "org.parchmentmc.librarian.forgegradle"
 
 version = "1.17.1-2.1.0"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -25,6 +30,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 println "Java: ${System.getProperty "java.version"}, JVM: ${System.getProperty "java.vm.version"} (${System.getProperty "java.vendor"}), Arch: ${System.getProperty "os.arch"}"
 minecraft {
     mappings channel: "official", version: "1.17.1"
+    mappings channel: "parchment", version: "2021.10.31-1.17.1"
 
     accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
 
@@ -61,20 +67,19 @@ repositories {
         content { includeGroup "curse.maven" }
     }
     mavenCentral()
-    maven { url = "https://repository.mulesoft.org/nexus/content/repositories/public/" }
 }
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.17.1-37.0.104"
+    minecraft "net.minecraftforge:forge:1.17.1-37.0.109"
 
     // Mixin
     annotationProcessor "org.spongepowered:mixin:0.8.4:processor"
 
     // itlt uses the "image4j" library to read .ico files
-    implementation "com.github.imcdonagh:image4j:0.7.2"
-    shade "com.github.imcdonagh:image4j:0.7.2"
-    library "com.github.imcdonagh:image4j:0.7.2"
+    implementation files("thirdPartyLibs/image4j-0.7.2.jar")
+    shade files("thirdPartyLibs/image4j-0.7.2.jar")
+    library files("thirdPartyLibs/image4j-0.7.2.jar")
 
     // itlt uses the "Apache Commons Imaging" library to read .icns files
     /*implementation "org.apache.commons:commons-imaging:1.0-alpha2"

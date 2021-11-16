@@ -205,8 +205,9 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ### Things left to-do with the existing code
 
--   Cleanup config handling and migration code
 -   Improve config verification code, make it do more than just log errors in the console
+-   Prevent the backup system from logging a successful backup when only used temporarily
+-   Test if explicitGC still works
 
 ### New features to consider adding later
 

@@ -17,6 +17,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.client.gui.ScrollPanel;
 import net.minecraftforge.common.ForgeHooks;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -64,22 +65,26 @@ public class FirstLaunchScreen extends Screen {
     public void render(final PoseStack poseStack, final int mouseX, final int mouseY, final float partialTicks) {
         this.renderDirtBackground(0);
 
-        drawScaledString(poseStack, this.font, this.title, this.width / 2.0F, 8, 16777215, 1.5F);
+        drawCenteredStringWithScale(poseStack, this.font, this.title, this.width / 2.0F, 8, 16777215, 1.5F);
 
         this.scrollableTextPanel.render(poseStack, mouseX, mouseY, partialTicks);
 
         super.render(poseStack, mouseX, mouseY, partialTicks);
     }
 
-    private static void drawScaledString(final PoseStack poseStack, final Font font, final Component string, final float x, final float y, final int color, final float scale) {
+    private static void drawCenteredStringWithScale(final PoseStack poseStack, final Font font, final Component string, final float x, final float y, final int color, final float scale) {
         poseStack.pushPose();
         poseStack.scale(scale, scale, 1.0F);
         font.drawShadow(poseStack, string, ((x / scale) - font.width(string) / 2.0F), y / scale, color);
         poseStack.popPose();
     }
 
+    /*private static void drawStringWithScale(final PoseStack poseStack, final Font font, final Component string, final float x, final float y, final int color, final float scale) {
+
+    }*/
+
     public class ScrollableTextPanel extends ScrollPanel {
-        private List<FormattedCharSequence> lines = Collections.emptyList();
+        private List<Pair<Float, FormattedCharSequence>> lines = Collections.emptyList();
         public int padding = 6;
 
         ScrollableTextPanel(final Minecraft mcInstance, final int width, final int height, final int top, final int left) {
@@ -97,10 +102,17 @@ public class FirstLaunchScreen extends Screen {
 
         @Override
         protected void drawPanel(PoseStack poseStack, int entryRight, int relativeY, Tesselator tesselator, int mouseX, int mouseY) {
-            for (final FormattedCharSequence line : lines) {
+            for (final Pair<Float, FormattedCharSequence> line : lines) {
                 if (line != null) {
                     RenderSystem.enableBlend();
-                    FirstLaunchScreen.this.font.drawShadow(poseStack, line, left + padding, relativeY, 0xFFFFFF);
+                    if (!line.getLeft().equals(1.0F)) {
+                        poseStack.pushPose();
+                        poseStack.scale(line.getLeft(), line.getLeft(), 1.0F);
+                        FirstLaunchScreen.this.font.drawShadow(poseStack, line.getRight(), (left + padding) / line.getLeft(), relativeY / line.getLeft(), 0xFFFFFF);
+                        poseStack.popPose();
+                    } else {
+                        FirstLaunchScreen.this.font.drawShadow(poseStack, line.getRight(), left + padding, relativeY, 0xFFFFFF);
+                    }
                     RenderSystem.disableBlend();
                 }
                 relativeY += font.lineHeight;
@@ -116,8 +128,12 @@ public class FirstLaunchScreen extends Screen {
         @Override
         public void updateNarration(final NarrationElementOutput narrationElementOutput) {}
 
-        public List<FormattedCharSequence> wordWrapAndFormat(final List<String> lines) {
-            final List<FormattedCharSequence> resized = new ArrayList<>(lines.size());
+        // todo: change line size to 0.5F, have every paragraph (normal text) print itself plus one blank line, change
+        // h1 from 2.0F to 1.5F and print itself plus 2 blank lines. This'll fix the inconsistent gap issue of headings
+        // compared to paragraphs without making the headings too big
+        public List<Pair<Float,FormattedCharSequence>> wordWrapAndFormat(final List<String> lines) {
+            final List<Pair<Float,FormattedCharSequence>> resized = new ArrayList<>(lines.size());
+            int lineCounter = 0;
             for (String line : lines) {
                 if (line == null) {
                     resized.add(null);
@@ -131,16 +147,33 @@ public class FirstLaunchScreen extends Screen {
                 line = line.replaceAll("(?i)&([a-f]|[0-9]|l|m|n|o|r)", "\u00a7$1");
                 line = line.replace("\\\u00a7", "&"); // allow formatting escaping with backslash (e.g. "\&a")
 
+                final float textSize;
+                if (line.startsWith("&h")) {
+                    textSize = 2.0F;
+                    line = line.substring(3);
+                } else {
+                    textSize = 1.0F;
+                }
+
                 // this makes links clickable, underlined and blue
                 final var lineWithFormattedLinks = ForgeHooks.newChatWithLinks(line, false);
 
                 int maxTextLength = this.width - padding * 2;
-                if (maxTextLength >= 0)
-                    resized.addAll(Language.getInstance().getVisualOrder(font.getSplitter().splitLines(lineWithFormattedLinks, maxTextLength, Style.EMPTY)));
+                if (maxTextLength >= 0) {
+                    Language.getInstance().getVisualOrder(font.getSplitter().splitLines(lineWithFormattedLinks, maxTextLength, Style.EMPTY)).forEach(formattedCharSequence -> {
+                        resized.add(Pair.of(textSize, formattedCharSequence));
+                    });
+                }
+
+                if (textSize > 1.0F) {
+                    resized.add(lineCounter - 1, Pair.of(1.0F, new TextComponent(" ").getVisualOrderText()));
+                    resized.add(Pair.of(1.0F, new TextComponent(" ").getVisualOrderText()));
+                }
+                lineCounter++;
             }
 
             // add a single line at the end of the panel for aesthetical and functional reasons (hard to click links on last line)
-            resized.add(new TextComponent(" ").getVisualOrderText());
+            resized.add(Pair.of(1.0F, new TextComponent(" ").getVisualOrderText()));
 
             return resized;
         }
@@ -171,7 +204,7 @@ public class FirstLaunchScreen extends Screen {
             if (lineIdx >= lines.size() || lineIdx < 1)
                 return null;
 
-            final FormattedCharSequence line = lines.get(lineIdx - 1);
+            final FormattedCharSequence line = lines.get(lineIdx - 1).getRight();
             if (line != null)
                 return font.getSplitter().componentStyleAtWidth(line, mouseX - left - border);
 

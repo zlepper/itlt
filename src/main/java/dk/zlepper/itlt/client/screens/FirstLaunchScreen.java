@@ -80,10 +80,6 @@ public class FirstLaunchScreen extends Screen {
         poseStack.popPose();
     }
 
-    /*private static void drawStringWithScale(final PoseStack poseStack, final Font font, final Component string, final float x, final float y, final int color, final float scale) {
-
-    }*/
-
     public class ScrollableTextPanel extends ScrollPanel {
         private List<Pair<Boolean, FormattedCharSequence>> lines = Collections.emptyList();
         public int padding = 6;
@@ -160,7 +156,7 @@ public class FirstLaunchScreen extends Screen {
                 // this makes links clickable, underlined and blue
                 final var lineWithFormattedLinks = ForgeHooks.newChatWithLinks(line, false);
 
-                int maxTextLength = this.width - padding * 2;
+                final int maxTextLength = this.width - padding * 2;
                 if (maxTextLength >= 0) {
                     Language.getInstance().getVisualOrder(font.getSplitter().splitLines(lineWithFormattedLinks, maxTextLength, Style.EMPTY)).forEach(formattedCharSequence -> {
                         resized.add(Pair.of(isHeading, formattedCharSequence));

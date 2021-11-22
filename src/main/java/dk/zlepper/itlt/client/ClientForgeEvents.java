@@ -45,10 +45,8 @@ public class ClientForgeEvents {
             }
         }
 
-        //if (screen instanceof TitleScreen && showFirstLaunchScreen) {
-        if (screen instanceof SelectWorldScreen) {
+        if (ClientConfig.enableWelcomeScreen.get() && screen instanceof SelectWorldScreen) {
             //showFirstLaunchScreen = false; // todo: save to config file
-            //event.setGui(new FirstLaunchScreen(new TitleScreen(true), new TranslatableComponent("resourcePack.title")));
             event.setGui(new FirstLaunchScreen(new TitleScreen(), new TranslatableComponent("itlt.welcomeScreen.title", ClientConfig.autoDetectedDisplayNameFallback.get())));
         }
     }

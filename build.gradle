@@ -29,7 +29,6 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 println "Java: ${System.getProperty "java.version"}, JVM: ${System.getProperty "java.vm.version"} (${System.getProperty "java.vendor"}), Arch: ${System.getProperty "os.arch"}"
 minecraft {
-    mappings channel: "official", version: "1.17.1"
     mappings channel: "parchment", version: "2021.10.31-1.17.1"
 
     accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
@@ -71,7 +70,7 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.17.1-37.0.109"
+    minecraft "net.minecraftforge:forge:1.17.1-37.0.112"
 
     // Mixin
     annotationProcessor "org.spongepowered:mixin:0.8.4:processor"

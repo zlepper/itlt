@@ -58,7 +58,8 @@ public final class ClientConfig {
             doExplicitGCOnPause,
             doExplicitGCOnSleep,
             doExplicitGCOnMenu,
-            enableWelcomeScreen;
+            enableWelcomeScreen,
+            enableUsingCustomWelcomeHeaderModpackDisplayName;
 
     public static ForgeConfigSpec.ConfigValue<String>
             customWindowTitleText,
@@ -67,6 +68,7 @@ public final class ClientConfig {
             customJavaDowngradeGuideURL,
             customMemoryAllocGuideURL,
             autoDetectedDisplayNameFallback,
+            customWelcomeHeaderModpackDisplayName,
             configVersion;
 
     public static ForgeConfigSpec.ConfigValue<Double>
@@ -656,6 +658,22 @@ public final class ClientConfig {
                                 " to this feature clear. If there's no mention of this feature in the changelog, rest assured",
                                 " you can update without needing to make any changes to your welcome.txt.")
                         .define("enableWelcomeScreen", false);
+
+                enableUsingCustomWelcomeHeaderModpackDisplayName = clientConfigBuilder
+                        .comment(" ",
+                                " Enable this if you want to change the modpack name that shows up on the heading of the",
+                                " welcome screen.",
+                                " ",
+                                " Note: If you leave this disabled, itlt will use the contents of %autoName (auto-detected",
+                                " modpack name - see the enableUsingAutodetectedDisplayName and autoDetectedDisplayNameFallback",
+                                " options for details).")
+                        .define("enableUsingCustomWelcomeHeaderModpackDisplayName", false);
+
+                customWelcomeHeaderModpackDisplayName = clientConfigBuilder
+                        .comment(" ",
+                                " If enableUsingCustomWelcomeHeaderModpackDisplayName is true, the welcome screen header will show \"Welcome to x\"",
+                                " where x is what you put here.")
+                        .define("customWelcomeHeaderModpackDisplayName", "ModpackName");
             } clientConfigBuilder.pop();
 
         } clientConfigBuilder.pop(); // end of Display section

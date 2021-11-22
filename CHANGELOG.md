@@ -8,7 +8,7 @@
 
 ## MC 1.17-specific changes
 
--   Bugfix: The mod's pack.mcmeta format version is now updated to 7 to match MC 1.17
+-   Bugfix: The mod's pack.mcmeta format version has been updated to 7 to match MC 1.17
 -   Use Mixin again instead of a JS coremod for custom window title handling
 
 ## Bug fixes
@@ -18,6 +18,16 @@
 -   Fixed a startup crash on some macOS systems
 
 ## New features
+
+### Welcome screen
+
+You can now optionally show a screen on first launch. This could be used to show a changelog, give advice to new users or provide links to your pack's social media for example.
+
+![](https://zlepper.github.io/itlt/docs/changelogs/v2.1.0/WelcomeScreen.png)
+
+The welcome screen supports MC formatting codes for different colours and styles, headings, clickable links, word-wrapping and scrolling. Simply enable the config option and edit the `config/itlt/welcome.txt` file.
+
+Note: This feature is experimental. It is stable, but may change in a future release. I will mention in the changelog if this feature receives any breaking changes. 
 
 ### Improved custom window title feature
 

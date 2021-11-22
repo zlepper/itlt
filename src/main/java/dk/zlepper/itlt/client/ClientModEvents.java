@@ -125,9 +125,7 @@ public class ClientModEvents {
         // Custom window title text
         if (ClientConfig.enableCustomWindowTitle.get()) {
             final String customWindowTitle = ClientUtils.getCustomWindowTitle(mcInstance);
-
             itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
-
             mcInstance.updateTitle();
         }
 

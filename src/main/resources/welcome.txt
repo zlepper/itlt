@@ -2,7 +2,7 @@ This is the default itlt welcome text. Please change this in config -> itlt -> w
 Note: The welcome screen feature automatically disables itself in the config after first launch.
 
 &hFormatting demo
-&nMC formatting codes are supported:&r
+MC formatting codes are supported:
 -&0 black &r
 -&1 dark blue &r
 -&2 dark green &r

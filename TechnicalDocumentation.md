@@ -208,6 +208,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 -   Improve config verification code, make it do more than just log errors in the console
 -   Prevent the backup system from logging a successful backup when only used temporarily
 -   Test if explicitGC still works
+-   Revamp config to be clearer with shorter, saner names and more concise descriptions
 
 ### New features to consider adding later
 
@@ -219,14 +220,15 @@ See the warnings feature brief for details on which to use and when. If you're n
     -   Add a client-side command, menu button or at least a config option for users to toggle so they can get the optional mods prompt again if they change their mind about any of their selection
     -   Be smart enough to also enable dependencies for optional mods when needed
 -   Server list menu system
-    - When joining a server that also has itlt and has this feature configured, instead of joining into a world on a hub server, show another screen similar to the server list but with a list of servers offered by said hub server
-    - The idea is that you can bypass a server's hub world and quickly join any of the servers through a multiplayer server list-like menu rather than running around a hub world
-    - Server hub replies with a json of IPs and Names on join and kicks player. Client renders and shows a separate multiplayer server list containing only the entries from the server hub's json with a button to go back to the main server list
+    -   When joining a server that also has itlt and has this feature configured, instead of joining into a world on a hub server, show another screen similar to the server list but with a list of servers offered by said hub server
+    -   The idea is that you can bypass a server's hub world and quickly join any of the servers through a multiplayer server list-like menu rather than running around a hub world
+    -   Server hub replies with a json of IPs and Names on join and kicks player. Client renders and shows a separate multiplayer server list containing only the entries from the server hub's json with a button to go back to the main server list
 -   Support Java 8 build number detection and requirements/warnings/etc (e.g. Java 8u51, Java 8u200, etc...)
 -   Anti-piracy feature (detect and block known pirated launchers by default)
 -   Redo the anti-cheat stuff
     -   It works, but there's lots of signs of me trying to get it all to work and trying new concepts in-place rather than in isolation. The whole thing could do with a cleanup really
     -   Measure if there's actually a performance benefit for using BLAKE3-JNI instead of the pure Java implementation or if the overhead of JNI and the benefits of JVM's JIT narrows the gap. If there isn't much perf benefit then removing it from being shadowed would be good.
+-   Full localisation support for FirstLaunchScreen rather than only for the heading
 
 ## Troubleshooting
 

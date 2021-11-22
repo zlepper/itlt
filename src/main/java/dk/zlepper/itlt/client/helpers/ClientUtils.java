@@ -36,6 +36,20 @@ import static dk.zlepper.itlt.client.ClientModEvents.detectedLauncher;
 
 public class ClientUtils {
 
+    public static String getAutoDetectedDisplayName() {
+        String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
+        if (ClientConfig.enableUsingAutodetectedDisplayName.get()) {
+            try {
+                final String tmp = detectedLauncher.getModpackDisplayName();
+                if (tmp != null) autoDetectedDisplayName = tmp;
+            } catch (final IOException e) {
+                itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
+                e.printStackTrace();
+            }
+        }
+        return autoDetectedDisplayName;
+    }
+
     public static byte getJavaVersion() {
         final String javaVerStr = System.getProperty("java.version");
         final String[] splitJavaVer = javaVerStr.split(Pattern.quote("."));
@@ -70,16 +84,7 @@ public class ClientUtils {
 
         String customWindowTitle = ClientConfig.customWindowTitleText.get();
 
-        String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
-        if (ClientConfig.enableUsingAutodetectedDisplayName.get() && customWindowTitle.contains("%autoName")) {
-            try {
-                final String tmp = detectedLauncher.getModpackDisplayName();
-                if (tmp != null) autoDetectedDisplayName = tmp;
-            } catch (final IOException e) {
-                itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
-                e.printStackTrace();
-            }
-        }
+        String autoDetectedDisplayName = getAutoDetectedDisplayName();
         customWindowTitle = customWindowTitle.replaceFirst("%autoName", autoDetectedDisplayName);
 
         // replace %mc with the Vanilla window title from getWindowTitle() (createTitle == getWindowTitle)
@@ -87,11 +92,6 @@ public class ClientUtils {
 
         if (customWindowTitle.isEmpty()) return mcInstance.createTitle();
         else return customWindowTitle;
-    }
-
-    public static void setCustomWindowTitle() {
-        itlt.LOGGER.info("######################################");
-        Minecraft.getInstance().getWindow().setTitle(getCustomWindowTitle(Minecraft.getInstance()));
     }
 
     public static void setWindowIcon(final InputStream inputIconInStream, final Minecraft mcInstance,

@@ -1,6 +1,7 @@
 package dk.zlepper.itlt.client;
 
 import com.mojang.realmsclient.RealmsMainScreen;
+import dk.zlepper.itlt.client.helpers.ClientUtils;
 import dk.zlepper.itlt.client.helpers.ConfigUtils;
 import dk.zlepper.itlt.client.screens.FirstLaunchScreen;
 import dk.zlepper.itlt.itlt;
@@ -55,7 +56,7 @@ public class ClientForgeEvents {
             }
         }
 
-        if (ClientConfig.enableWelcomeScreen.get() && screen instanceof SelectWorldScreen) {
+        if (ClientConfig.enableWelcomeScreen.get() && screen instanceof TitleScreen) {
             // make sure the config/itlt/ folder exists
             if (itltDir == null) {
                 itlt.LOGGER.warn("itlt folder in the config folder is missing");
@@ -73,7 +74,9 @@ public class ClientForgeEvents {
             }
 
             // show the welcome screen
-            event.setGui(new FirstLaunchScreen(new TitleScreen(), new TranslatableComponent("itlt.welcomeScreen.title", ClientConfig.autoDetectedDisplayNameFallback.get())));
+            event.setGui(new FirstLaunchScreen(
+                    new TitleScreen(), new TranslatableComponent("itlt.welcomeScreen.title", ClientConfig.enableUsingCustomWelcomeHeaderModpackDisplayName.get() ? ClientConfig.customWelcomeHeaderModpackDisplayName.get() : ClientUtils.getAutoDetectedDisplayName()))
+            );
         }
     }
 }

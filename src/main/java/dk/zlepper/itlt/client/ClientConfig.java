@@ -89,17 +89,6 @@ public final class ClientConfig {
         else return String.valueOf(floatNum);
     }
 
-    /** Returns the path as a File if it already exists or has been successfully created. Returns null otherwise **/
-    @Nullable
-    public static File makeItltFolderIfNeeded() {
-        final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
-        if (!itltDir.exists() && (enableCustomIcon.get() || enableEnhancedVanillaIcon.get() || areAnyWarningsEnabled()) && !itltDir.mkdir()) {
-            itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
-            return null;
-        }
-        return itltDir;
-    }
-
     public static boolean areAnyWarningsEnabled() {
         return enableMinMemoryWarning.get() || enableMaxMemoryWarning.get() ||
                 enableMinJavaVerWarning.get() || enableMaxJavaVerWarning.get() || enable64bitWarning.get();

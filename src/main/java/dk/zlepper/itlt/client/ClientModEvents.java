@@ -19,7 +19,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import static dk.zlepper.itlt.client.ClientConfig.makeItltFolderIfNeeded;
+import static dk.zlepper.itlt.client.helpers.ConfigUtils.makeItltFolderIfNeeded;
 
 @Mod.EventBusSubscriber(modid=itlt.MOD_ID, value=Dist.CLIENT, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ClientModEvents {
@@ -182,12 +181,9 @@ public class ClientModEvents {
 
         // Custom server list entries
         if (ClientConfig.enableCustomServerListEntries.get()) {
-            final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
-
-            if (!itltDir.exists()) {
-                itlt.LOGGER.warn("itlt folder in the config folder is missing.");
-                if (itltDir.mkdir()) itlt.LOGGER.info("The folder has been successfully created for you.");
-                else itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
+            if (itltDir == null) {
+                itlt.LOGGER.warn("itlt folder in the config folder is missing");
+                itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
                 return;
             }
 

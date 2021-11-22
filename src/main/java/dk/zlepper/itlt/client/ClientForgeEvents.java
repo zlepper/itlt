@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import static dk.zlepper.itlt.client.ClientModEvents.itltDir;
+
 @Mod.EventBusSubscriber(modid = itlt.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientForgeEvents {
 
@@ -54,13 +56,16 @@ public class ClientForgeEvents {
         }
 
         if (ClientConfig.enableWelcomeScreen.get() && screen instanceof SelectWorldScreen) {
+            // make sure the config/itlt/ folder exists
+            if (itltDir == null) {
+                itlt.LOGGER.warn("itlt folder in the config folder is missing");
+                itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
+                return;
+            }
 
             // if no welcome.txt is found, try copying the example one embedded inside the jar to config/itlt/welcome.txt
-            final var welcomeFilePath = ConfigUtils.configDir.resolve("itlt/welcome.txt");
+            final var welcomeFilePath = itltDir.toPath().resolve("itlt/welcome.txt");
             if (!welcomeFilePath.toFile().exists()) {
-                if (!ConfigUtils.configDir.resolve("itlt/").toFile().exists())
-                    ConfigUtils.configDir.resolve("itlt/").toFile().mkdir();
-
                 final Path embeddedWelcomeFile = ModList.get().getModFileById("itlt").getFile().findResource("welcome.txt");
                 try {
                     Files.copy(embeddedWelcomeFile, welcomeFilePath, StandardCopyOption.REPLACE_EXISTING);

@@ -40,6 +40,7 @@ To help troubleshooting mistakes with your config, the mod now logs an error if 
 ## Other changes
 
 -   Minor performance improvements
+-   itlt will no longer log when it can't find the config/itlt/ folder but successfully created it for you - instead, it will now only let you know if you need to manually do it yourself 
 
 # v2.0.1
 

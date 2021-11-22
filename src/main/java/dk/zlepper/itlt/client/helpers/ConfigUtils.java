@@ -3,13 +3,16 @@ package dk.zlepper.itlt.client.helpers;
 import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
 import com.electronwill.nightconfig.toml.TomlParser;
 import com.electronwill.nightconfig.toml.TomlWriter;
+import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.fml.loading.FMLPaths;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
@@ -87,5 +90,16 @@ public class ConfigUtils {
                 path.toFile().deleteOnExit();
             } catch (final Exception ignored) {}
         }
+    }
+
+    /** Returns the path as a File if it already exists or has been successfully created. Returns null otherwise **/
+    @Nullable
+    public static File makeItltFolderIfNeeded() {
+        final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
+        if (!itltDir.exists() && (ClientConfig.enableCustomIcon.get() || ClientConfig.enableEnhancedVanillaIcon.get() || ClientConfig.areAnyWarningsEnabled() || ClientConfig.enableCustomServerListEntries.get() || ClientConfig.enableWelcomeScreen.get()) && !itltDir.mkdir()) {
+            itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
+            return null;
+        }
+        return itltDir;
     }
 }

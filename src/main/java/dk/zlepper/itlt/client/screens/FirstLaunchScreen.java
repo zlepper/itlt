@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import dk.zlepper.itlt.client.ClientConfig;
-import dk.zlepper.itlt.client.helpers.ConfigUtils;
+import static dk.zlepper.itlt.client.ClientModEvents.itltDir;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,7 +51,7 @@ public class FirstLaunchScreen extends Screen {
         this.scrollableTextPanel = new ScrollableTextPanel(mcInstance, this.width - 40, this.height - 40 - doneButton.getHeight(), 24, 20);
 
         // Note: this has the Files.lines() inside the try() part as it is a try-with-resources
-        try (final Stream<String> lines = Files.lines(ConfigUtils.configDir.resolve("itlt/welcome.txt"))) {
+        try (final Stream<String> lines = Files.lines(itltDir.toPath().resolve("welcome.txt"))) {
             this.scrollableTextPanel.setText(lines.collect(Collectors.toList()));
         } catch (final IOException e) {
             this.scrollableTextPanel.setText(List.of("Error: Failed to load welcome.txt, see the console log for details."));

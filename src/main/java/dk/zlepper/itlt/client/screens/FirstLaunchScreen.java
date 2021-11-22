@@ -3,6 +3,7 @@ package dk.zlepper.itlt.client.screens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
+import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.client.helpers.ConfigUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -39,10 +40,9 @@ public class FirstLaunchScreen extends Screen {
         this.previousScreen = previousScreen;
     }
 
-    // only necessary for allowing the fade-in TitleScreen effect to still work, if you don't need that then you can
-    // remove this method and rely on Screen's onClose() method instead
     @Override
     public void onClose() {
+        ClientConfig.enableWelcomeScreen.set(false);
         mcInstance.setScreen(this.previousScreen);
     }
 

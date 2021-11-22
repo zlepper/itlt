@@ -1,6 +1,7 @@
 package dk.zlepper.itlt.client;
 
 import com.mojang.realmsclient.RealmsMainScreen;
+import dk.zlepper.itlt.client.helpers.ConfigUtils;
 import dk.zlepper.itlt.client.screens.FirstLaunchScreen;
 import dk.zlepper.itlt.itlt;
 import net.minecraft.client.gui.screens.*;
@@ -14,12 +15,19 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLModContainer;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 @Mod.EventBusSubscriber(modid = itlt.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientForgeEvents {
-
-    static boolean showFirstLaunchScreen = true;
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onGuiOpen(final GuiOpenEvent event) {
@@ -46,7 +54,20 @@ public class ClientForgeEvents {
         }
 
         if (ClientConfig.enableWelcomeScreen.get() && screen instanceof SelectWorldScreen) {
-            //showFirstLaunchScreen = false; // todo: save to config file
+
+            // if no welcome.txt is found, try copying the example one embedded inside the jar to config/itlt/welcome.txt
+            final var welcomeFilePath = ConfigUtils.configDir.resolve("itlt/welcome.txt");
+            if (!welcomeFilePath.toFile().exists()) {
+                if (!ConfigUtils.configDir.resolve("itlt/").toFile().exists())
+                    ConfigUtils.configDir.resolve("itlt/").toFile().mkdir();
+
+                final Path embeddedWelcomeFile = ModList.get().getModFileById("itlt").getFile().findResource("welcome.txt");
+                try {
+                    Files.copy(embeddedWelcomeFile, welcomeFilePath, StandardCopyOption.REPLACE_EXISTING);
+                } catch (final IOException ignored) {}
+            }
+
+            // show the welcome screen
             event.setGui(new FirstLaunchScreen(new TitleScreen(), new TranslatableComponent("itlt.welcomeScreen.title", ClientConfig.autoDetectedDisplayNameFallback.get())));
         }
     }

@@ -60,7 +60,7 @@ public class ClientModEvents {
         if (ClientConfig.enableMinJavaVerRequirement.get() && javaVerInt < ClientConfig.requiredMinJavaVersion.get()) {
             ClientUtils.startUIProcess(Message.Content.NeedsNewerJava);
         } else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get()) {
-            if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
+            if (ClientConfig.ignoreMinJavaVerWarningWhenVerForced.get()) {
                 if (!detectedLauncher.supportsChangingJavaVersion()) {
                     itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.getName()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
@@ -79,7 +79,7 @@ public class ClientModEvents {
         if (ClientConfig.enableMaxJavaVerRequirement.get() && javaVerInt > ClientConfig.requiredMaxJavaVersion.get()) {
             ClientUtils.startUIProcess(Message.Content.NeedsOlderJava);
         } else if (ClientConfig.enableMaxJavaVerWarning.get() && javaVerInt > ClientConfig.warnMaxJavaVersion.get()) {
-            if (ClientConfig.selectivelyIgnoreMaxJavaVerWarning.get()) {
+            if (ClientConfig.ignoreMaxJavaVerWarningWhenVerForced.get()) {
                 if (!detectedLauncher.supportsChangingJavaVersion()) {
                     itlt.LOGGER.info("Skipping maxJavaVerWarning as you appear to be using the " + detectedLauncher.getName()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");

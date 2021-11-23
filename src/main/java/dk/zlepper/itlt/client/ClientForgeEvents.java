@@ -26,6 +26,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import static dk.zlepper.itlt.client.ClientModEvents.itltDir;
 
@@ -44,16 +45,24 @@ public class ClientForgeEvents {
             // pause screen or opening an opaque bg screen such as the Resource Pack or Controls screens.
             // Doing this can help reduce memory usage in certain situations and also slightly reduces the chances
             // of a large GC happening in the middle of gameplay.
-            if ((ClientConfig.doExplicitGCOnPause.get() && screen.isPauseScreen())
-                    || (ClientConfig.doExplicitGCOnSleep.get() && screen instanceof InBedChatScreen)
-                    || (ClientConfig.doExplicitGCOnMenu.get() && (
-                            screen instanceof SelectWorldScreen || screen instanceof JoinMultiplayerScreen
-                                    || screen instanceof DirectJoinServerScreen || screen instanceof PackSelectionScreen
-                                    || screen instanceof LanguageSelectScreen || screen instanceof ChatOptionsScreen
-                                    || screen instanceof ControlsScreen || screen instanceof AccessibilityOptionsScreen
-                                    || screen instanceof RealmsMainScreen || screen instanceof StatsScreen))) {
-                Runtime.getRuntime().gc();
-            }
+            ClientConfig.doExplicitGCWhen.get().forEach(trigger -> {
+                switch (ClientConfig.explicitGCTriggers.valueOf(trigger)) {
+                    case Pause -> {
+                        if (screen.isPauseScreen()) Runtime.getRuntime().gc();
+                    }
+                    case Sleep -> {
+                        if (screen instanceof InBedChatScreen) Runtime.getRuntime().gc();
+                    }
+                    case Menu -> {
+                        if (screen instanceof SelectWorldScreen || screen instanceof JoinMultiplayerScreen
+                                || screen instanceof DirectJoinServerScreen || screen instanceof PackSelectionScreen
+                                || screen instanceof LanguageSelectScreen || screen instanceof ChatOptionsScreen
+                                || screen instanceof ControlsScreen || screen instanceof AccessibilityOptionsScreen
+                                || screen instanceof RealmsMainScreen || screen instanceof StatsScreen)
+                            Runtime.getRuntime().gc();
+                    }
+                }
+            });
         }
 
         if (ClientConfig.enableWelcomeScreen.get() && screen instanceof TitleScreen) {

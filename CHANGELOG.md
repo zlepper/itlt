@@ -43,14 +43,17 @@ This basically means that if the config format changes in newer versions, itlt w
 
 This feature currently supports migrating from v2.0.0/v2.0.1 to v2.1.0. Support for migrating configs from older versions is currently unimplemented.
 
-### Config verification
+### Enhanced config validation
 
 To help troubleshooting mistakes with your config, the mod now logs an error if you set requirements that are impossible to meet (e.g. requiring that the user simultaneously uses at least Java 11 but not newer than Java 8).
+
+Additionally, ranges have been added to the min/max memory config options to prevent them being accidentally set to a negative value.
 
 ## Other changes
 
 -   Minor performance improvements
--   itlt will no longer log when it can't find the config/itlt/ folder but successfully created it for you - instead, it will now only let you know if you need to manually do it yourself 
+-   itlt will no longer log when it can't find the config/itlt/ folder but successfully created it for you - instead, it will now only let you know if you need to manually do it yourself
+-   Fixed a couple of typos in the config
 
 # v2.0.1
 

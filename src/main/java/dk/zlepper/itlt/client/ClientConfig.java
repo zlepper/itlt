@@ -18,13 +18,14 @@ import dk.zlepper.itlt.client.helpers.ConfigUtils;
 import dk.zlepper.itlt.client.helpers.Migration;
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ClientConfig {
 
@@ -44,10 +45,10 @@ public final class ClientConfig {
             enableCustomMemoryAllocGuide,
             enableMinJavaVerRequirement,
             enableMinJavaVerWarning,
-            selectivelyIgnoreMinJavaVerWarning,
+            ignoreMinJavaVerWarningWhenVerForced,
             enableMaxJavaVerRequirement,
             enableMaxJavaVerWarning,
-            selectivelyIgnoreMaxJavaVerWarning,
+            ignoreMaxJavaVerWarningWhenVerForced,
             enableCustomWindowTitle,
             enableUsingAutodetectedDisplayName,
             enableEnhancedVanillaIcon,
@@ -55,9 +56,6 @@ public final class ClientConfig {
             enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
             enableExplicitGC,
-            doExplicitGCOnPause,
-            doExplicitGCOnSleep,
-            doExplicitGCOnMenu,
             enableWelcomeScreen,
             enableUsingCustomWelcomeHeaderModpackDisplayName;
 
@@ -71,7 +69,7 @@ public final class ClientConfig {
             customWelcomeHeaderModpackDisplayName,
             configVersion;
 
-    public static ForgeConfigSpec.ConfigValue<Double>
+    public static ForgeConfigSpec.DoubleValue
             reqMinMemoryAmountInGB,
             reqMaxMemoryAmountInGB,
             warnMinMemoryAmountInGB,
@@ -83,6 +81,15 @@ public final class ClientConfig {
             warnMinJavaVersion,
             requiredMaxJavaVersion,
             warnMaxJavaVersion;
+
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> doExplicitGCWhen;
+
+    public enum explicitGCTriggers {
+        Pause, Sleep, Menu
+    }
+
+    // a List<String> of all the possible values of the explicitGCTriggers enum
+    public static List<String> explicitGCTriggersStrList = Arrays.stream(explicitGCTriggers.values()).map(Enum::toString).collect(Collectors.toList());
 
     /** Simplify floats to ints when they represent the same value (e.g. show "1" instead of "1.0") **/
     public static String getSimplifiedFloatStr(final float floatNum) {
@@ -174,34 +181,25 @@ public final class ClientConfig {
                                     " default as it may actually hurt performance if Xms and Xmx aren't the same!")
                             .define("enableExplicitGC", false);
 
-                    doExplicitGCOnPause = clientConfigBuilder
-                            .comment(" " ,
-                                    " Whether or not to run explicit GC when the player pauses the game.",
-                                    " ",
-                                    " Mainly useful to turn off if you usually only have the game paused for a tiny amount ",
-                                    " of time (i.e. less than ~2s).",
-                                    " ",
-                                    " Note: enableExplicitGC must be true for this to have any effect.")
-                            .define("explicitGCOnPause", true);
-
-                    doExplicitGCOnSleep = clientConfigBuilder
+                    doExplicitGCWhen = clientConfigBuilder
                             .comment(" ",
-                                    " Whether or not to run explicit GC when the player is sleeping in a bed.",
+                                    " A list of triggers of when to run explicit GC.",
+                                    " ",
+                                    " Pause: When the player pauses the game.",
+                                    " Sleep: When the player is sleeping in a bed.",
+                                    " Menu: When navigating one of the following opaque background screens: ",
+                                    "     Singleplayer world selection, Multiplayer server selection,",
+                                    "     Resource Pack selection, Language selection, Chat options, Controls options,",
+                                    "     Accessibility options, Realms main screen and Stats menu.",
+                                    " ",
+                                    " Note: It's mainly useful to remove \"Pause\" from this list if you usually only",
+                                    " have the game paused for a tiny amount of time (i.e. less than ~2s).",
+                                    " ",
+                                    " Note: It's mainly useful to remove \"Menu\" from this list for speedruns that",
+                                    " start the timer when the main menu is shown.",
                                     " ",
                                     " Note: enableExplicitGC must be true for this to have any effect.")
-                            .define("explicitGCOnSleep", true);
-
-                    doExplicitGCOnMenu = clientConfigBuilder
-                            .comment(" ",
-                                    " Whether or not to run explicit GC when navigating one of the following opaque",
-                                    " background screens: Singleplayer world selection, Multiplayer server selection,",
-                                    " Resource Pack selection, Language selection, Chat options, controls options,",
-                                    " accessibility options, Realms main screen and stats menu.",
-                                    " ",
-                                    " Mainly useful to disable for speedruns that start the timer when the main menu is shown.",
-                                    " ",
-                                    " Note: enableExplicitGC must be true for this to have any effect.")
-                            .define("explicitGCOnMenu", true);
+                            .defineList("doExplicitGCWhen", explicitGCTriggersStrList, entry -> explicitGCTriggersStrList.contains(entry.toString()));
 
                 } clientConfigBuilder.pop();
 
@@ -306,7 +304,7 @@ public final class ClientConfig {
                                         " Note: itlt handles Java version naming scheme differences for you, meaning you can",
                                         " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
                                         " while values such as \"15\" will check against \"Java 15\" internally.")
-                                .defineInRange("requiredMinJavaVerion", 16, 6, 127);
+                                .defineInRange("requiredMinJavaVersion", 16, 6, 127);
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Min.Warning
@@ -327,7 +325,7 @@ public final class ClientConfig {
                                         " The minimum recommended version of Java needed to skip the warning message when",
                                         " launching the modpack.")
                                 .defineInRange("warnMinJavaVersion", 16, 6, 127);
-                        selectivelyIgnoreMinJavaVerWarning = clientConfigBuilder
+                        ignoreMinJavaVerWarningWhenVerForced = clientConfigBuilder
                                 .comment(" ",
                                         " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",
                                         " to be changed beyond Java 8.",
@@ -392,7 +390,7 @@ public final class ClientConfig {
                                         " Note: itlt handles Java version naming scheme differences for you, meaning you can",
                                         " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
                                         " while values such as \"15\" will check against \"Java 15\" internally.")
-                                .defineInRange("requiredMaxJavaVerion", 17, 6, 127);
+                                .defineInRange("requiredMaxJavaVersion", 17, 6, 127);
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Max.Warning
@@ -413,7 +411,7 @@ public final class ClientConfig {
                                         " The minimum recommended version of Java needed to skip the warning message when",
                                         " launching the modpack.")
                                 .defineInRange("warnMaxJavaVersion", 17, 6, 127);
-                        selectivelyIgnoreMaxJavaVerWarning = clientConfigBuilder
+                        ignoreMaxJavaVerWarningWhenVerForced = clientConfigBuilder
                                 .comment(" ",
                                         " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",
                                         " to be changed from Java 8.",
@@ -512,8 +510,8 @@ public final class ClientConfig {
                                         " to the point of causing nasty GC-related lag spikes as a result.")
                                 .define("enableMaxMemoryRequirement", true);
                         reqMaxMemoryAmountInGB = clientConfigBuilder
-                                .comment(" ", "The maximum amount of allocated RAM in GB to be able to launch the modpack.")
-                                .define("reqMaxMemoryAmountInGB", 16.0);
+                                .comment(" ", " The maximum amount of allocated RAM in GB to be able to launch the modpack.")
+                                .defineInRange("reqMaxMemoryAmountInGB", 16.0, 0.1, 1024.0);
                     } clientConfigBuilder.pop();
 
                     // Java.Memory.Max.Warning
@@ -530,7 +528,7 @@ public final class ClientConfig {
                                 .comment(" ",
                                         " The maximum recommended amount of allocated RAM in GB needed to skip the warning",
                                         " message when launching the modpack.")
-                                .define("warnMaxMemoryAmountInGB", 14.0);
+                                .defineInRange("warnMaxMemoryAmountInGB", 14.0, 0.1, 1024.0);
                     } clientConfigBuilder.pop();
 
                 } clientConfigBuilder.pop();

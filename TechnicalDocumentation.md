@@ -189,6 +189,8 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 ### Things I still need to document here
 
+-   WelcomeScreen
+-   The new config and migration system
 -   The new custom window title system
 -   Custom server list entries (found in `client.ClientModEvents#clientInit`)
 -   Explicit GC (found in `client.ClientForgeEvents#onGuiOpen`)
@@ -207,7 +209,6 @@ See the warnings feature brief for details on which to use and when. If you're n
 
 -   Improve config verification code, make it do more than just log errors in the console
 -   Prevent the backup system from logging a successful backup when only used temporarily
--   Test if explicitGC still works
 -   Revamp config to be clearer with shorter, saner names and more concise descriptions
 
 ### New features to consider adding later

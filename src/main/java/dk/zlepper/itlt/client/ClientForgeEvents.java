@@ -2,7 +2,6 @@ package dk.zlepper.itlt.client;
 
 import com.mojang.realmsclient.RealmsMainScreen;
 import dk.zlepper.itlt.client.helpers.ClientUtils;
-import dk.zlepper.itlt.client.helpers.ConfigUtils;
 import dk.zlepper.itlt.client.screens.FirstLaunchScreen;
 import dk.zlepper.itlt.itlt;
 import net.minecraft.client.gui.screens.*;
@@ -18,15 +17,11 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 
 import static dk.zlepper.itlt.client.ClientModEvents.itltDir;
 

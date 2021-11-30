@@ -128,9 +128,10 @@ public final class ClientConfig {
 
         if (oldConfig != null) { // oldConfig will be null if no config file exists yet
             detectedConfigVersion = ConfigUtils.getConfigVersion(oldConfig);
-            itlt.LOGGER.debug("detectedConfigVersion: " + detectedConfigVersion);
+            itlt.LOGGER.info("detectedConfigVersion: " + detectedConfigVersion);
             if (detectedConfigVersion.equals(itlt.VERSION)) {
                 // Delete the backup (itlt-client.toml.bak) if no migration is necessary
+                itlt.LOGGER.info("Removing backup as no migration is necessary");
                 ConfigUtils.delete(oldConfigFile.toPath());
             } else {
                 /* Delete the current config (itlt-client.toml) so that the code below makes the new config file, then

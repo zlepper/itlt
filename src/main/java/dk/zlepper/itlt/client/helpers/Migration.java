@@ -7,9 +7,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Migration {
 
@@ -32,7 +29,7 @@ public class Migration {
             }
         }
 
-        for (Map.Entry<String, Object> entry : oldConfig.valueMap().entrySet()) {
+        for (final Map.Entry<String, Object> entry : oldConfig.valueMap().entrySet()) {
             final String key = entry.getKey();
             final Object value = entry.getValue();
 
@@ -93,11 +90,11 @@ public class Migration {
 
                 // [Java.Advanced.ExplicitGC] explicitGCOnX -> [Java.Advanced.ExplicitGC] doExplicitGCWhen["x"]
                 final List<String> triggersList = new ArrayList<>(3);
-                if (oldConfig.get("Java.Advanced.ExplicitGC.explicitGCOnPause"))
+                if ((boolean) oldConfig.get("Java.Advanced.ExplicitGC.explicitGCOnPause"))
                     triggersList.add(ClientConfig.explicitGCTriggers.Pause.toString());
-                if (oldConfig.get("Java.Advanced.ExplicitGC.explicitGCOnSleep"))
+                if ((boolean) oldConfig.get("Java.Advanced.ExplicitGC.explicitGCOnSleep"))
                     triggersList.add(ClientConfig.explicitGCTriggers.Sleep.toString());
-                if (oldConfig.get("Java.Advanced.ExplicitGC.explicitGCOnMenu"))
+                if ((boolean) oldConfig.get("Java.Advanced.ExplicitGC.explicitGCOnMenu"))
                     triggersList.add(ClientConfig.explicitGCTriggers.Menu.toString());
                 ClientConfig.doExplicitGCWhen.set(triggersList);
 

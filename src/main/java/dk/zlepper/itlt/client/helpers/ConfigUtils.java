@@ -69,7 +69,7 @@ public class ConfigUtils {
         final Path currentConfigPath = ConfigUtils.configDir.resolve("itlt-client.toml");
         final Path backupConfigPath = ConfigUtils.configDir.resolve("itlt-client.toml.bak");
 
-        itlt.LOGGER.info("Backing up itlt config...");
+        itlt.LOGGER.info("Backing up itlt config just in case...");
         if (currentConfigPath.toFile().exists() && !currentConfigPath.toFile().isDirectory()) {
             try {
                 Files.copy(currentConfigPath, backupConfigPath, StandardCopyOption.REPLACE_EXISTING);

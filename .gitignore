@@ -14,7 +14,7 @@ out
 .idea
 
 # vscode
-.vscode\launch.json
+.vscode/launch.json
 
 # gradle
 build

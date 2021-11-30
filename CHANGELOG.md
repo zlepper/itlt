@@ -4,8 +4,6 @@
 
 # v2.1.0
 
-(preliminary changelog - changes mentioned here may not be implemented yet)
-
 ## MC 1.17-specific changes
 
 -   Bugfix: The mod's pack.mcmeta format version has been updated to 7 to match MC 1.17
@@ -43,7 +41,7 @@ This basically means that if the config format changes in newer versions, itlt w
 
 This feature currently supports migrating from v2.0.0/v2.0.1 to v2.1.0. Support for migrating configs from older versions is currently unimplemented.
 
-### Enhanced config validation
+### Improved config validation
 
 To help troubleshooting mistakes with your config, the mod now logs an error if you set requirements that are impossible to meet (e.g. requiring that the user simultaneously uses at least Java 11 but not newer than Java 8).
 

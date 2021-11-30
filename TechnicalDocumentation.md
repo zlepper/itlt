@@ -208,8 +208,7 @@ See the warnings feature brief for details on which to use and when. If you're n
 ### Things left to-do with the existing code
 
 -   Improve config verification code, make it do more than just log errors in the console
--   Prevent the backup system from logging a successful backup when only used temporarily
--   Revamp config to be clearer with shorter, saner names and more concise descriptions
+-   Revamp config to be clearer with shorter, saner names and more concise descriptions (done for explicitGC, still pending for the rest)
 
 ### New features to consider adding later
 
@@ -230,6 +229,7 @@ See the warnings feature brief for details on which to use and when. If you're n
     -   It works, but there's lots of signs of me trying to get it all to work and trying new concepts in-place rather than in isolation. The whole thing could do with a cleanup really
     -   Measure if there's actually a performance benefit for using BLAKE3-JNI instead of the pure Java implementation or if the overhead of JNI and the benefits of JVM's JIT narrows the gap. If there isn't much perf benefit then removing it from being shadowed would be good.
 -   Full localisation support for FirstLaunchScreen rather than only for the heading
+-   Tooltips for video settings
 
 ## Troubleshooting
 

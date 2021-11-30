@@ -70,7 +70,7 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.17.1-37.0.112"
+    minecraft "net.minecraftforge:forge:1.17.1-37.0.126"
 
     // Mixin
     annotationProcessor "org.spongepowered:mixin:0.8.4:processor"
@@ -159,4 +159,8 @@ jar.finalizedBy shrinkJar
 
 mixin {
     add sourceSets.main, "itlt.refmap.json"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.fork = true
 }

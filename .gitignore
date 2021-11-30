@@ -13,6 +13,9 @@ out
 *.iml
 .idea
 
+# vscode
+.vscode\launch.json
+
 # gradle
 build
 .gradle

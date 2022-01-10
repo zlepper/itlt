@@ -1,35 +1,35 @@
 import org.gradle.api.java.archives.internal.DefaultManifest
 
 buildscript {
-    repositories {
+    /*repositories {
         maven { url = "https://maven.parchmentmc.org" }
-    }
+    }*/
     dependencies {
         classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
-        classpath "org.parchmentmc:librarian:1.+"
+        //classpath "org.parchmentmc:librarian:1.+"
     }
 }
 
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "7.1.0"
     id "java" // java plugin is needed for the shadow plugin to work
     id "eclipse"
     id "maven-publish"
     id "net.minecraftforge.gradle" version "5.1.+"
 }
 apply plugin: "org.spongepowered.mixin"
-apply plugin: "org.parchmentmc.librarian.forgegradle"
+//apply plugin: "org.parchmentmc.librarian.forgegradle"
 
-version = "1.17.1-2.1.0"
+version = "1.18-2.1.0"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
-// Target Java 16
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty "java.version"}, JVM: ${System.getProperty "java.vm.version"} (${System.getProperty "java.vendor"}), Arch: ${System.getProperty "os.arch"}"
 minecraft {
-    mappings channel: "parchment", version: "2021.10.31-1.17.1"
+    mappings channel: "official", version: "1.18"
 
     accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
 
@@ -38,6 +38,8 @@ minecraft {
             workingDirectory project.file("run")
             property "forge.logging.console.level", "info"
             arg "-mixin.config=itlt.mixins.json"
+            arg "--add-exports com.google.gson/com/google/gson/Gson=org.spongepowered.mixin"
+            arg "--add-opens com.google.gson/com/google/gson/Gson=org.spongepowered.mixin"
             mods {
                 itlt {
                     source sourceSets.main
@@ -70,10 +72,10 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.17.1-37.1.0"
+    minecraft "net.minecraftforge:forge:1.18-38.0.8"
 
     // Mixin
-    annotationProcessor "org.spongepowered:mixin:0.8.4:processor"
+    annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 
     // itlt uses the "image4j" library to read .ico files
     implementation files("thirdPartyLibs/image4j-0.7.2.jar")

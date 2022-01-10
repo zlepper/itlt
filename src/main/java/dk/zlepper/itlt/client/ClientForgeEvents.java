@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -29,8 +29,8 @@ import static dk.zlepper.itlt.client.ClientModEvents.itltDir;
 public class ClientForgeEvents {
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onGuiOpen(final GuiOpenEvent event) {
-        final Screen screen = event.getGui();
+    public static void onGuiOpen(final ScreenOpenEvent event) {
+        final Screen screen = event.getScreen();
         if (screen == null) return;
 
         if (ClientConfig.enableExplicitGC.get()) {
@@ -78,7 +78,7 @@ public class ClientForgeEvents {
             }
 
             // show the welcome screen
-            event.setGui(new FirstLaunchScreen(
+            event.setScreen(new FirstLaunchScreen(
                     new TitleScreen(), new TranslatableComponent("itlt.welcomeScreen.title", ClientConfig.enableUsingCustomWelcomeHeaderModpackDisplayName.get() ? ClientConfig.customWelcomeHeaderModpackDisplayName.get() : ClientUtils.getAutoDetectedDisplayName()))
             );
         }

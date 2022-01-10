@@ -1,7 +1,7 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[37,)" #mandatory
+loaderVersion="[38,)" #mandatory
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/zlepper/itlt/issues" #optional
 license="MIT"
@@ -14,7 +14,7 @@ version="2.1.0" #mandatory
 # A display name for the mod
 displayName="It's The Little Things" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
-updateJSONURL="https://raw.githubusercontent.com/zlepper/itlt/1.17/updates.json" #optional
+updateJSONURL="https://raw.githubusercontent.com/zlepper/itlt/1.18/updates.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://github.com/zlepper/itlt" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
@@ -32,7 +32,7 @@ description='''It's the little things that make all the difference, the finishin
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[37.0.104,)" #mandatory
+    versionRange="[38.0.6,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -41,6 +41,6 @@ description='''It's the little things that make all the difference, the finishin
 [[dependencies.itlt]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.17.1,1.18)"
+    versionRange="[1.18,1.19)"
     ordering="NONE"
     side="CLIENT"

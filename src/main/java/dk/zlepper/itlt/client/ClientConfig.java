@@ -305,7 +305,7 @@ public final class ClientConfig {
                                         " Note: itlt handles Java version naming scheme differences for you, meaning you can",
                                         " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
                                         " while values such as \"15\" will check against \"Java 15\" internally.")
-                                .defineInRange("requiredMinJavaVersion", 16, 6, 127);
+                                .defineInRange("requiredMinJavaVersion", 17, 6, 127);
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Min.Warning
@@ -325,7 +325,7 @@ public final class ClientConfig {
                                 .comment(" ",
                                         " The minimum recommended version of Java needed to skip the warning message when",
                                         " launching the modpack.")
-                                .defineInRange("warnMinJavaVersion", 16, 6, 127);
+                                .defineInRange("warnMinJavaVersion", 17, 6, 127);
                         ignoreMinJavaVerWarningWhenVerForced = clientConfigBuilder
                                 .comment(" ",
                                         " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",
@@ -391,7 +391,7 @@ public final class ClientConfig {
                                         " Note: itlt handles Java version naming scheme differences for you, meaning you can",
                                         " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
                                         " while values such as \"15\" will check against \"Java 15\" internally.")
-                                .defineInRange("requiredMaxJavaVersion", 17, 6, 127);
+                                .defineInRange("requiredMaxJavaVersion", 19, 6, 127);
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Max.Warning
@@ -411,7 +411,7 @@ public final class ClientConfig {
                                 .comment(" ",
                                         " The minimum recommended version of Java needed to skip the warning message when",
                                         " launching the modpack.")
-                                .defineInRange("warnMaxJavaVersion", 17, 6, 127);
+                                .defineInRange("warnMaxJavaVersion", 19, 6, 127);
                         ignoreMaxJavaVerWarningWhenVerForced = clientConfigBuilder
                                 .comment(" ",
                                         " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",

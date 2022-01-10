@@ -4,10 +4,11 @@
 
 # v2.1.0
 
-## MC 1.17-specific changes
+## MC 1.18-specific changes
 
--   Bugfix: The mod's pack.mcmeta format version has been updated to 7 to match MC 1.17
--   Use Mixin again instead of a JS coremod for custom window title handling
+-   itlt now supports MC 1.18
+-   Gradle 7.3.1
+-   Default config for min Java version matches MC 1.18's min requirement of Java 17
 
 ## Bug fixes
 

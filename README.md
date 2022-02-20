@@ -1,6 +1,6 @@
 [![It's the little things logo](https://zlepper.github.io/itlt/docs/logo/logo-long-githubdark.png)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things)
 
-[![](http://cf.way2muchnoise.eu/short_its-the-little-things_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](http://cf.way2muchnoise.eu/versions/Available%20for%20MC_its-the-little-things_all.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
+[![](http://cf.way2muchnoise.eu/short_232791_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](http://cf.way2muchnoise.eu/versions/For%20MC_232791_all.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
 
 ## About itlt
 

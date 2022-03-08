@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -41,8 +42,10 @@ public final class Main {
             return new ImageIcon(image);
         } catch (final IllegalAccessException e) {
             // Don't show the illegal access stacktrace on Java 16+
-            if (ClientUtils.getJavaVersion() > 15)
-                System.err.println("Warn: Please run with JVM's \"permit illegal access\" flag for the best experience on Windows.");
+            if (ClientUtils.getJavaVersion() == 16)
+                System.err.println("Warn: Please run with the \"--illegal-access=permit\" flag for the best experience on Windows.");
+            else if (ClientUtils.getJavaVersion() > 16)
+                System.err.println("Warn: Please run with the \"-XX:+IgnoreUnrecognizedVMOptions --add-opens=java.desktop/sun.awt.shell=ALL-UNNAMED\" flags for the best experience on Windows.");
             else e.printStackTrace();
             return null;
         } catch (final InvocationTargetException | NoSuchMethodException | ClassNotFoundException | ClassCastException e) {
@@ -67,8 +70,12 @@ public final class Main {
             // Manually detect Windows and use modern icons for it
             if (Platform.isWindows()) {
                 infoIcon = getWindowsSystemIcon("imageres", 81, 32);
-                warningIcon = getWindowsSystemIcon("imageres", 84, 32);
-                errorIcon = getWindowsSystemIcon("imageres", 98, 32);
+
+                // don't attempt to get other Windows icons if getting the first one failed so that we avoid error spam
+                if (infoIcon != null) {
+                    warningIcon = getWindowsSystemIcon("imageres", 84, 32);
+                    errorIcon = getWindowsSystemIcon("imageres", 98, 32);
+                }
             }
         } catch (final ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException
                 | InstantiationException ignored) {

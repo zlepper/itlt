@@ -14,16 +14,20 @@ import org.apache.logging.log4j.Logger;
 
 @Mod(itlt.MOD_ID)
 public final class itlt {
-    public static final String MOD_ID = "itlt";
+    public static final String
+            MOD_ID = "itlt",
+            VERSION = "2.1.0";
     public static final Logger LOGGER = LogManager.getLogger();
+    public static ModLoadingContext modLoadingContext;
 
     public itlt() {
-        MinecraftForge.EVENT_BUS.register(this);
-
-        final ModLoadingContext modLoadingContext = ModLoadingContext.get();
+        modLoadingContext = ModLoadingContext.get();
 
         modLoadingContext.registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+
+        ClientConfig.init();
         modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientConfig);
-        ClientConfig.loadConfig(ClientConfig.clientConfig, FMLPaths.CONFIGDIR.get().resolve("itlt-client.toml"));
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
 }

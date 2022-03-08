@@ -11,19 +11,24 @@ package dk.zlepper.itlt.client;
 //       a want or need. When this happens, show a tailored error message for this specific scenario or change the
 //       behaviour so that the max warn/need gets disabled when the min is higher (with updated config comments to note this)
 
+import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
+import dk.zlepper.itlt.client.helpers.ConfigUtils;
+import dk.zlepper.itlt.client.helpers.Migration;
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ClientConfig {
-    private static final ForgeConfigSpec.Builder clientConfigBuilder = new ForgeConfigSpec.Builder();
+
     public static ForgeConfigSpec clientConfig;
 
     public static ForgeConfigSpec.BooleanValue
@@ -40,10 +45,10 @@ public final class ClientConfig {
             enableCustomMemoryAllocGuide,
             enableMinJavaVerRequirement,
             enableMinJavaVerWarning,
-            selectivelyIgnoreMinJavaVerWarning,
+            ignoreMinJavaVerWarningWhenVerForced,
             enableMaxJavaVerRequirement,
             enableMaxJavaVerWarning,
-            selectivelyIgnoreMaxJavaVerWarning,
+            ignoreMaxJavaVerWarningWhenVerForced,
             enableCustomWindowTitle,
             enableUsingAutodetectedDisplayName,
             enableEnhancedVanillaIcon,
@@ -51,9 +56,8 @@ public final class ClientConfig {
             enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
             enableExplicitGC,
-            doExplicitGCOnPause,
-            doExplicitGCOnSleep,
-            doExplicitGCOnMenu;
+            enableWelcomeScreen,
+            enableUsingCustomWelcomeHeaderModpackDisplayName;
 
     public static ForgeConfigSpec.ConfigValue<String>
             customWindowTitleText,
@@ -62,9 +66,10 @@ public final class ClientConfig {
             customJavaDowngradeGuideURL,
             customMemoryAllocGuideURL,
             autoDetectedDisplayNameFallback,
+            customWelcomeHeaderModpackDisplayName,
             configVersion;
 
-    public static ForgeConfigSpec.ConfigValue<Double>
+    public static ForgeConfigSpec.DoubleValue
             reqMinMemoryAmountInGB,
             reqMaxMemoryAmountInGB,
             warnMinMemoryAmountInGB,
@@ -77,6 +82,15 @@ public final class ClientConfig {
             requiredMaxJavaVersion,
             warnMaxJavaVersion;
 
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> doExplicitGCWhen;
+
+    public enum explicitGCTriggers {
+        Pause, Sleep, Menu
+    }
+
+    // a List<String> of all the possible values of the explicitGCTriggers enum
+    public static List<String> explicitGCTriggersStrList = Arrays.stream(explicitGCTriggers.values()).map(Enum::toString).collect(Collectors.toList());
+
     /** Simplify floats to ints when they represent the same value (e.g. show "1" instead of "1.0") **/
     public static String getSimplifiedFloatStr(final float floatNum) {
         if (floatNum == (int) floatNum && floatNum != 0)
@@ -84,23 +98,53 @@ public final class ClientConfig {
         else return String.valueOf(floatNum);
     }
 
-    /** Returns the path as a File if it already exists or has been successfully created. Returns null otherwise **/
-    @Nullable
-    public static File makeItltFolderIfNeeded() {
-        final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
-        if (!itltDir.exists() && (enableCustomIcon.get() || enableEnhancedVanillaIcon.get() || areAnyWarningsEnabled()) && !itltDir.mkdir()) {
-            itlt.LOGGER.warn("Unable to make an \"itlt\" folder inside the config folder. Please make it manually.");
-            return null;
-        }
-        return itltDir;
-    }
-
     public static boolean areAnyWarningsEnabled() {
         return enableMinMemoryWarning.get() || enableMaxMemoryWarning.get() ||
                 enableMinJavaVerWarning.get() || enableMaxJavaVerWarning.get() || enable64bitWarning.get();
     }
 
-    static {
+    public static void init() {
+
+        @Nullable
+        UnmodifiableCommentedConfig oldConfig = null;
+
+        final File configFile = ConfigUtils.configDir.resolve("itlt-client.toml").toFile();
+        final File oldConfigFile = ConfigUtils.configDir.resolve("itlt-client.toml.bak").toFile();
+        String detectedConfigVersion = "Unknown";
+        boolean shouldMigrate = false;
+
+        // If a config file already exists, we make a backup and read that instead to avoid corrupting it
+        if (configFile.exists()) {
+            ConfigUtils.backup();
+            try {
+                oldConfig = ConfigUtils.readToml(oldConfigFile);
+            } catch (final IOException e) {
+                itlt.LOGGER.error(e);
+                e.printStackTrace();
+            }
+        } else {
+            itlt.LOGGER.info("Couldn't find a config file, making one...");
+        }
+
+        if (oldConfig != null) { // oldConfig will be null if no config file exists yet
+            detectedConfigVersion = ConfigUtils.getConfigVersion(oldConfig);
+            itlt.LOGGER.info("detectedConfigVersion: " + detectedConfigVersion);
+            if (detectedConfigVersion.equals(itlt.VERSION)) {
+                // Delete the backup (itlt-client.toml.bak) if no migration is necessary
+                itlt.LOGGER.info("Removing backup as no migration is necessary");
+                ConfigUtils.delete(oldConfigFile.toPath());
+            } else {
+                /* Delete the current config (itlt-client.toml) so that the code below makes the new config file, then
+                 * once that's done we check shouldMigrate and run Migration.migrate() if true, which handles copying
+                 * over the settings from the old format (itlt-client.toml.bak) to the new format (itlt-client.toml)
+                 */
+                ConfigUtils.delete(configFile.toPath());
+                shouldMigrate = true;
+            }
+        }
+
+        final ForgeConfigSpec.Builder clientConfigBuilder = new ForgeConfigSpec.Builder();
+
         /* Forge's config system doesn't guarantee to preserve the order of options, hence the large use of grouping to
          * avoid confusion to the user.
          *
@@ -138,38 +182,29 @@ public final class ClientConfig {
                                     " default as it may actually hurt performance if Xms and Xmx aren't the same!")
                             .define("enableExplicitGC", false);
 
-                    doExplicitGCOnPause = clientConfigBuilder
-                            .comment(" " ,
-                                    " Whether or not to run explicit GC when the player pauses the game.",
-                                    " ",
-                                    " Mainly useful to turn off if you usually only have the game paused for a tiny amount ",
-                                    " of time (i.e. less than ~2s).",
-                                    " ",
-                                    " Note: enableExplicitGC must be true for this to have any effect.")
-                            .define("explicitGCOnPause", true);
-
-                    doExplicitGCOnSleep = clientConfigBuilder
+                    doExplicitGCWhen = clientConfigBuilder
                             .comment(" ",
-                                    " Whether or not to run explicit GC when the player is sleeping in a bed.",
+                                    " A list of triggers of when to run explicit GC.",
+                                    " ",
+                                    " Pause: When the player pauses the game.",
+                                    " Sleep: When the player is sleeping in a bed.",
+                                    " Menu: When navigating one of the following opaque background screens: ",
+                                    "     Singleplayer world selection, Multiplayer server selection,",
+                                    "     Resource Pack selection, Language selection, Chat options, Controls options,",
+                                    "     Accessibility options, Realms main screen and Stats menu.",
+                                    " ",
+                                    " Note: It's mainly useful to remove \"Pause\" from this list if you usually only",
+                                    " have the game paused for a tiny amount of time (i.e. less than ~2s).",
+                                    " ",
+                                    " Note: It's mainly useful to remove \"Menu\" from this list for speedruns that",
+                                    " start the timer when the main menu is shown.",
                                     " ",
                                     " Note: enableExplicitGC must be true for this to have any effect.")
-                            .define("explicitGCOnSleep", true);
-
-                    doExplicitGCOnMenu = clientConfigBuilder
-                            .comment(" ",
-                                    " Whether or not to run explicit GC when navigating one of the following opaque",
-                                    " background screens: Singleplayer world selection, Multiplayer server selection,",
-                                    " Resource Pack selection, Language selection, Chat options, controls options,",
-                                    " accessibility options, Realms main screen and stats menu.",
-                                    " ",
-                                    " Mainly useful to disable for speedruns that start the timer when the main menu is shown.",
-                                    " ",
-                                    " Note: enableExplicitGC must be true for this to have any effect.")
-                            .define("explicitGCOnMenu", true);
+                            .defineList("doExplicitGCWhen", explicitGCTriggersStrList, entry -> explicitGCTriggersStrList.contains(entry.toString()));
 
                 } clientConfigBuilder.pop();
 
-            } clientConfigBuilder.pop();
+            } clientConfigBuilder.pop(); // end of Java.Advanced
 
             // Java.Arch
             clientConfigBuilder.push("Arch"); {
@@ -270,7 +305,7 @@ public final class ClientConfig {
                                         " Note: itlt handles Java version naming scheme differences for you, meaning you can",
                                         " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
                                         " while values such as \"15\" will check against \"Java 15\" internally.")
-                                .defineInRange("requiredMinJavaVerion", 8, 6, 127);
+                                .defineInRange("requiredMinJavaVersion", 8, 6, 127);
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Min.Warning
@@ -291,7 +326,7 @@ public final class ClientConfig {
                                         " The minimum recommended version of Java needed to skip the warning message when",
                                         " launching the modpack.")
                                 .defineInRange("warnMinJavaVersion", 8, 6, 127);
-                        selectivelyIgnoreMinJavaVerWarning = clientConfigBuilder
+                        ignoreMinJavaVerWarningWhenVerForced = clientConfigBuilder
                                 .comment(" ",
                                         " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",
                                         " to be changed beyond Java 8.",
@@ -356,7 +391,7 @@ public final class ClientConfig {
                                         " Note: itlt handles Java version naming scheme differences for you, meaning you can",
                                         " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
                                         " while values such as \"15\" will check against \"Java 15\" internally.")
-                                .defineInRange("requiredMaxJavaVerion", 15, 6, 127);
+                                .defineInRange("requiredMaxJavaVersion", 15, 6, 127);
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Max.Warning
@@ -377,7 +412,7 @@ public final class ClientConfig {
                                         " The minimum recommended version of Java needed to skip the warning message when",
                                         " launching the modpack.")
                                 .defineInRange("warnMaxJavaVersion", 15, 6, 127);
-                        selectivelyIgnoreMaxJavaVerWarning = clientConfigBuilder
+                        ignoreMaxJavaVerWarningWhenVerForced = clientConfigBuilder
                                 .comment(" ",
                                         " Some launchers (such as Twitch/CurseForge launcher) do not allow the Java version",
                                         " to be changed from Java 8.",
@@ -476,8 +511,8 @@ public final class ClientConfig {
                                         " to the point of causing nasty GC-related lag spikes as a result.")
                                 .define("enableMaxMemoryRequirement", true);
                         reqMaxMemoryAmountInGB = clientConfigBuilder
-                                .comment(" ", "The maximum amount of allocated RAM in GB to be able to launch the modpack.")
-                                .define("reqMaxMemoryAmountInGB", 16.0);
+                                .comment(" ", " The maximum amount of allocated RAM in GB to be able to launch the modpack.")
+                                .defineInRange("reqMaxMemoryAmountInGB", 16.0, 0.1, 1024.0);
                     } clientConfigBuilder.pop();
 
                     // Java.Memory.Max.Warning
@@ -494,7 +529,7 @@ public final class ClientConfig {
                                 .comment(" ",
                                         " The maximum recommended amount of allocated RAM in GB needed to skip the warning",
                                         " message when launching the modpack.")
-                                .define("warnMaxMemoryAmountInGB", 14.0);
+                                .defineInRange("warnMaxMemoryAmountInGB", 14.0, 0.1, 1024.0);
                     } clientConfigBuilder.pop();
 
                 } clientConfigBuilder.pop();
@@ -524,6 +559,7 @@ public final class ClientConfig {
             } clientConfigBuilder.pop(); // end of Java.Memory
 
         } clientConfigBuilder.pop(); // end of Java section
+        clientConfigBuilder.pop();
 
         // Display section
         clientConfigBuilder.push("Display"); {//.comment("Here you can change the aesthetics of your modpack.");
@@ -607,6 +643,38 @@ public final class ClientConfig {
                         .define("enableUsingAutodetectedIcon", true); // Currently supported launchers: Technic, MultiMC.
             } clientConfigBuilder.pop();
 
+            // Display.WelcomeScreen
+            clientConfigBuilder.push("WelcomeScreen"); {
+                enableWelcomeScreen = clientConfigBuilder
+                        .comment(" ",
+                                " Enable this if you want to show a welcome screen to your users the first time they",
+                                " start your modpack. You can customise the text shown using a text file.",
+                                " ",
+                                " Note: The text file needs to be placed in config" + File.separator + "itlt" + File.separator + "welcome.txt",
+                                " ",
+                                " Warning: This feature is experimental and may change in future v2.x releases. Check the",
+                                " changelog before updating if you use this. The changelog will make any breaking changes",
+                                " to this feature clear. If there's no mention of this feature in the changelog, rest assured",
+                                " you can update without needing to make any changes to your welcome.txt.")
+                        .define("enableWelcomeScreen", false);
+
+                enableUsingCustomWelcomeHeaderModpackDisplayName = clientConfigBuilder
+                        .comment(" ",
+                                " Enable this if you want to change the modpack name that shows up on the heading of the",
+                                " welcome screen.",
+                                " ",
+                                " Note: If you leave this disabled, itlt will use the contents of %autoName (auto-detected",
+                                " modpack name - see the enableUsingAutodetectedDisplayName and autoDetectedDisplayNameFallback",
+                                " options for details).")
+                        .define("enableUsingCustomWelcomeHeaderModpackDisplayName", false);
+
+                customWelcomeHeaderModpackDisplayName = clientConfigBuilder
+                        .comment(" ",
+                                " If enableUsingCustomWelcomeHeaderModpackDisplayName is true, the welcome screen header will show \"Welcome to x\"",
+                                " where x is what you put here.")
+                        .define("customWelcomeHeaderModpackDisplayName", "ModpackName");
+            } clientConfigBuilder.pop();
+
         } clientConfigBuilder.pop(); // end of Display section
 
         // Server list section
@@ -620,8 +688,7 @@ public final class ClientConfig {
                             " Warning: This feature is experimental and may change in future v2.x releases. Check the",
                             " changelog before updating if you use this. The changelog will make any breaking changes",
                             " to this feature clear. If there's no mention of this feature in the changelog, rest assured",
-                            " you can update without needing to make any changes to your servers.json.",
-                            " ")
+                            " you can update without needing to make any changes to your servers.json.")
                     .define("enableCustomServerListEntries", false);
         } clientConfigBuilder.pop(); // end of Server list section
 
@@ -631,21 +698,37 @@ public final class ClientConfig {
                     .comment(" ",
                             " The version of itlt that created this config file. Intended to be used for migrating",
                             " config changes when you update the mod. Please don't touch this, this is for itlt itself to change.")
-                    .define("configVersion", "2.0.0");
+                    .define("configVersion", "2.1.0");
         } clientConfigBuilder.pop();
 
         // Build the config
         clientConfig = clientConfigBuilder.build();
+
+        // Manually load the config early so that it can be used immediately
+        final CommentedFileConfig configData =
+                CommentedFileConfig.builder(ConfigUtils.configDir.resolve("itlt-client.toml"))
+                        .sync().autoreload().autosave().charset(StandardCharsets.UTF_8).writingMode(WritingMode.REPLACE).build();
+        configData.load();
+        clientConfig.setConfig(configData);
+
+        // copy over the old config format's settings to the new format if necessary, determined near the start of ClientConfig.init()
+        if (shouldMigrate) Migration.migrate(detectedConfigVersion, itlt.VERSION, oldConfig);
+
+        validate();
     }
 
-    public static void loadConfig(final ForgeConfigSpec spec, final Path path) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
-                .sync()
-                .autosave()
-                .writingMode(WritingMode.REPLACE)
-                .build();
+    private static void validate() {
+        if (enableMaxJavaVerRequirement.get() && enableMinJavaVerRequirement.get() && requiredMaxJavaVersion.get() < requiredMinJavaVersion.get())
+            itlt.LOGGER.error("Impossible Java version requirements set: requiredMinJavaVersion cannot be higher than requiredMaxJavaVersion.");
 
-        configData.load();
-        spec.setConfig(configData);
+        if (enableCustom64bitJavaGuide.get() && !custom64bitJavaGuideURL.get().toLowerCase().startsWith("https://"))
+            itlt.LOGGER.error("The custom64bitJavaGuideURL must start with \"https://\"");
+        else if (enableCustomJavaDowngradeGuide.get() && !customJavaDowngradeGuideURL.get().toLowerCase().startsWith("https://"))
+            itlt.LOGGER.error("The customJavaDowngradeGuideURL must start with \"https://\"");
+        else if (enableCustomJavaUpgradeGuide.get() && !customJavaUpgradeGuideURL.get().toLowerCase().startsWith("https://"))
+            itlt.LOGGER.error("The customJavaUpgradeGuideURL must start with \"https://\"");
+        else if (enableCustomMemoryAllocGuide.get() && !customMemoryAllocGuideURL.get().toLowerCase().startsWith("https://"))
+            itlt.LOGGER.error("The customMemoryAllocGuideURL must start with \"https://\"");
+
     }
 }

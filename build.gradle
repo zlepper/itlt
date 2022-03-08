@@ -15,7 +15,7 @@ plugins {
 }
 apply plugin: "org.spongepowered.mixin"
 
-version = "1.16.x-2.0.1"
+version = "1.16.x-2.1.0"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
@@ -95,20 +95,19 @@ repositories {
         content { includeGroup "curse.maven" }
     }
     mavenCentral()
-    maven { url = "https://repository.mulesoft.org/nexus/content/repositories/public/" }
 }
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.16.5-36.2.28"
+    minecraft "net.minecraftforge:forge:1.16.5-36.2.30"
 
     // Mixin
     implementation "org.spongepowered:mixin:0.8.2"
     annotationProcessor "org.spongepowered:mixin:0.8.2:processor"
 
     // itlt uses the "image4j" library to read .ico files
-    implementation "com.github.imcdonagh:image4j:0.7.2"
-    shade "com.github.imcdonagh:image4j:0.7.2"
+    implementation files("thirdPartyLibs/image4j-0.7.2.jar")
+    shade files("thirdPartyLibs/image4j-0.7.2.jar")
 
     // itlt uses the "Apache Commons Imaging" library to read .icns files
     /*implementation "org.apache.commons:commons-imaging:1.0-alpha2"
@@ -188,4 +187,8 @@ jar.finalizedBy shrinkJar
 
 mixin {
     add sourceSets.main, "itlt.refmap.json"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.fork = true
 }

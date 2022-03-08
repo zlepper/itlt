@@ -1,0 +1,40 @@
+This is the default itlt welcome text. Please change this in config -> itlt -> welcome.txt or turn off the welcome screen feature in config -> itlt-client.toml
+Note: The welcome screen feature automatically disables itself in the config after first launch.
+
+&hFormatting demo
+MC formatting codes are supported:
+-&0 black &r
+-&1 dark blue &r
+-&2 dark green &r
+-&3 dark aqua &r
+-&4 dark red &r
+-&5 dark purple &r
+-&6 gold &r
+-&7 grey &r
+-&8 dark grey &r
+-&9 blue &r
+-&a green &r
+-&b aqua &r
+-&c red &r
+-&d light purple &r
+-&e yellow &r
+-&f white &r
+-&l bold &r
+- &mstrikethrough&r
+- &nunderline&r
+-&o italic &r
+-&r reset &r
+
+You can combine formatting codes, for example:
+-&a&o green and italic &r
+- &b&naqua and underlined&r
+
+itlt adds support for headings by putting &h at the start of a line:
+&hThis is a heading
+This is a paragraph
+
+itlt also supports formatting code escaping:
+-\&a this won't be green \&r
+
+Links are automatically formatted and clickable:
+- https://www.curseforge.com/minecraft/mc-mods/its-the-little-things

@@ -1,7 +1,6 @@
 package dk.zlepper.itlt.client;
 
 import com.google.gson.Gson;
-import dk.zlepper.itlt.client.helpers.Platform;
 import dk.zlepper.itlt.client.launchers.LauncherUtils;
 import dk.zlepper.itlt.client.launchers.DetectedLauncher;
 import dk.zlepper.itlt.itlt;
@@ -20,7 +19,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import static dk.zlepper.itlt.client.ClientConfig.makeItltFolderIfNeeded;
+import static dk.zlepper.itlt.client.helpers.ConfigUtils.makeItltFolderIfNeeded;
 
 @Mod.EventBusSubscriber(modid=itlt.MOD_ID, value=Dist.CLIENT, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ClientModEvents {
@@ -61,7 +59,7 @@ public class ClientModEvents {
         if (ClientConfig.enableMinJavaVerRequirement.get() && javaVerInt < ClientConfig.requiredMinJavaVersion.get()) {
             ClientUtils.startUIProcess(Message.Content.NeedsNewerJava);
         } else if (ClientConfig.enableMinJavaVerWarning.get() && javaVerInt < ClientConfig.warnMinJavaVersion.get()) {
-            if (ClientConfig.selectivelyIgnoreMinJavaVerWarning.get()) {
+            if (ClientConfig.ignoreMinJavaVerWarningWhenVerForced.get()) {
                 if (!detectedLauncher.supportsChangingJavaVersion()) {
                     itlt.LOGGER.info("Skipping minJavaVerWarning as you appear to be using the " + detectedLauncher.getName()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
@@ -80,7 +78,7 @@ public class ClientModEvents {
         if (ClientConfig.enableMaxJavaVerRequirement.get() && javaVerInt > ClientConfig.requiredMaxJavaVersion.get()) {
             ClientUtils.startUIProcess(Message.Content.NeedsOlderJava);
         } else if (ClientConfig.enableMaxJavaVerWarning.get() && javaVerInt > ClientConfig.warnMaxJavaVersion.get()) {
-            if (ClientConfig.selectivelyIgnoreMaxJavaVerWarning.get()) {
+            if (ClientConfig.ignoreMaxJavaVerWarningWhenVerForced.get()) {
                 if (!detectedLauncher.supportsChangingJavaVersion()) {
                     itlt.LOGGER.info("Skipping maxJavaVerWarning as you appear to be using the " + detectedLauncher.getName()
                             + " launcher which currently does not allow changing Java version beyond Java 8. :(");
@@ -125,27 +123,9 @@ public class ClientModEvents {
 
         // Custom window title text
         if (ClientConfig.enableCustomWindowTitle.get()) {
-            String customWindowTitle = ClientConfig.customWindowTitleText.get();
-
-            String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
-            if (ClientConfig.enableUsingAutodetectedDisplayName.get() && customWindowTitle.contains("%autoName")) {
-                try {
-                    final String tmp = detectedLauncher.getModpackDisplayName();
-                    if (tmp != null) autoDetectedDisplayName = tmp;
-                } catch (final IOException e) {
-                    itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
-                    e.printStackTrace();
-                }
-            }
-            customWindowTitle = customWindowTitle.replaceFirst("%autoName", autoDetectedDisplayName);
-
-            // replace %mc with the Vanilla window title from getWindowTitle() (func_230149_ax_ == getWindowTitle)
-            customWindowTitle = customWindowTitle.replaceFirst("%mc", mcInstance.func_230149_ax_());
-
+            final String customWindowTitle = ClientUtils.getCustomWindowTitle(mcInstance);
             itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
-
-            // set the new window title (func_230148_b_ == setWindowTitle)
-            if (!customWindowTitle.isEmpty()) mcInstance.getMainWindow().func_230148_b_(customWindowTitle);
+            mcInstance.func_230150_b_(); // func_230150_b_ == setDefaultMinecraftTitle
         }
 
         // Custom window icon
@@ -198,12 +178,9 @@ public class ClientModEvents {
 
         // Custom server list entries
         if (ClientConfig.enableCustomServerListEntries.get()) {
-            final File itltDir = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), "itlt").toFile();
-
-            if (!itltDir.exists()) {
-                itlt.LOGGER.warn("itlt folder in the config folder is missing.");
-                if (itltDir.mkdir()) itlt.LOGGER.info("The folder has been successfully created for you.");
-                else itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
+            if (itltDir == null) {
+                itlt.LOGGER.warn("itlt folder in the config folder is missing");
+                itlt.LOGGER.warn("Please create a folder named \"itlt\" (case sensitive) in the config folder.");
                 return;
             }
 

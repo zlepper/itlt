@@ -125,7 +125,7 @@ public class ClientModEvents {
         if (ClientConfig.enableCustomWindowTitle.get()) {
             final String customWindowTitle = ClientUtils.getCustomWindowTitle(mcInstance);
             itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
-            mcInstance.func_230150_b_(); // func_230150_b_ == setDefaultMinecraftTitle
+            mcInstance.func_230150_b_(); // func_230150_b_ == setDefaultMinecraftTitle == updateTitle
         }
 
         // Custom window icon

@@ -1,9 +1,12 @@
 package dk.zlepper.itlt.client;
 
 import com.mojang.realmsclient.RealmsMainScreen;
+import dk.zlepper.itlt.client.helpers.ClientUtils;
+import dk.zlepper.itlt.client.screens.FirstLaunchScreen;
 import dk.zlepper.itlt.itlt;
 import net.minecraft.client.gui.AccessibilityScreen;
 import net.minecraft.client.gui.screen.*;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -75,9 +78,9 @@ public class ClientForgeEvents {
             }
 
             // show the welcome screen
-            /*event.setGui(new FirstLaunchScreen(
+            event.setGui(new FirstLaunchScreen(
                     new MainMenuScreen(), new TranslationTextComponent("itlt.welcomeScreen.title", ClientConfig.enableUsingCustomWelcomeHeaderModpackDisplayName.get() ? ClientConfig.customWelcomeHeaderModpackDisplayName.get() : ClientUtils.getAutoDetectedDisplayName()))
-            );*/
+            );
         }
     }
 }

@@ -7,18 +7,9 @@ import static dk.zlepper.itlt.client.ClientModEvents.itltDir;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.fonts.Font;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.resources.Language;
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.text.*;
 import net.minecraftforge.client.gui.ScrollPanel;
@@ -64,7 +55,7 @@ public class FirstLaunchScreen extends Screen {
         }
 
         this.addButton(doneButton);
-        this.addButton(this.scrollableTextPanel);
+        this.addListener(this.scrollableTextPanel);
     }
 
     public void render(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
@@ -80,7 +71,7 @@ public class FirstLaunchScreen extends Screen {
     private static void drawCenteredStringWithScale(final MatrixStack matrixStack, final FontRenderer font, final ITextComponent string, final float x, final float y, final int color, final float scale) {
         matrixStack.push();
         matrixStack.scale(scale, scale, 1.0F);
-        font.drawStringWithShadow(matrixStack, string, ((x / scale) - font.func_238414_a_(string) / 2.0F), y / scale, color);
+        font.drawStringWithShadow(matrixStack, string.getString(), ((x / scale) - font.func_238414_a_(string) / 2.0F), y / scale, color);
         matrixStack.pop();
     }
 
@@ -110,10 +101,11 @@ public class FirstLaunchScreen extends Screen {
                         matrixStack.push();
                         matrixStack.scale(1.5F, 1.5F, 1.0F);
                         matrixStack.translate(0.0F, 1.5F, 0.0F);
-                        FirstLaunchScreen.this.font.drawStringWithShadow(matrixStack, line.getRight(), (left + padding) / 1.5F, relativeY / 1.5F, 0xFFFFFF);
+                        // func_238407_a_ == drawShadow
+                        FirstLaunchScreen.this.font.func_238407_a_(matrixStack, line.getRight(), (left + padding) / 1.5F, relativeY / 1.5F, 0xFFFFFF);
                         matrixStack.pop();
                     } else {
-                        FirstLaunchScreen.this.font.drawStringWithShadow(matrixStack, line.getRight(), left + padding, relativeY, 0xFFFFFF);
+                        FirstLaunchScreen.this.font.func_238407_a_(matrixStack, line.getRight(), left + padding, relativeY, 0xFFFFFF);
                     }
                     RenderSystem.disableBlend();
                 }
@@ -153,7 +145,10 @@ public class FirstLaunchScreen extends Screen {
 
                 final int maxTextLength = this.width - padding * 2;
                 if (maxTextLength >= 0) {
-                    Language.getInstance().getVisualOrder(font.getSplitter().splitLines(lineWithFormattedLinks, maxTextLength, Style.EMPTY)).forEach(formattedCharSequence -> {
+                    // func_244260_a == getVisualOrder
+                    // func_238420_b_ == getSplitter
+                    // func_238362_b_ == splitLines
+                    LanguageMap.getInstance().func_244260_a(font.func_238420_b_().func_238362_b_(lineWithFormattedLinks, maxTextLength, Style.EMPTY)).forEach(formattedCharSequence -> {
                         resized.add(Pair.of(isHeading, formattedCharSequence));
                     });
                 }
@@ -163,7 +158,8 @@ public class FirstLaunchScreen extends Screen {
                 // add a blank line after headings to avoid overlapping with any text that may be directly below it
                 if (isHeading) {
                     //resized.add(lineCounter - 1, Pair.of(false, new TextComponent(" ").getVisualOrderText()));
-                    resized.add(Pair.of(false, new TextComponent(" ").getVisualOrderText()));
+                    // func_241878_f == getVisualOrderText
+                    resized.add(Pair.of(false, new StringTextComponent(" ").func_241878_f()));
                 }
                 lineCounter++;
             }
@@ -171,7 +167,7 @@ public class FirstLaunchScreen extends Screen {
             // if the last line isn't a heading, add a single line at the end of the panel for
             // aesthetical (looks nicer) and functional reasons (hard to click links on last line otherwise)
             if (!resized.get(resized.size() - 1).getLeft())
-                resized.add(Pair.of(false, new StringTextComponent(" ").getVisualOrderText()));
+                resized.add(Pair.of(false, new StringTextComponent(" ").func_241878_f()));
 
             return resized;
         }
@@ -203,8 +199,9 @@ public class FirstLaunchScreen extends Screen {
                 return null;
 
             final IReorderingProcessor line = lines.get(lineIdx - 1).getRight();
+            // func_243239_a == componentStyleAtWidth
             if (line != null)
-                return font.getSplitter().componentStyleAtWidth(line, mouseX - left - border);
+                return font.func_238420_b_().func_243239_a(line, mouseX - left - border);
 
             return null;
         }

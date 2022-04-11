@@ -391,7 +391,7 @@ public final class ClientConfig {
                                         " Note: itlt handles Java version naming scheme differences for you, meaning you can",
                                         " put \"7\" here and itlt will correctly check against \"Java 1.7\" internally,",
                                         " while values such as \"15\" will check against \"Java 15\" internally.")
-                                .defineInRange("requiredMaxJavaVersion", 15, 6, 127);
+                                .defineInRange("requiredMaxJavaVersion", 19, 6, 127);
                     } clientConfigBuilder.pop();
 
                     // Java.Version.Max.Warning

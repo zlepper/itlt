@@ -99,7 +99,7 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.16.5-36.2.30"
+    minecraft "net.minecraftforge:forge:1.16.5-36.2.33"
 
     // Mixin
     implementation "org.spongepowered:mixin:0.8.2"

@@ -110,7 +110,7 @@ public class Migration {
                 // Copy over the remaining settings that haven't changed format
                 migrateSameFormat(oldConfig, ignoreList);
 
-                ClientConfig.configVersion.set("2.1.0");
+                ClientConfig.configVersion.set("2.1.1");
             }
             case "1.0.3" -> {
                 from += " (auto-detected)";
@@ -131,7 +131,7 @@ public class Migration {
                     itlt.LOGGER.warn(String.format("Unable to migrate SERVER_SERVER_IP option from v%s to v%s", from, to));
                 }
 
-                ClientConfig.configVersion.set("2.1.0");
+                ClientConfig.configVersion.set("2.1.1");
             }
             default -> itlt.LOGGER.error(String.format("Migration failed: Unknown config version \"v%s\"", from));
         }

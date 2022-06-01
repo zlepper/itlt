@@ -23,9 +23,9 @@ public class LauncherUtils {
         // the Twitch launcher. If the file "installedPacks" exists in this folder and there's also a folder called
         // "modpacks" in here, we know we're running within a Technic Launcher modpack
         final Path theoreticalTechnicPath = itltJarPath.getParent().getParent().getParent().getParent();
-        final boolean isTechnicLauncher =
-                Files.exists(theoreticalTechnicPath.resolve("installedPacks")) &&
-                        Files.exists(theoreticalTechnicPath.resolve("modpacks"));
+        final boolean isTechnicLauncher = theoreticalTechnicPath != null
+                && Files.exists(theoreticalTechnicPath.resolve("installedPacks"))
+                && Files.exists(theoreticalTechnicPath.resolve("modpacks"));
         itlt.LOGGER.debug("theoreticalTechnicPath: " + theoreticalTechnicPath);
         itlt.LOGGER.debug("isTechnicLauncher: " + isTechnicLauncher);
         if (isTechnicLauncher) return new Technic();
@@ -33,9 +33,9 @@ public class LauncherUtils {
         // if the .minecraft folder has mmc-pack.json and instance.cfg files beside it then we know we're running
         // within a MultiMC modpack.
         final Path theoreticalMultiMCPath = itltJarPath.getParent().getParent().getParent();
-        final boolean isMultiMCLauncher =
-                Files.exists(theoreticalMultiMCPath.resolve("mmc-pack.json")) &&
-                        Files.exists(theoreticalMultiMCPath.resolve("instance.cfg"));
+        final boolean isMultiMCLauncher = theoreticalMultiMCPath != null
+                && Files.exists(theoreticalMultiMCPath.resolve("mmc-pack.json"))
+                && Files.exists(theoreticalMultiMCPath.resolve("instance.cfg"));
         itlt.LOGGER.debug("theoreticalMultiMCPath: " + theoreticalMultiMCPath);
         itlt.LOGGER.debug("isMultiMCLauncher: " + isMultiMCLauncher);
         if (isMultiMCLauncher) return new MultiMC();
@@ -43,23 +43,23 @@ public class LauncherUtils {
         // if the .minecraft folder has .curseclient and minecraftinstance.json files inside it then we know we're
         // running within the CurseClient
         final Path theoreticalCurseClientPath = itltJarPath.getParent().getParent();
-        final boolean isCurseClientLauncher =
-                Files.exists(theoreticalCurseClientPath.resolve(".curseclient")) &&
-                        Files.exists(theoreticalCurseClientPath.resolve("minecraftinstance.json"));
+        final boolean isCurseClientLauncher = theoreticalCurseClientPath != null
+                && Files.exists(theoreticalCurseClientPath.resolve(".curseclient"))
+                && Files.exists(theoreticalCurseClientPath.resolve("minecraftinstance.json"));
         itlt.LOGGER.debug("theoreticalCurseClientPath: " + theoreticalCurseClientPath);
         itlt.LOGGER.debug("isCurseClientLauncher: " + isCurseClientLauncher);
         if (isCurseClientLauncher) return new CurseClient();
 
         final Path theoreticalFTBAppPath = itltJarPath.getParent().getParent().getParent().getParent();
-        final boolean isFTBAppLauncher =
-                Files.exists(theoreticalFTBAppPath.resolve("ftbapp.log"));
+        final boolean isFTBAppLauncher = theoreticalFTBAppPath != null
+                && Files.exists(theoreticalFTBAppPath.resolve("ftbapp.log"));
         itlt.LOGGER.debug("theoreticalFTBAppPath: " + theoreticalFTBAppPath);
         itlt.LOGGER.debug("isFTBAppLauncher: " + isFTBAppLauncher);
         if (isFTBAppLauncher) return new FTBApp();
 
         // todo: test this
         /*final Path theoreticalGDLauncherPath = itltJarPath.getParent().getParent().getParent().getParent();
-        final boolean isGDLauncher =
+        final boolean isGDLauncher = theoreticalGDLauncherPath != null &&
                 Files.exists(theoreticalGDLauncherPath.resolve("datastore").resolve("forgeinstallers")) &&
                         Files.exists(itltJarPath.getParent().resolve("config.json"));
         itlt.LOGGER.info("theoreticalGDLauncherPath.resolve(\"datastore\").resolve(\"forgeinstallers\"): " + theoreticalGDLauncherPath.resolve("datastore").resolve("forgeInstallers"));

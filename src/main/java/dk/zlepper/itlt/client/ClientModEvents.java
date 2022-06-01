@@ -1,6 +1,7 @@
 package dk.zlepper.itlt.client;
 
 import com.google.gson.Gson;
+import dk.zlepper.itlt.client.helpers.Platform;
 import dk.zlepper.itlt.client.launchers.LauncherUtils;
 import dk.zlepper.itlt.client.launchers.DetectedLauncher;
 import dk.zlepper.itlt.itlt;
@@ -124,9 +125,13 @@ public class ClientModEvents {
 
         // Custom window title text
         if (ClientConfig.enableCustomWindowTitle.get()) {
-            final String customWindowTitle = ClientUtils.getCustomWindowTitle(mcInstance);
-            itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
-            mcInstance.updateTitle();
+            if (ClientConfig.dontTouchWindowTitleOnMacOS.get() && Platform.isMac()) {
+                itlt.LOGGER.info("Detected macOS. Not changing the window title as the dontTouchWindowTitleOnMacOS workaround is enabled in the config.");
+            } else {
+                final String customWindowTitle = ClientUtils.getCustomWindowTitle(mcInstance);
+                itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
+                mcInstance.updateTitle();
+            }
         }
 
         // Custom window icon

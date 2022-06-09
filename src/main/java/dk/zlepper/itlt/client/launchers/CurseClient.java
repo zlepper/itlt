@@ -22,7 +22,7 @@ public class CurseClient implements DetectedLauncher {
         final Path itltJarPath = LauncherUtils.getItltJarPath();
 
         // open the minecraftinstance.json file
-        final Reader reader = Files.newBufferedReader(itltJarPath.resolve("../../minecraftinstance.json"));
+        final Reader reader = Files.newBufferedReader(itltJarPath.getParent().getParent().resolve("minecraftinstance.json"));
 
         // parse the json file to a Map with keys of type String
         final Type type = new TypeToken<Map<String, Object>>(){}.getType();

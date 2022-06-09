@@ -25,7 +25,8 @@ public class Technic implements DetectedLauncher {
         final String packSlug = itltJarPath.getParent().getParent().getFileName().toString();
 
         // open the cache.json for the associated slug to get the pack's displayName
-        final Path cacheJsonPath = itltJarPath.resolve("../../../../assets/packs" + packSlug + "/cache.json");
+        //final Path cacheJsonPath = itltJarPath.resolve("../../../../assets/packs" + packSlug + "/cache.json"); // commented out due to #37
+        final Path cacheJsonPath = itltJarPath.getParent().getParent().getParent().getParent().resolve("assets").resolve("packs" + packSlug).resolve("cache.json");
         final Reader reader = Files.newBufferedReader(cacheJsonPath);
 
         // convert the cacheJson String to a Map
@@ -49,7 +50,8 @@ public class Technic implements DetectedLauncher {
         final String packSlug = itltJarPath.getParent().getParent().getFileName().toString();
 
         // get the icon from the associated pack's slug
-        final Path iconPath = itltJarPath.resolve("../../../../assets/packs/" + packSlug + "/icon.png");
+        //        final Path iconPath = itltJarPath.resolve("../../../../assets/packs/" + packSlug + "/icon.png");
+        final Path iconPath = itltJarPath.getParent().getParent().getParent().getParent().resolve("assets").resolve("packs").resolve(packSlug).resolve("icon.png");
 
         if (iconPath.toFile().exists()) return iconPath.toFile();
         else return null;

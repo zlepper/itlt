@@ -20,7 +20,7 @@ plugins {
 apply plugin: "org.spongepowered.mixin"
 //apply plugin: "org.parchmentmc.librarian.forgegradle"
 
-version = "1.18-2.1.1"
+version = "1.18.x-2.1.1"
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 

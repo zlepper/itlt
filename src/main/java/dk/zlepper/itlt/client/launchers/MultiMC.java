@@ -17,7 +17,7 @@ public class MultiMC implements DetectedLauncher {
     public String getModpackDisplayName() throws IOException {
         final Path itltJarPath = LauncherUtils.getItltJarPath();
 
-        final String instanceCfg = itltJarPath.resolve("../../../instance.cfg").toString();
+        final String instanceCfg = itltJarPath.getParent().getParent().getParent().resolve("instance.cfg").toString();
 
         // attempt to load the instance.cfg file and parse it
         final Properties parsedInstanceCfg = new Properties();

@@ -1,6 +1,6 @@
 [![It's the little things logo](https://zlepper.github.io/itlt/docs/logo/logo-long-githubdark.png)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things)
 
-[![](http://cf.way2muchnoise.eu/short_232791_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](http://cf.way2muchnoise.eu/versions/For%20MC_232791_all.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
+[![](http://cf.way2muchnoise.eu/short_232791_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things) [![](http://cf.way2muchnoise.eu/versions/For%20MC_232791_all.svg?1.19)](https://www.curseforge.com/minecraft/mc-mods/its-the-little-things/files)
 
 ## About itlt
 
@@ -50,7 +50,8 @@ Work for the latest supported Minecraft version is done on the "master" branch, 
 
 | Branch                                                          | Minecraft version | Mod version | ForgeGradle version              | Gradle version |
 | --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------- | -------------- |
-| master (you're here)                                            | 1.18              | **v2**      | ForgeGradle 5.1                  | Gradle 7.3.1   |
+| master (you're here)                                            | 1.19              | **v2**      | ForgeGradle 5.1                  | Gradle 7.3.1   |
+| [1.18](https://github.com/zlepper/itlt/tree/1.18)               | 1.18.x            | **v2**      | ForgeGradle 5.1                  | Gradle 7.3.1   |
 | [1.17](https://github.com/zlepper/itlt/tree/1.17)               | 1.17.1            | **v2**      | ForgeGradle 5.1                  | Gradle 7.2     |
 | [1.16](https://github.com/zlepper/itlt/tree/1.16)               | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.15](https://github.com/zlepper/itlt/tree/1.15)               | 1.15.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |

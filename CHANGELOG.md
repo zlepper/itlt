@@ -11,19 +11,7 @@
 ## Bug fixes
 
 -   Fixed a crash on launch if the game is launched near the root of a drive. ([#38](https://github.com/zlepper/itlt/issues/38))
--   Fixed another startup crash on some macOS systems via a workaround. ([#35](https://github.com/zlepper/itlt/issues/35))
-    - A proper fix is planned for a future release. In the meantime, changing the window title is disabled by default on macOS with this workaround.
-    - You can force itlt to attempt to change the window title on macOS by disabling the dontTouchWindowTitleOnMacOS workaround in the config.
-
-## New features
-
-### Workarounds
-
-A new config section has been added for workarounds, so that you can continue using itlt while I fix difficult OS-specific bugs.
-
-These workarounds are intended to be temporary and are expected to be removed in future releases once the underlying issues they workaround are fixed.
-
-Don't worry, your old configs will be migrated to work on this version without any manual changes necessary thanks to the new config migration feature added in v2.1.0.
+-   Fixed an issue causing launcher integration features not working on some Linux systems ([#37](https://github.com/zlepper/itlt/issues/37))
 
 # v2.1.0
 

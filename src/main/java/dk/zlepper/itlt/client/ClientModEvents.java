@@ -125,13 +125,9 @@ public class ClientModEvents {
 
         // Custom window title text
         if (ClientConfig.enableCustomWindowTitle.get()) {
-            if (ClientConfig.dontTouchWindowTitleOnMacOS.get() && Platform.isMac()) {
-                itlt.LOGGER.info("Detected macOS. Not changing the window title as the dontTouchWindowTitleOnMacOS workaround is enabled in the config.");
-            } else {
-                final String customWindowTitle = ClientUtils.getCustomWindowTitle(mcInstance);
-                itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
-                mcInstance.updateTitle();
-            }
+            final String customWindowTitle = ClientUtils.getCustomWindowTitle(mcInstance);
+            itlt.LOGGER.info("customWindowTitle: " + customWindowTitle);
+            mcInstance.updateTitle();
         }
 
         // Custom window icon

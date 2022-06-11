@@ -57,8 +57,7 @@ public final class ClientConfig {
             enableCustomServerListEntries,
             enableExplicitGC,
             enableWelcomeScreen,
-            enableUsingCustomWelcomeHeaderModpackDisplayName,
-            dontTouchWindowTitleOnMacOS;
+            enableUsingCustomWelcomeHeaderModpackDisplayName;
 
     public static ForgeConfigSpec.ConfigValue<String>
             customWindowTitleText,
@@ -693,33 +692,13 @@ public final class ClientConfig {
                     .define("enableCustomServerListEntries", false);
         } clientConfigBuilder.pop(); // end of Server list section
 
-        // Workarounds section
-        clientConfigBuilder.push("Workarounds"); {
-            dontTouchWindowTitleOnMacOS = clientConfigBuilder
-                    .comment(" ",
-                            " Enable this if you want itlt to avoid changing the window title on macOS.",
-                            " ",
-                            " macOS has made breaking changes and kills the game's process tree if you don't do things",
-                            " exactly as it expects (due to it changing). This can cause the game to instantly crash when",
-                            " itlt tries to change the window title as a result. Due to macOS immediately killing the",
-                            " process, I'm unable to catch the error and skip setting the title in these instances.",
-                            " ",
-                            " I don't know how often macOS will make breaking changes like this, but I'll try to adapt",
-                            " itlt's code accordingly. In the meantime, you can enable this option to avoid the crash so",
-                            " that you can continue using itlt's other features on macOS.",
-                            " ",
-                            " Warning: Workaround config options may be removed in future versions of itlt when",
-                            " deemed no longer necessary.")
-                    .define("dontTouchWindowTitleOnMacOS", true);
-        } clientConfigBuilder.pop(); // end of Workarounds section
-
         // Internal section
         clientConfigBuilder.push("Internal"); {
             configVersion = clientConfigBuilder
                     .comment(" ",
                             " The version of itlt that created this config file. Intended to be used for migrating",
                             " config changes when you update the mod. Please don't touch this, this is for itlt itself to change.")
-                    .define("configVersion", "2.1.1");
+                    .define("configVersion", "2.1.0");
         } clientConfigBuilder.pop();
 
         // Build the config

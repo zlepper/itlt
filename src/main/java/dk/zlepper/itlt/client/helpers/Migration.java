@@ -72,6 +72,11 @@ public class Migration {
     // Copy over the differing values to the new latest spec's equivalents
     public static void migrate(String from, final String to, final UnmodifiableCommentedConfig oldConfig) {
         switch (from) {
+            case "2.1.1", "2.1.0" -> {
+                // no changes
+                migrateSameFormat(oldConfig, Set.of());
+                ClientConfig.configVersion.set("2.1.2");
+            }
             case "2.0.1", "2.0.0" -> {
                 // v2.1.0 fixed a bug where all config options were inside the Java group.
                 // e.g. [Java.Display.WindowTitle] in v2.0.0 becomes [Display.WindowTitle] in v2.1.0
@@ -110,7 +115,7 @@ public class Migration {
                 // Copy over the remaining settings that haven't changed format
                 migrateSameFormat(oldConfig, ignoreList);
 
-                ClientConfig.configVersion.set("2.1.0");
+                ClientConfig.configVersion.set("2.1.2");
             }
             case "1.0.3" -> {
                 from += " (auto-detected)";
@@ -131,7 +136,7 @@ public class Migration {
                     itlt.LOGGER.warn(String.format("Unable to migrate SERVER_SERVER_IP option from v%s to v%s", from, to));
                 }
 
-                ClientConfig.configVersion.set("2.1.0");
+                ClientConfig.configVersion.set("2.1.2");
             }
             default -> itlt.LOGGER.error(String.format("Migration failed: Unknown config version \"v%s\"", from));
         }

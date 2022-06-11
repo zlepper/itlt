@@ -209,7 +209,7 @@ public class ClientModEvents {
 
                         if (!ClientUtils.alreadyInServerList(serverToAdd, serverList)) {
                             itlt.LOGGER.info("Adding custom server entry");
-                            serverList.add(serverToAdd);
+                            serverList.add(serverToAdd, false);
                             serverList.save();
                         }
                     }

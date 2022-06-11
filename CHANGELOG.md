@@ -2,6 +2,20 @@
 
 # Changelog
 
+# v2.1.2
+
+## MC 1.19-specific changes
+
+-   itlt now supports MC 1.19
+
+## Bug fixes
+
+-   Hotfix: Fixed an issue causing config files to wrongly be deleted due to a programming mistake in v2.1.1.
+    - A backup is made on first load with v2.1.1. You can restore the backup by deleting `itlt-client.toml` in the config folder and changing `itlt-client.toml.bak` to `itlt-client.toml`
+    - Once the backup is restored, update itlt to v2.1.2 to fix the issue.
+    - It is recommended that all v2.1.1 users update to v2.1.2 if they want a non-default config take effect.
+-   All the fixes from v2.1.1 (see below)
+
 # v2.1.1
 
 ## MC 1.18-specific bug fixes

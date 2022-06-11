@@ -14,7 +14,6 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.client.gui.ScrollPanel;
 import net.minecraftforge.common.ForgeHooks;
@@ -166,8 +165,8 @@ public class FirstLaunchScreen extends Screen {
 
                 // add a blank line after headings to avoid overlapping with any text that may be directly below it
                 if (isHeading) {
-                    //resized.add(lineCounter - 1, Pair.of(false, new TextComponent(" ").getVisualOrderText()));
-                    resized.add(Pair.of(false, new TextComponent(" ").getVisualOrderText()));
+                    //resized.add(lineCounter - 1, Pair.of(false, Component.literal(" ").getVisualOrderText()));
+                    resized.add(Pair.of(false, Component.literal(" ").getVisualOrderText()));
                 }
                 lineCounter++;
             }
@@ -175,7 +174,7 @@ public class FirstLaunchScreen extends Screen {
             // if the last line isn't a heading, add a single line at the end of the panel for
             // aesthetical (looks nicer) and functional reasons (hard to click links on last line otherwise)
             if (!resized.get(resized.size() - 1).getLeft())
-                resized.add(Pair.of(false, new TextComponent(" ").getVisualOrderText()));
+                resized.add(Pair.of(false, Component.literal(" ").getVisualOrderText()));
 
             return resized;
         }

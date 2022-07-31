@@ -698,7 +698,7 @@ public final class ClientConfig {
                     .comment(" ",
                             " The version of itlt that created this config file. Intended to be used for migrating",
                             " config changes when you update the mod. Please don't touch this, this is for itlt itself to change.")
-                    .define("configVersion", "2.1.2");
+                    .define("configVersion", itlt.VERSION);
         } clientConfigBuilder.pop();
 
         // Build the config

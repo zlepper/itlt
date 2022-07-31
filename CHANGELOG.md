@@ -2,6 +2,21 @@
 
 # Changelog
 
+# v2.1.3
+
+## MC 1.19-specific changes
+
+-   itlt now supports Forge 41.1.0+ and MC 1.19.1
+
+## Bug fixes
+
+-   Fixed a bug where the mod would claim to be incompatible if you looked in the datapacks
+
+## Other changes
+
+-   Minor performance improvements
+-   Removed usage of a deprecated GLFWImage method
+
 # v2.1.2
 
 ## MC 1.19-specific changes

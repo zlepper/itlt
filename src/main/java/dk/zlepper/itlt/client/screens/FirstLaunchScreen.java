@@ -15,7 +15,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraftforge.client.gui.ScrollPanel;
+import net.minecraftforge.client.gui.widget.ScrollPanel;
 import net.minecraftforge.common.ForgeHooks;
 import org.apache.commons.lang3.tuple.Pair;
 

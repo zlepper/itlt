@@ -175,7 +175,7 @@ public class ClientUtils {
     public static GLFWImage.Buffer loadIconsIntoBuffer(final List<InputStream> iconsList, final Minecraft mcInstance,
                                                        final int attempt) throws IOException {
         final MemoryStack memoryStack = MemoryStack.stackPush();
-        final GLFWImage.Buffer buffer = GLFWImage.mallocStack(iconsList.size(), memoryStack);
+        final GLFWImage.Buffer buffer = GLFWImage.malloc(iconsList.size(), memoryStack);
 
         final IntBuffer intBufferX = memoryStack.mallocInt(1);
         final IntBuffer intBufferY = memoryStack.mallocInt(1);

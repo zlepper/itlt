@@ -20,5 +20,5 @@ public class WindowTitleMixin {
     }
 
     @Shadow
-    private static Minecraft instance;
+    static Minecraft instance;
 }

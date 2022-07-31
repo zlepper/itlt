@@ -2,6 +2,17 @@
 
 # Changelog
 
+# v2.1.2
+
+## MC 1.17-specific changes
+
+-   The minimum Forge version to run itlt on MC 1.17 has been raised to 37.1.1 to make sure people are protected against the log4j security flaw (CVE-2021-44228)
+
+## Bug fixes
+
+-   Fixed a crash on launch if the game is launched near the root of a drive. ([#38](https://github.com/zlepper/itlt/issues/38))
+-   Fixed an issue causing launcher integration features not working on some Linux systems ([#37](https://github.com/zlepper/itlt/issues/37))
+
 # v2.1.0
 
 ## MC 1.17-specific changes

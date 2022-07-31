@@ -26,9 +26,9 @@ public final class Message {
         NeedsOlderJava(Type.Needs, Desire.Older, Subject.Java),
         WantsOlderJava(Type.Wants, Desire.Older, Subject.Java);
 
-        public Type msgType;
-        public Desire msgDesire;
-        public Subject msgSubject;
+        public final Type msgType;
+        public final Desire msgDesire;
+        public final Subject msgSubject;
         Content(final Type msgType, final Desire msgDesire, final Subject msgSubject) {
             this.msgType = msgType;
             this.msgDesire = msgDesire;

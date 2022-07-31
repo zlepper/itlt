@@ -2,6 +2,13 @@
 
 # Changelog
 
+# v2.1.3
+
+## Other changes
+
+-   Minor performance improvements
+-   Removed usage of a deprecated GLFWImage method
+
 # v2.1.2
 
 ## MC 1.18-specific changes

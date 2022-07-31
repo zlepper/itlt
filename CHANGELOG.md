@@ -7,7 +7,6 @@
 ## Other changes
 
 -   Minor performance improvements
--   Removed usage of a deprecated GLFWImage method
 
 # v2.1.2
 

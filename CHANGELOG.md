@@ -2,6 +2,17 @@
 
 # Changelog
 
+# v2.1.4
+
+## Bug fixes
+
+-   Hotfix: Fixed a migration error due to a silly programming mistake again in v2.1.3.
+
+## Other changes
+
+-   The amount of variables I need to change for migration to work properly has been significantly reduced, hopefully preventing the bug from happening again.
+-   All the changes from v2.1.3 (see below)
+
 # v2.1.3
 
 ## Other changes

@@ -2,6 +2,12 @@
 
 # Changelog
 
+# v2.1.5
+
+## Bug fixes
+
+-   Fixed a bug that caused itlt to wrongly get blamed for other mod's crashes in certain situations ([#34](https://github.com/zlepper/itlt/issues/34), [#39](https://github.com/zlepper/itlt/issues/39))
+
 # v2.1.4
 
 ## Bug fixes

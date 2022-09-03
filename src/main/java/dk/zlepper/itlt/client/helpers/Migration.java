@@ -72,7 +72,7 @@ public class Migration {
     // Copy over the differing values to the new latest spec's equivalents
     public static void migrate(String from, final String to, final UnmodifiableCommentedConfig oldConfig) {
         switch (from) {
-            case itlt.VERSION, "2.1.2", "2.1.1", "2.1.0" -> {
+            case itlt.VERSION, "2.1.4", "2.1.3", "2.1.2", "2.1.1", "2.1.0" -> {
                 // no changes
                 migrateSameFormat(oldConfig, Set.of());
                 ClientConfig.configVersion.set(itlt.VERSION);

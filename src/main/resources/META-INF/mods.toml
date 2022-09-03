@@ -10,7 +10,7 @@ license="MIT"
 # The modid of the mod
 modId="itlt" #mandatory
 # The version number of the mod - there's a few well known ${} variables usable here or just hardcode it
-version="2.1.4" #mandatory
+version="2.1.5" #mandatory
 # A display name for the mod
 displayName="It's The Little Things" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>

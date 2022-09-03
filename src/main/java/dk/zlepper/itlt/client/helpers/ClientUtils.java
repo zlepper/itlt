@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -79,7 +80,11 @@ public class ClientUtils {
     }
 
     public static String getCustomWindowTitle(final Minecraft mcInstance) {
-        if (!ClientConfig.enableCustomWindowTitle.get()) return mcInstance.createTitle();
+        if (ClientConfig.enableCustomWindowTitle == null)
+            return "Minecraft* " + SharedConstants.getCurrentVersion().getName();
+
+        if (!ClientConfig.enableCustomWindowTitle.get())
+            return mcInstance.createTitle();
 
         String customWindowTitle = ClientConfig.customWindowTitleText.get();
 

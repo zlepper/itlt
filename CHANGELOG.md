@@ -2,6 +2,13 @@
 
 # Changelog
 
+# v2.1.4
+
+## Other changes
+
+-   Minor performance improvements
+-   The amount of variables I need to change for migration to work properly has been significantly reduced, hopefully preventing a migration programming mistake from happening again.
+
 # v2.1.2
 
 ## MC 1.17-specific changes

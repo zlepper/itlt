@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
     id "java" // java plugin is needed for the shadow plugin to work
     id "eclipse"
     id "maven-publish"
@@ -18,7 +18,7 @@ plugins {
 apply plugin: "org.spongepowered.mixin"
 apply plugin: "org.parchmentmc.librarian.forgegradle"
 
-version = "1.17.1-2.1.2"
+version = "1.17.1-2.1.4" // remember to update mods.toml and itlt.VERSION too
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
@@ -160,5 +160,6 @@ mixin {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
     options.fork = true
 }

@@ -49,9 +49,10 @@ If you need a hand working with itlt, ping me (@Paint_Ninja) in **#squirrels** o
 Work for the latest supported Minecraft version is done on the "master" branch, however mod update checking always uses named branches to ensure reliability during a switchover to a newer MC version. When 1.18 comes out, master is merged onto 1.17 and 1.18 work goes on master. Until then, the 1.16 branch serves as a placeholder for update checking.
 
 | Branch                                                          | Minecraft version | Mod version | ForgeGradle version              | Gradle version |
-| --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------- | -------------- |
-| master (you're here)                                            | 1.17.1            | **v2**      | ForgeGradle 5.1                  | Gradle 7.2     |
-| 1.17                                                            | Placeholder       | **v2**      | None                             | None           |
+|-----------------------------------------------------------------|-------------------| ----------- |----------------------------------|----------------|
+| master                                                          | 1.19.x            | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
+| [1.18](https://github.com/zlepper/itlt/tree/1.18)               | 1.18.x            | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
+| 1.17 (you're here)                                              | 1.17.1            | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
 | [1.16](https://github.com/zlepper/itlt/tree/1.16)               | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.15](https://github.com/zlepper/itlt/tree/1.15)               | 1.15.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
 | [1.14](https://github.com/zlepper/itlt/tree/1.14)               | 1.14.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
@@ -70,7 +71,7 @@ Work for the latest supported Minecraft version is done on the "master" branch, 
 
 These are still maintained, but are worked on much less often due to being harder to setup and work with in general.
 
-I've provided `Instructions.md` and some additional files in each of these branches to help. I strongly recommend you read the instructions if you're not already familiar with the process, otherwise you're going end up spending a while troubleshooting. These Python scripts no longer work out of the box like they used to - they need a bit of manual setup and a specific environment to work in. RetroGradle aims to eventually port these MC versions to use ForgeGradle 4 but it's a long way off - possibly years from now.
+I've provided `Instructions.md` and some additional files in each of these branches to help. I strongly recommend you read the instructions if you're not already familiar with the process, otherwise you're going end up spending a while troubleshooting. These Python scripts no longer work out of the box like they used to - they need a bit of manual setup and a specific environment to work in. RetroGradle aims to eventually port these MC versions to use ForgeGradle 5 but it's a long way off - possibly years from now.
 
 | Branch                                                          | Minecraft version | Mod version | Dev toolchain                                            | Python version |
 | --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------------------------------- | -------------- |

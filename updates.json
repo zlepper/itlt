@@ -1,9 +1,12 @@
 {
     "homepage": "https://curseforge.com/minecraft/mc-mods/its-the-little-things/files/all?filter-status=1&filter-game-version=1738749986%3A73242",
     "promos": {
-        "1.17.1-recommended": "2.0.1"
+        "1.17.1-recommended": "2.1.4"
     },
     "1.17.1": {
-        "2.0.1": "https://github.com/zlepper/itlt/blob/master/CHANGELOG.md#v201"
+        "2.1.4": "https://github.com/zlepper/itlt/blob/1.17/CHANGELOG.md#v214",
+        "2.1.2": "https://github.com/zlepper/itlt/blob/1.17/CHANGELOG.md#v212",
+        "2.1.0": "https://github.com/zlepper/itlt/blob/1.17/CHANGELOG.md#v210",
+        "2.0.1": "https://github.com/zlepper/itlt/blob/1.17/CHANGELOG.md#v201"
     }
 }

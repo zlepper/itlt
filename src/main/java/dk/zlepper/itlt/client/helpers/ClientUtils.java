@@ -9,6 +9,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
+import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraftforge.fml.ModList;
 
 import java.awt.image.BufferedImage;
@@ -194,7 +195,7 @@ public class ClientUtils {
         for (final InputStream inStream : iconsList) {
             final ByteBuffer byteBuffer;
             try {
-                byteBuffer = mcInstance.getWindow().readIconPixels(inStream, intBufferX, intBufferY, intBufferChannels);
+                byteBuffer = mcInstance.getWindow().readIconPixels(() -> inStream, intBufferX, intBufferY, intBufferChannels);
                 if (byteBuffer == null) throw new IOException("byteBuffer is null");
             } catch (final IOException e) {
                 itlt.LOGGER.debug("Unable to load image #" + iconCounter + " inside iconsList, skipping...");

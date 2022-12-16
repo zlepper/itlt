@@ -45,7 +45,9 @@ public class FirstLaunchScreen extends Screen {
     }
 
     protected void init() {
-        final Button doneButton = new Button(this.width / 2 - 100, this.height - 28, 200, 20, CommonComponents.GUI_DONE, onPress -> this.onClose());
+        final Button doneButton = Button.builder(CommonComponents.GUI_DONE, onPress -> this.onClose())
+                .bounds(this.width / 2 - 100, this.height - 20, 200, 20)
+                .build();
 
         this.scrollableTextPanel = new ScrollableTextPanel(mcInstance, this.width - 40, this.height - 40 - doneButton.getHeight(), 24, 20);
 

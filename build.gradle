@@ -6,7 +6,7 @@ plugins {
     id "org.spongepowered.mixin" version "0.7-SNAPSHOT"
 }
 
-version = "1.19.x-2.1.5" // remember to update mods.toml and itlt.VERSION too
+version = "1.19.3-2.1.5-beta1" // remember to update mods.toml and itlt.VERSION too
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
@@ -15,7 +15,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty "java.version"}, JVM: ${System.getProperty "java.vm.version"} (${System.getProperty "java.vendor"}), Arch: ${System.getProperty "os.arch"}"
 minecraft {
-    mappings channel: "official", version: "1.19"
+    mappings channel: "official", version: "1.19.3"
 
     accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
 
@@ -58,7 +58,7 @@ repositories {
 
 dependencies {
     // Forge
-    minecraft "net.minecraftforge:forge:1.19-41.1.0"
+    minecraft "net.minecraftforge:forge:1.19.3-44.0.30"
 
     // Mixin
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"

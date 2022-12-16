@@ -12,23 +12,29 @@ import net.minecraft.client.Minecraft;
 
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
+import net.minecraft.client.resources.ClientPackSource;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.VanillaPackResources;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Objects;
 
 import static dk.zlepper.itlt.client.helpers.ConfigUtils.makeItltFolderIfNeeded;
 
@@ -178,10 +184,10 @@ public class ClientModEvents {
         // Enhanced window icon
         if (ClientConfig.enableEnhancedVanillaIcon.get() && !isCustomIconSet) {
             try {
-                final InputStream enhancedIcon = mcInstance.getClientPackSource().getVanillaPack()
-                        .getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("icons/minecraft.icns"));
+                final InputStream enhancedIcon = Objects.requireNonNull(mcInstance.getVanillaPackResources()
+                        .getResource(PackType.CLIENT_RESOURCES, new ResourceLocation("icons/minecraft.icns"))).get();
                 ClientUtils.setWindowIcon(enhancedIcon, mcInstance, itltDir, "icns");
-            } catch (final IOException e) {
+            } catch (final IOException | NullPointerException e) {
                 e.printStackTrace();
             }
         }

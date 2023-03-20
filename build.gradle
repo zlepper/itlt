@@ -6,7 +6,7 @@ plugins {
     id "org.spongepowered.mixin" version "0.7-SNAPSHOT"
 }
 
-version = "1.19.3-2.1.5-beta1" // remember to update mods.toml and itlt.VERSION too
+version = "1.19.3-2.1.5" // remember to update mods.toml and itlt.VERSION too
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 

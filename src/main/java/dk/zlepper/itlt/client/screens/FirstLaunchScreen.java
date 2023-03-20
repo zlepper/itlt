@@ -64,7 +64,7 @@ public class FirstLaunchScreen extends Screen {
     }
 
     public void render(final PoseStack poseStack, final int mouseX, final int mouseY, final float partialTicks) {
-        this.renderDirtBackground(0);
+        this.renderDirtBackground(poseStack);
 
         drawCenteredStringWithScale(poseStack, this.font, this.title, this.width / 2.0F, 8, 16777215, 1.5F);
 

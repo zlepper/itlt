@@ -69,7 +69,7 @@ public class ClientForgeEvents {
             }
 
             // if no welcome.txt is found, try copying the example one embedded inside the jar to config/itlt/welcome.txt
-            final var welcomeFilePath = itltDir.toPath().resolve("itlt/welcome.txt");
+            final var welcomeFilePath = itltDir.toPath().resolve("welcome.txt");
             if (!welcomeFilePath.toFile().exists()) {
                 final Path embeddedWelcomeFile = ModList.get().getModFileById("itlt").getFile().findResource("welcome.txt");
                 try {

@@ -72,18 +72,52 @@ public class Migration {
     // Copy over the differing values to the new latest spec's equivalents
     public static void migrate(String from, final String to, final UnmodifiableCommentedConfig oldConfig) {
         switch (from) {
-            case itlt.VERSION, "2.1.4", "2.1.3", "2.1.2", "2.1.1", "2.1.0" -> {
+            case itlt.VERSION -> {
                 // no changes
                 migrateSameFormat(oldConfig, Set.of());
                 ClientConfig.configVersion.set(itlt.VERSION);
+            }
+            case "2.1.5", "2.1.4", "2.1.3", "2.1.2", "2.1.1", "2.1.0" -> {
+                // v2.2.0 simplified some config options...
+
+                // [Display.WindowTitle] enableUsingAutodetectedDisplayName and autoDetectedDisplayNameFallback
+                // have been replaced with a single option [Display.General] modpackName.
+                // - If empty string, same as enableUsingAutodetectedDisplayName = true and autoDetectedDisplayNameFallback = ""
+                // - If not empty, same as enableUsingAutodetectedDisplayName = false and autoDetectedDisplayNameFallback = modpackName
+                // - Explicit (non-blank) modpackName overrides any auto-detected name.
+                String modpackName = oldConfig.get("Display.WindowTitle.autoDetectedDisplayNameFallback");
+                if (modpackName.equals("ModpackName")) modpackName = "";
+                ClientConfig.modpackName.set(modpackName);
+
+                // [Display.WelcomeScreen] enableUsingCustomWelcomeHeaderModpackDisplayName
+                // has been replaced with a simple empty string check for [Display.WelcomeScreen] customWelcomeHeaderModpackDisplayName.
+                // - If empty string, same as enableUsingCustomWelcomeHeaderModpackDisplayName = false
+                final boolean enableUsingCustomWelcomeHeaderModpackDisplayName = oldConfig.get("Display.WelcomeScreen.enableUsingCustomWelcomeHeaderModpackDisplayName");
+                String customWelcomeHeaderModpackDisplayName = oldConfig.get("Display.WelcomeScreen.customWelcomeHeaderModpackDisplayName");
+                if (enableUsingCustomWelcomeHeaderModpackDisplayName) {
+                    if (customWelcomeHeaderModpackDisplayName.equals("ModpackName")) {
+                        customWelcomeHeaderModpackDisplayName = "";
+                    }
+                } else {
+                    customWelcomeHeaderModpackDisplayName = "";
+                }
+                ClientConfig.customWelcomeHeaderModpackDisplayName.set(customWelcomeHeaderModpackDisplayName);
+
+                // [Display.WindowTitle] customWindowTitleText "%autoName" has been replaced with "%modpackName", but
+                // the old value is still valid for now for backwards compatibility.
+                String customWindowTitleText = oldConfig.get("Display.WindowTitle.customWindowTitleText");
+                customWindowTitleText = customWindowTitleText.replace("%autoName", "%modpackName");
+                ClientConfig.customWindowTitleText.set(customWindowTitleText);
             }
             case "2.0.1", "2.0.0" -> {
                 // v2.1.0 fixed a bug where all config options were inside the Java group.
                 // e.g. [Java.Display.WindowTitle] in v2.0.0 becomes [Display.WindowTitle] in v2.1.0
                 ClientConfig.enableCustomWindowTitle.set(oldConfig.get("Java.Display.WindowTitle.enableCustomWindowTitle"));
                 ClientConfig.customWindowTitleText.set(oldConfig.get("Java.Display.WindowTitle.customWindowTitleText"));
-                ClientConfig.enableUsingAutodetectedDisplayName.set(oldConfig.get("Java.Display.WindowTitle.enableUsingAutodetectedDisplayName"));
-                ClientConfig.autoDetectedDisplayNameFallback.set(oldConfig.get("Java.Display.WindowTitle.autoDetectedDisplayNameFallback"));
+
+                String modpackName = oldConfig.get("Java.Display.WindowTitle.autoDetectedDisplayNameFallback");
+                if (modpackName.equals("ModpackName")) modpackName = "";
+                ClientConfig.modpackName.set(modpackName);
 
                 // [Java.Display.Icon] -> [Display.Icon]
                 ClientConfig.enableEnhancedVanillaIcon.set(oldConfig.get("Java.Display.Icon.enableEnhancedVanillaIcon"));
@@ -125,8 +159,8 @@ public class Migration {
                 ClientConfig.enableUsingAutodetectedIcon.set(oldConfig.get("Display.useTechnicIcon"));
                 ClientConfig.enableCustomIcon.set(oldConfig.get("Display.loadCustomIcon"));
 
-                // [Display] useTechnicDisplayName -> [Display.WindowTitle] enableUsingAutodetectedDisplayName
-                ClientConfig.enableUsingAutodetectedDisplayName.set(oldConfig.get("Display.useTechnicDisplayName"));
+                // [Display] useTechnicDisplayName -> [Display.WindowTitle] enableCustomWindowTitle
+                ClientConfig.enableCustomWindowTitle.set(oldConfig.get("Display.useTechnicDisplayName"));
 
                 // [Server] AddDedicatedServer -> [ServerList] enableCustomServerListEntries
                 final boolean addDedicatedServer = oldConfig.get("Server.AddDedicatedServer");

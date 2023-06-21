@@ -78,8 +78,13 @@ public class ClientForgeEvents {
             }
 
             // show the welcome screen
+            final String welcomeHeaderModpackDisplayName;
+            final String customWelcomeHeaderModpackDisplayName = ClientConfig.customWelcomeHeaderModpackDisplayName.get();
+            if (customWelcomeHeaderModpackDisplayName.isEmpty()) welcomeHeaderModpackDisplayName = ClientUtils.getAutoDetectedDisplayName();
+            else welcomeHeaderModpackDisplayName = customWelcomeHeaderModpackDisplayName;
+
             event.setScreen(new FirstLaunchScreen(
-                    new TitleScreen(), new TranslatableComponent("itlt.welcomeScreen.title", ClientConfig.enableUsingCustomWelcomeHeaderModpackDisplayName.get() ? ClientConfig.customWelcomeHeaderModpackDisplayName.get() : ClientUtils.getAutoDetectedDisplayName()))
+                    new TitleScreen(), new TranslatableComponent("itlt.welcomeScreen.title", welcomeHeaderModpackDisplayName))
             );
         }
     }

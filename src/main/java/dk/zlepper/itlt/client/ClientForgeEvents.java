@@ -31,7 +31,7 @@ public class ClientForgeEvents {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onGuiOpen(final GuiOpenEvent event) {
         final Screen screen = event.getGui();
-        if (screen == null) return;
+        if (screen == null || ClientConfig.enableExplicitGC == null) return;
 
         if (ClientConfig.enableExplicitGC.get()) {
             itlt.LOGGER.debug("Screen: " + screen);

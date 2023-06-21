@@ -47,6 +47,11 @@ public class ClientModEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST) // run this as soon as possible to avoid wasting time if a requirement isn't met
     public static void commonInit(final FMLCommonSetupEvent event) {
+        // this should never be null, but could be if a different mod crashes before itlt has finished loading its config
+        // returning early here prevents itlt being blamed for a different mod's crash
+        if (ClientConfig.enableCustomIcon == null)
+            return;
+
         itltDir = makeItltFolderIfNeeded();
 
         final int javaVerInt = ClientUtils.getJavaVersion();
@@ -113,6 +118,9 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void clientInit(final FMLClientSetupEvent event) {
         final Minecraft mcInstance = Minecraft.getInstance();
+
+        if (ClientConfig.enable64bitRequirement == null)
+            return;
 
         // Java arch requirement and warning
         final boolean isJava64bit = mcInstance.is64Bit();

@@ -2,6 +2,19 @@
 
 # Changelog
 
+# v2.2.0
+
+## New features
+
+### Simplified config
+
+Some config options have been removed or changed to simplify the config and make things easier. **Existing config files will be automatically migrated to the new format on launch, so you don't need to worry about losing your settings.**
+
+- A new option has been added called `modpackName` in the `[Display.General]` section
+    - If left blank, itlt will attempt to automatically detect the name of the modpack you're using from supported launchers
+    - Otherwise the name you set will be used
+- `%autoName` has been renamed to `%modpackName`, but the old placeholder variable will still work for now
+
 # v2.1.5
 
 ## Bug fixes

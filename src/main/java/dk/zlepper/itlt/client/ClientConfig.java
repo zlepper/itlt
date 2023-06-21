@@ -50,22 +50,20 @@ public final class ClientConfig {
             enableMaxJavaVerWarning,
             ignoreMaxJavaVerWarningWhenVerForced,
             enableCustomWindowTitle,
-            enableUsingAutodetectedDisplayName,
             enableEnhancedVanillaIcon,
             enableCustomIcon,
             enableUsingAutodetectedIcon,
             enableCustomServerListEntries,
             enableExplicitGC,
-            enableWelcomeScreen,
-            enableUsingCustomWelcomeHeaderModpackDisplayName;
+            enableWelcomeScreen;
 
     public static ForgeConfigSpec.ConfigValue<String>
+            modpackName,
             customWindowTitleText,
             custom64bitJavaGuideURL,
             customJavaUpgradeGuideURL,
             customJavaDowngradeGuideURL,
             customMemoryAllocGuideURL,
-            autoDetectedDisplayNameFallback,
             customWelcomeHeaderModpackDisplayName,
             configVersion;
 
@@ -564,6 +562,16 @@ public final class ClientConfig {
         // Display section
         clientConfigBuilder.push("Display"); {//.comment("Here you can change the aesthetics of your modpack.");
 
+            // Display.General
+            clientConfigBuilder.push("General"); {
+                modpackName = clientConfigBuilder
+                        .comment(" ",
+                                " The name of your modpack.",
+                                " If blank, the modpack name will be auto-detected from supported launchers.",
+                                " This auto-detection isn't perfect, so you can override it here if needed.")
+                        .define("modpackName", "");
+            } clientConfigBuilder.pop();
+
             // Display.WindowTitle
             clientConfigBuilder.push("WindowTitle"); {
                 enableCustomWindowTitle = clientConfigBuilder
@@ -583,33 +591,17 @@ public final class ClientConfig {
                                 " it's based on - especially useful if your modpack has multiple major releases that",
                                 " span across different Minecraft versions.",
                                 " ",
-                                " Note: Put \"%autoName\" for your modpack's display name to be automatically detected",
-                                " and used when launching from a supported launcher.",
+                                " Note: Put \"%modpackName\" to fill in your modpack's display name from [Display.General] modpackName.",
                                 " ",
                                 " Examples:",
                                 " - \"ModpackName - %mc\" = \"ModpackName - Minecraft* 1.17.1\"",
                                 " - \"%mc - ModpackName\" = \"Minecraft* 1.17.1 - ModpackName\"",
                                 " - \"ModpackName (%mc)\" = \"ModpackName (Minecraft* 1.17.1)\"",
-                                " - \"%autoName (%mc)\" = \"ModpackName (Minecraft* 1.17.1)\"",
+                                " - \"%modpackName (%mc)\" = \"ModpackName (Minecraft* 1.17.1)\"",
                                 " - \"ModpackName v2 based on %mc\" = \"ModpackName v2 based on Minecraft* 1.17.1\"",
                                 " ",
                                 " Note: enableCustomWindowTitle must be enabled for this to take effect.")
-                        .define("customWindowTitleText", "%autoName - %mc");
-                enableUsingAutodetectedDisplayName = clientConfigBuilder
-                        .comment(" ",
-                                " Whether or not to automatically replace \"%autoName\" in customWindowTitleText with",
-                                " your modpack's display name when launching from a supported launcher.",
-                                " ",
-                                " Note: enableCustomWindowTitle must be enabled for this to take effect.")
-                        .define("enableUsingAutodetectedDisplayName", true);
-                autoDetectedDisplayNameFallback = clientConfigBuilder
-                        .comment(" ",
-                                " The text to use in place of %autoDetect if we're unable to automatically detect your",
-                                " modpack's display name.",
-                                " ",
-                                " Note: This value will always be used for %autoName if enableUsingAutodetectedDisplayName",
-                                " is disabled, regardless of whether or not the pack is launched from a supported launcher.")
-                        .define("autoDetectedDisplayNameFallback", "ModpackName");
+                        .define("customWindowTitleText", "%modpackName - %mc");
             } clientConfigBuilder.pop();
 
             // Display.Icon
@@ -658,21 +650,13 @@ public final class ClientConfig {
                                 " you can update without needing to make any changes to your welcome.txt.")
                         .define("enableWelcomeScreen", false);
 
-                enableUsingCustomWelcomeHeaderModpackDisplayName = clientConfigBuilder
-                        .comment(" ",
-                                " Enable this if you want to change the modpack name that shows up on the heading of the",
-                                " welcome screen.",
-                                " ",
-                                " Note: If you leave this disabled, itlt will use the contents of %autoName (auto-detected",
-                                " modpack name - see the enableUsingAutodetectedDisplayName and autoDetectedDisplayNameFallback",
-                                " options for details).")
-                        .define("enableUsingCustomWelcomeHeaderModpackDisplayName", false);
-
                 customWelcomeHeaderModpackDisplayName = clientConfigBuilder
                         .comment(" ",
-                                " If enableUsingCustomWelcomeHeaderModpackDisplayName is true, the welcome screen header will show \"Welcome to x\"",
-                                " where x is what you put here.")
-                        .define("customWelcomeHeaderModpackDisplayName", "ModpackName");
+                                " The welcome screen header shows \"Welcome to x\". This setting lets you change x.",
+                                " ",
+                                " - If blank (default), itlt will use your modpack's name from [Display.General] modpackName.",
+                                " - Otherwise x will be whatever you put here.")
+                        .define("customWelcomeHeaderModpackDisplayName", "");
             } clientConfigBuilder.pop();
 
         } clientConfigBuilder.pop(); // end of Display section

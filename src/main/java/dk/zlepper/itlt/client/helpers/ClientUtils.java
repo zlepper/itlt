@@ -37,17 +37,18 @@ import static dk.zlepper.itlt.client.ClientModEvents.detectedLauncher;
 public class ClientUtils {
 
     public static String getAutoDetectedDisplayName() {
-        String autoDetectedDisplayName = ClientConfig.autoDetectedDisplayNameFallback.get();
-        if (ClientConfig.enableUsingAutodetectedDisplayName.get()) {
+        String modpackName = ClientConfig.modpackName.get();
+        if (modpackName.isEmpty()) {
             try {
                 final String tmp = detectedLauncher.getModpackDisplayName();
-                if (tmp != null) autoDetectedDisplayName = tmp;
+                if (tmp != null) modpackName = tmp;
             } catch (final IOException e) {
-                itlt.LOGGER.warn("Unable to auto-detect modpack display name, falling back to autoDetectedDisplayNameFallback in the config.");
+                itlt.LOGGER.warn("Unable to auto-detect modpack display name, please set one in the itlt-client.toml config file.");
                 e.printStackTrace();
             }
         }
-        return autoDetectedDisplayName;
+
+        return modpackName;
     }
 
     public static byte getJavaVersion() {
@@ -90,11 +91,12 @@ public class ClientUtils {
 
         String autoDetectedDisplayName = getAutoDetectedDisplayName();
         customWindowTitle = customWindowTitle.replaceFirst("%autoName", autoDetectedDisplayName);
+        customWindowTitle = customWindowTitle.replaceFirst("%modpackName", autoDetectedDisplayName);
 
         // replace %mc with the Vanilla window title from getWindowTitle() (createTitle == getWindowTitle)
         customWindowTitle = customWindowTitle.replaceFirst("%mc", mcInstance.createTitle());
 
-        if (customWindowTitle.isEmpty()) return mcInstance.createTitle();
+        if (customWindowTitle.isEmpty() || autoDetectedDisplayName.isEmpty()) return mcInstance.createTitle();
         else return customWindowTitle;
     }
 

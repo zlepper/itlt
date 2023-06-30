@@ -7,6 +7,7 @@ import dk.zlepper.itlt.client.ClientConfig;
 import static dk.zlepper.itlt.client.ClientModEvents.itltDir;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -63,20 +64,21 @@ public class FirstLaunchScreen extends Screen {
         this.addRenderableWidget(this.scrollableTextPanel);
     }
 
-    public void render(final PoseStack poseStack, final int mouseX, final int mouseY, final float partialTicks) {
-        this.renderDirtBackground(poseStack);
+    public void render(GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
+        this.renderDirtBackground(guiGraphics);
 
-        drawCenteredStringWithScale(poseStack, this.font, this.title, this.width / 2.0F, 8, 16777215, 1.5F);
+        drawCenteredStringWithScale(guiGraphics, this.font, this.title, this.width / 2.0F, 8, 16777215, 1.5F);
 
-        this.scrollableTextPanel.render(poseStack, mouseX, mouseY, partialTicks);
+        this.scrollableTextPanel.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        super.render(poseStack, mouseX, mouseY, partialTicks);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
-    private static void drawCenteredStringWithScale(final PoseStack poseStack, final Font font, final Component string, final float x, final float y, final int color, final float scale) {
+    private static void drawCenteredStringWithScale(GuiGraphics guiGraphics, final Font font, final Component string, final float x, final float y, final int color, final float scale) {
+        PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         poseStack.scale(scale, scale, 1.0F);
-        font.drawShadow(poseStack, string, ((x / scale) - font.width(string) / 2.0F), y / scale, color);
+        guiGraphics.drawCenteredString(font, string, (int) ((x / scale) - font.width(string) / 2.0F), (int) (y / scale), color);
         poseStack.popPose();
     }
 
@@ -98,18 +100,19 @@ public class FirstLaunchScreen extends Screen {
         }
 
         @Override
-        protected void drawPanel(PoseStack poseStack, int entryRight, int relativeY, Tesselator tesselator, int mouseX, int mouseY) {
+        protected void drawPanel(GuiGraphics guiGraphics, int entryRight, int relativeY, Tesselator tesselator, int mouseX, int mouseY) {
             for (final Pair<Boolean, FormattedCharSequence> line : lines) {
                 if (line != null) {
                     RenderSystem.enableBlend();
                     if (line.getLeft()) {
+                        PoseStack poseStack = guiGraphics.pose();
                         poseStack.pushPose();
                         poseStack.scale(1.5F, 1.5F, 1.0F);
                         poseStack.translate(0.0F, 1.5F, 0.0F);
-                        FirstLaunchScreen.this.font.drawShadow(poseStack, line.getRight(), (left + padding) / 1.5F, relativeY / 1.5F, 0xFFFFFF);
+                        guiGraphics.drawString(FirstLaunchScreen.this.font, line.getRight(), (left + padding) / 1.5F, relativeY / 1.5F, 0xFFFFFF, true);
                         poseStack.popPose();
                     } else {
-                        FirstLaunchScreen.this.font.drawShadow(poseStack, line.getRight(), left + padding, relativeY, 0xFFFFFF);
+                        guiGraphics.drawString(FirstLaunchScreen.this.font, line.getRight(), left + padding, relativeY, 0xFFFFFF, true);
                     }
                     RenderSystem.disableBlend();
                 }

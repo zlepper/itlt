@@ -1,6 +1,7 @@
 package dk.zlepper.itlt.client;
 
 import com.google.gson.Gson;
+import dk.zlepper.itlt.MinecraftExtension;
 import dk.zlepper.itlt.client.helpers.Platform;
 import dk.zlepper.itlt.client.launchers.LauncherUtils;
 import dk.zlepper.itlt.client.launchers.DetectedLauncher;
@@ -170,7 +171,7 @@ public class ClientModEvents {
 
             if (customIcon != null) {
                 try {
-                    ClientUtils.setWindowIcon(customIcon, mcInstance);
+                    ((MinecraftExtension)mcInstance).updateIcon(customIcon); //call setIcon from inside the minecraft class
                     isCustomIconSet = true;
                 } catch (final IOException e) {
                     itlt.LOGGER.error("Unable to set the window icon.");

@@ -237,7 +237,9 @@ public class ClientUtils {
         }
     }
 
-    //TODO replace with new vanilla logic
+    //TODO replace with new vanilla 1.20 logic
+    // Currently this is 1.19.4 logic
+    // In 1.20 MC changed so there is no separate load method anymore
     private static ByteBuffer readIconPixels(InputStream pTextureStream, IntBuffer pX, IntBuffer pY, IntBuffer pChannelInFile) throws IOException {
         RenderSystem.assertInInitPhase();
         ByteBuffer bytebuffer = null;

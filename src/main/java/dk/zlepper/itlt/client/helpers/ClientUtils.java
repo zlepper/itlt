@@ -2,6 +2,8 @@ package dk.zlepper.itlt.client.helpers;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import dk.zlepper.itlt.client.ClientConfig;
 import dk.zlepper.itlt.client.ClientModEvents;
 import dk.zlepper.itlt.itlt;
@@ -29,8 +31,11 @@ import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.formats.icns.IcnsImageParser;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
+import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
 import static dk.zlepper.itlt.client.ClientModEvents.detectedLauncher;
@@ -197,7 +202,7 @@ public class ClientUtils {
         for (final InputStream inStream : iconsList) {
             final ByteBuffer byteBuffer;
             try {
-                byteBuffer = mcInstance.getWindow().readIconPixels(() -> inStream, intBufferX, intBufferY, intBufferChannels);
+                byteBuffer = readIconPixels(inStream, intBufferX, intBufferY, intBufferChannels);
                 if (byteBuffer == null) throw new IOException("byteBuffer is null");
             } catch (final IOException e) {
                 itlt.LOGGER.debug("Unable to load image #" + iconCounter + " inside iconsList, skipping...");
@@ -230,6 +235,28 @@ public class ClientUtils {
             buffer.position(0);
             return buffer;
         }
+    }
+
+    //TODO replace with new vanilla 1.20 logic
+    // Currently this is 1.19.4 logic
+    // In 1.20 MC changed so there is no separate load method anymore
+    private static ByteBuffer readIconPixels(InputStream pTextureStream, IntBuffer pX, IntBuffer pY, IntBuffer pChannelInFile) throws IOException {
+        RenderSystem.assertInInitPhase();
+        ByteBuffer bytebuffer = null;
+
+        ByteBuffer bytebuffer1;
+        try {
+            bytebuffer = TextureUtil.readResource(pTextureStream);
+            bytebuffer.rewind();
+            bytebuffer1 = STBImage.stbi_load_from_memory(bytebuffer, pX, pY, pChannelInFile, 0);
+        } finally {
+            if (bytebuffer != null) {
+                MemoryUtil.memFree(bytebuffer);
+            }
+
+        }
+
+        return bytebuffer1;
     }
 
     public static ByteArrayInputStream convertToInputStream(final BufferedImage bufferedImage) throws IOException {

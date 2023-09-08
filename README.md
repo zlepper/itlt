@@ -48,24 +48,27 @@ If you need a hand working with itlt, ping me (@Paint_Ninja) in **#squirrels** o
 
 Work for the latest supported Minecraft version is done on the "master" branch, however mod update checking always uses named branches to ensure reliability during a switchover to a newer MC version. When 1.18 comes out, master is merged onto 1.17 and 1.18 work goes on master. Until then, the 1.16 branch serves as a placeholder for update checking.
 
-| Branch                                                          | Minecraft version | Mod version | ForgeGradle version              | Gradle version |
-| --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------- | -------------- |
-| master (you're here)                                            | 1.19              | **v2**      | ForgeGradle 5.1                  | Gradle 7.3.1   |
-| [1.18](https://github.com/zlepper/itlt/tree/1.18)               | 1.18.x            | **v2**      | ForgeGradle 5.1                  | Gradle 7.3.1   |
-| [1.17](https://github.com/zlepper/itlt/tree/1.17)               | 1.17.1            | **v2**      | ForgeGradle 5.1                  | Gradle 7.2     |
-| [1.16](https://github.com/zlepper/itlt/tree/1.16)               | 1.16.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| [1.15](https://github.com/zlepper/itlt/tree/1.15)               | 1.15.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| [1.14](https://github.com/zlepper/itlt/tree/1.14)               | 1.14.x            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| [1.13](https://github.com/zlepper/itlt/tree/1.13)               | 1.13.2            | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
-| [1.12](https://github.com/zlepper/itlt/tree/1.12)               | 1.12.2            | v1          | ForgeGradle 4.1                  | Gradle 6.9     |
-| [1.11](https://github.com/zlepper/itlt/tree/1.11)               | 1.11.x            | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
-| [1.10](https://github.com/zlepper/itlt/tree/1.10)               | 1.10.x            | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
-| [1.9](https://github.com/zlepper/itlt/tree/1.9)                 | 1.9.x             | v1          | ForgeGradle 2.1.1                | Gradle 4.10.3  |
-| [1.8.8/1.8.9](https://github.com/zlepper/itlt/tree/1.8.8/1.8.9) | 1.8.8 and 1.8.9   | v1          | ForgeGradle 2.1.1                | Gradle 4.10.3  |
-| [1.8](https://github.com/zlepper/itlt/tree/1.8)                 | 1.8.0             | v1          | ForgeGradle 2.0-SNAPSHOT-aa67375 | Gradle 4.7     |
-| [1.7](https://github.com/zlepper/itlt/tree/1.7)                 | 1.7.x             | v1          | ForgeGradle 1.2.1                | Gradle 4.4.1   |
-| [1.6](https://github.com/zlepper/itlt/tree/1.6)                 | 1.6.x             | v1          | ForgeGradle 1.0                  | Gradle 3.0     |
-| [1.4.6/1.4.7](https://github.com/zlepper/itlt/tree/1.4.6/1.4.7) | 1.4.6 and 1.4.7   | v1          | ForgeGradle 4.1.legacy-SNAPSHOT  | Gradle 6.9     |
+| Branch                                                                        | Minecraft version       | Mod version | ForgeGradle version              | Gradle version |
+|-------------------------------------------------------------------------------|-------------------------|-------------|----------------------------------|----------------|
+| master (you're here)                                                          | 1.20.x                  | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
+| [1.19.4](https://github.com/zlepper/itlt/tree/1.19.4)                         | 1.19.4                  | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
+| [1.19.3](https://github.com/zlepper/itlt/tree/1.19.3)                         | 1.19.3                  | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
+| [1.19/1.19.1/1.19.2](https://github.com/zlepper/itlt/tree/1.19/1.19.1/1.19.2) | 1.19, 1.19.1 and 1.19.2 | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
+| [1.18](https://github.com/zlepper/itlt/tree/1.18)                             | 1.18.x                  | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
+| [1.17](https://github.com/zlepper/itlt/tree/1.17)                             | 1.17.1                  | **v2**      | ForgeGradle 5.1                  | Gradle 7.5.1   |
+| [1.16](https://github.com/zlepper/itlt/tree/1.16)                             | 1.16.x                  | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| [1.15](https://github.com/zlepper/itlt/tree/1.15)                             | 1.15.x                  | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| [1.14](https://github.com/zlepper/itlt/tree/1.14)                             | 1.14.x                  | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| [1.13](https://github.com/zlepper/itlt/tree/1.13)                             | 1.13.2                  | **v2**      | ForgeGradle 4.1                  | Gradle 6.9     |
+| [1.12](https://github.com/zlepper/itlt/tree/1.12)                             | 1.12.2                  | v1          | ForgeGradle 4.1                  | Gradle 6.9     |
+| [1.11](https://github.com/zlepper/itlt/tree/1.11)                             | 1.11.x                  | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
+| [1.10](https://github.com/zlepper/itlt/tree/1.10)                             | 1.10.x                  | v1          | ForgeGradle 2.2.1                | Gradle 4.10.3  |
+| [1.9](https://github.com/zlepper/itlt/tree/1.9)                               | 1.9.x                   | v1          | ForgeGradle 2.1.1                | Gradle 4.10.3  |
+| [1.8.8/1.8.9](https://github.com/zlepper/itlt/tree/1.8.8/1.8.9)               | 1.8.8 and 1.8.9         | v1          | ForgeGradle 2.1.1                | Gradle 4.10.3  |
+| [1.8](https://github.com/zlepper/itlt/tree/1.8)                               | 1.8.0                   | v1          | ForgeGradle 2.0-SNAPSHOT-aa67375 | Gradle 4.7     |
+| [1.7](https://github.com/zlepper/itlt/tree/1.7)                               | 1.7.x                   | v1          | ForgeGradle 1.2.1                | Gradle 4.4.1   |
+| [1.6](https://github.com/zlepper/itlt/tree/1.6)                               | 1.6.x                   | v1          | ForgeGradle 1.0                  | Gradle 3.0     |
+| [1.4.6/1.4.7](https://github.com/zlepper/itlt/tree/1.4.6/1.4.7)               | 1.4.6 and 1.4.7         | v1          | ForgeGradle 4.1.legacy-SNAPSHOT  | Gradle 6.9     |
 
 #### Legacy
 
@@ -74,7 +77,7 @@ These are still maintained, but are worked on much less often due to being harde
 I've provided `Instructions.md` and some additional files in each of these branches to help. I strongly recommend you read the instructions if you're not already familiar with the process, otherwise you're going end up spending a while troubleshooting. These Python scripts no longer work out of the box like they used to - they need a bit of manual setup and a specific environment to work in. RetroGradle aims to eventually port these MC versions to use ForgeGradle 4 but it's a long way off - possibly years from now.
 
 | Branch                                                          | Minecraft version | Mod version | Dev toolchain                                            | Python version |
-| --------------------------------------------------------------- | ----------------- | ----------- | -------------------------------------------------------- | -------------- |
+|-----------------------------------------------------------------|-------------------|-------------|----------------------------------------------------------|----------------|
 | [1.5](https://github.com/zlepper/itlt/tree/1.5)                 | 1.5.x             | v1          | Forge Src 7.8.1.738(?) + MCP 7.51 scripts + Manual steps | Python 2.7.3   |
 | [1.4.4/1.4.5](https://github.com/zlepper/itlt/tree/1.4.4/1.4.5) | 1.4.4 and 1.4.5   | v1          | Forge Src 6.4.2.448(?) + MCP 7.23 scripts + Manual steps | Python 2.7.3   |
 | [1.3.2](https://github.com/zlepper/itlt/tree/1.3.2)             | 1.3.2             | v1          | Forge Src 4.3.5.318(?) + MCP 7.2 scripts + Manual steps  | Python 2.7.2   |

@@ -2,6 +2,16 @@
 
 # Changelog
 
+# v2.2.1
+
+## MC 1.20-specific changes
+
+-   Thanks to Ferri_Arnus for the initial port to 1.20 and 1.20.1
+
+## Bug fixes
+
+-   New approach to changing the window icon which should improve macOS compatibility
+
 # v2.2.0
 
 ## New features

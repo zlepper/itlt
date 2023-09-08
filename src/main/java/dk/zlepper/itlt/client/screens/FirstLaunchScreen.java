@@ -47,14 +47,14 @@ public class FirstLaunchScreen extends Screen {
 
     protected void init() {
         final Button doneButton = Button.builder(CommonComponents.GUI_DONE, onPress -> this.onClose())
-                .bounds(this.width / 2 - 100, this.height - 20, 200, 20)
+                .bounds(this.width / 2 - 100, this.height - 30, 200, 20)
                 .build();
 
         this.scrollableTextPanel = new ScrollableTextPanel(mcInstance, this.width - 40, this.height - 40 - doneButton.getHeight(), 24, 20);
 
         // Note: this has the Files.lines() inside the try() part as it is a try-with-resources
         try (final Stream<String> lines = Files.lines(itltDir.toPath().resolve("welcome.txt"))) {
-            this.scrollableTextPanel.setText(lines.collect(Collectors.toList()));
+            this.scrollableTextPanel.setText(lines.toList());
         } catch (final IOException e) {
             this.scrollableTextPanel.setText(List.of("Error: Failed to load welcome.txt, see the console log for details."));
             e.printStackTrace();
@@ -67,18 +67,18 @@ public class FirstLaunchScreen extends Screen {
     public void render(GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
         this.renderDirtBackground(guiGraphics);
 
-        drawCenteredStringWithScale(guiGraphics, this.font, this.title, this.width / 2.0F, 8, 16777215, 1.5F);
+        drawCenteredStringWithScale(guiGraphics, this.font, this.title, this.width / 2, 8, 16777215, 1.5F);
 
         this.scrollableTextPanel.render(guiGraphics, mouseX, mouseY, partialTicks);
 
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
-    private static void drawCenteredStringWithScale(GuiGraphics guiGraphics, final Font font, final Component string, final float x, final float y, final int color, final float scale) {
+    private static void drawCenteredStringWithScale(GuiGraphics guiGraphics, final Font font, final Component string, final int x, final int y, final int color, final float scale) {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         poseStack.scale(scale, scale, 1.0F);
-        guiGraphics.drawCenteredString(font, string, (int) ((x / scale) - font.width(string) / 2.0F), (int) (y / scale), color);
+        guiGraphics.drawString(font, string, (int) ((x / scale) - font.width(string) / 2.0F), (int) (y / scale), color);
         poseStack.popPose();
     }
 
@@ -142,7 +142,7 @@ public class FirstLaunchScreen extends Screen {
                 }
 
                 // allow blank lines to be rendered
-                if (line.length() == 0) line += " ";
+                if (line.isEmpty()) line += " ";
 
                 // apply formatting codes where appropriate
                 line = line.replaceAll("(?i)&([a-f]|[0-9]|l|m|n|o|r)", "\u00a7$1");

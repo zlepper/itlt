@@ -218,7 +218,7 @@ public class ClientModEvents {
                     final var serverList = new ServerList(mcInstance);
 
                     for (final ClientUtils.CustomServerData customServerEntry : featuredList) {
-                        final ServerData serverToAdd = new ServerData(customServerEntry.name, customServerEntry.address, false);
+                        final ServerData serverToAdd = new ServerData(customServerEntry.name, customServerEntry.address, ServerData.Type.OTHER);
                         if (customServerEntry.forceResourcePack)
                             serverToAdd.setResourcePackStatus(ServerData.ServerPackStatus.ENABLED);
 

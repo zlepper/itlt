@@ -2,8 +2,7 @@ package dk.zlepper.itlt.client.launchers;
 
 import dk.zlepper.itlt.itlt;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.targets.FMLClientUserdevLaunchHandler;
-import net.minecraftforge.fml.loading.targets.FMLServerUserdevLaunchHandler;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,13 +78,6 @@ public class LauncherUtils {
     }
 
     public static boolean isForgeDevEnv() {
-        try {
-            Class.forName("net.minecraftforge.fml.loading.targets.FMLClientUserdevLaunchHandler");
-            if (new FMLClientUserdevLaunchHandler().name().equals("fmlclientuserdev")) return true;
-            if (new FMLServerUserdevLaunchHandler().name().equals("fmlserveruserdev")) return true;
-        } catch (final ClassNotFoundException | NoClassDefFoundError e) {
-            return false;
-        }
-        return false;
+        return !FMLEnvironment.production;
     }
 }

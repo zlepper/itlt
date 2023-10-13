@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 public final class itlt {
     public static final String
             MOD_ID = "itlt",
-            VERSION = "2.2.1";
+            VERSION = "2.2.2";
     public static final Logger LOGGER = LogManager.getLogger();
     public static ModLoadingContext modLoadingContext;
 

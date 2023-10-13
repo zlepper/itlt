@@ -2,6 +2,12 @@
 
 # Changelog
 
+# v2.2.1
+
+## Bug fixes
+
+-   Fixed a compatibility issue with other mods that also use the image4j library. ([#45](https://github.com/zlepper/itlt/issues/45))
+
 # v2.2.0
 
 ## New features

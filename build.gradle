@@ -107,6 +107,9 @@ shadowJar {
     // Apache Commons Imaging needs to be put somewhere else to prevent a NoClassDefFoundError
     relocate "org.apache.commons.imaging", "${project.group}.shadow.org.apache.commons.imaging"
 
+    // image4j needs to be put somewhere else to prevent a ResolutionException with other mods - See Issue #45
+    relocate "net.sf.image4j", "${project.group}.shadow.net.sf.image4j"
+
     manifest.from(MANIFEST)
 }
 

@@ -6,7 +6,7 @@ plugins {
     id "org.spongepowered.mixin" version "0.7-SNAPSHOT"
 }
 
-version = "1.20.01-2.2.1" // remember to update mods.toml and itlt.VERSION too
+version = "1.20.01-2.2.2" // remember to update mods.toml and itlt.VERSION too
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 
@@ -105,6 +105,9 @@ shadowJar {
 
     // Apache Commons Imaging needs to be put somewhere else to prevent a NoClassDefFoundError
     relocate "org.apache.commons.imaging", "${project.group}.shadow.org.apache.commons.imaging"
+
+    // image4j needs to be put somewhere else to prevent a ResolutionException with other mods - See Issue #45
+    relocate "net.sf.image4j", "${project.group}.shadow.net.sf.image4j"
 
     manifest.from(MANIFEST)
 }

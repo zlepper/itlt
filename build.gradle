@@ -18,7 +18,7 @@ plugins {
 apply plugin: "org.spongepowered.mixin"
 //apply plugin: "org.parchmentmc.librarian.forgegradle"
 
-version = "1.18.x-2.2.0" // remember to update mods.toml and itlt.VERSION too
+version = "1.18.x-2.2.1" // remember to update mods.toml and itlt.VERSION too
 group = "dk.zlepper.itlt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "itlt"
 

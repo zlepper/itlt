@@ -1,0 +1,49 @@
+plugins {
+    id 'multiloader-loader'
+    id 'fabric-loom'
+}
+
+repositories {
+    repositories {
+        maven {
+            name = "Fuzs Mod Resources"
+            url = uri("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment "org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip"
+    }
+
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:21.1.0"
+}
+
+loom {
+    def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
+
+    runs {
+        client {
+            client()
+            configName = "Fabric Client"
+            ideConfigGenerated = true
+            runDir = "runs/client"
+        }
+        server {
+            server()
+            configName = "Fabric Server"
+            ideConfigGenerated = true
+            runDir = "runs/server"
+        }
+    }
+}

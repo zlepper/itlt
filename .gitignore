@@ -11,10 +11,8 @@ out
 *.ipr
 *.iws
 *.iml
-.idea
-
-# vscode
-.vscode/launch.json
+.idea/*
+!.idea/scopes
 
 # gradle
 build
@@ -23,7 +21,4 @@ build
 # other
 eclipse
 run
-
-# Files from Forge MDK
-forge*changelog.txt
-run/
+runs

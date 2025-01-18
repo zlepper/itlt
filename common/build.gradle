@@ -16,6 +16,10 @@ neoForge {
     }
 }
 
+dependencies {
+    compileOnly "org.spongepowered:mixin:0.8.5"
+}
+
 configurations {
     commonJava {
         canBeResolved = false

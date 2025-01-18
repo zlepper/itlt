@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import ga.ozli.minecraftmods.itlt.platform.Services;
 import ga.ozli.minecraftmods.itlt.shared.Constants;
+import ga.ozli.minecraftmods.itlt.shared.mixins.WindowTitleMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
@@ -55,8 +56,9 @@ public final class ClientUtils {
         }
     }
 
+    /** @see WindowTitleMixin */
     public static void setCustomWindowTitle() {
-        // todo: mixin Minecraft.updateTitle() to redirect to this method
+        if (!ClientConfig.ready) return;
         MC.getWindow().setTitle(ClientConfig.Display.WINDOW_TITLE.replaceFirst("%mc", MC.createTitle()));
     }
 

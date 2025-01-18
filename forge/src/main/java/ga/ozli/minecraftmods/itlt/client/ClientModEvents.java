@@ -15,6 +15,7 @@ public final class ClientModEvents {
 
     public static void onClientSetup(FMLClientSetupEvent event) {
         ClientConfig.load();
+        ClientConfig.ready = true;
 
         // using enqueueWork to make sure this runs on the render thread
         event.enqueueWork(() -> {

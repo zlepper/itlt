@@ -1,0 +1,11 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "ga.ozli.minecraftmods.itlt.shared.mixins",
+    "refmap": "itlt.refmap.json",
+    "compatibilityLevel": "JAVA_17",
+    "client": ["WindowTitleMixin"],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

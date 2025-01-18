@@ -19,6 +19,8 @@ public final class ClientConfig {
 
     public static final ForgeConfigSpec SPEC;
 
+    public static volatile boolean ready = false;
+
     static {
         BUILDER.push("Graphics"); {
             WRONG_GPU = BUILDER

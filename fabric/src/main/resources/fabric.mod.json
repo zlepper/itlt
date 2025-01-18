@@ -19,6 +19,10 @@
             "ga.ozli.minecraftmods.itlt.Itlt"
         ]
     },
+    "mixins": [
+        "itlt.mixins.json"
+    ],
+    "accessWidener": "itlt.accesswidener",
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": ">=${fabric_version}",

@@ -15,6 +15,8 @@ public final class ClientModEvents {
     public static void onClientSetup(Minecraft client) {
         RenderSystem.assertOnRenderThread();
 
+        ClientConfig.ready = true;
+
         if (ClientConfig.Graphics.WRONG_GPU && ClientUtils.runningOnWrongGPU()) {
             Services.PLATFORM.addWarning("Running on wrong GPU");
         }
